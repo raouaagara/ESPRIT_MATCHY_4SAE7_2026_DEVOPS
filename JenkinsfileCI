@@ -72,7 +72,7 @@ pipeline {
         }
 
         failure {
-            echo "FAILED PIPELINE ❌"
+            echo "FAILED PIPELINE "
         }
     }
 }
