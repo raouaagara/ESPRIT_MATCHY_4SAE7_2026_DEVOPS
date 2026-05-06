@@ -2,27 +2,34 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'   // adapte si ton Jenkins appelle "Maven"
-        jdk 'JDK17'     // adapte selon ton installation
+        maven 'Maven'
+        jdk 'JDK17'
     }
 
     environment {
         SONARQUBE = 'sonarqube-server'
-        NEXUS_REPO = 'http://localhost:8082/repository/maven-releases/'
+        NEXUS_DOCKER_URL = '192.168.183.128:8083'
+        NEXUS_CREDS = 'nexus'
+        IMAGE_NAME = 'content-service'
+        IMAGE_TAG = "1.0.${BUILD_NUMBER}"
     }
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'subscription-service',
-                url: 'https://github.com/raouaagara/ESPRIT_MATCHY_4SAE7_2026_DEVOPS.git'
+                checkout scm
             }
         }
 
-        stage('Build & Test') {
+        stage('Build + Test') {
             steps {
-                sh 'mvn clean test'
+                sh 'mvn clean verify'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
             }
         }
 
@@ -34,33 +41,26 @@ pipeline {
             }
         }
 
-        stage('Build Package') {
+        stage('Build Docker Image') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh "docker build -t ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
 
-        stage('Deploy to Nexus') {
+        stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'nexus-cred',
+                    credentialsId: 'nexus',
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
 
-                    writeFile file: 'settings.xml', text: """
-<settings>
-  <servers>
-    <server>
-      <id>nexus</id>
-      <username>${USER}</username>
-      <password>${PASS}</password>
-    </server>
-  </servers>
-</settings>
-"""
+                    sh """
+                        echo $PASS | docker login ${NEXUS_DOCKER_URL} \
+                        -u $USER --password-stdin
 
-                    sh 'mvn -s settings.xml deploy -DskipTests'
+                        docker push ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG}
+                    """
                 }
             }
         }
@@ -68,11 +68,11 @@ pipeline {
 
     post {
         success {
-            echo 'CI Pipeline SUCCESS ✔'
+            echo "SUCCESS CI/CD ✔ ${IMAGE_NAME}:${IMAGE_TAG}"
         }
 
         failure {
-            echo 'CI Pipeline FAILED ❌'
+            echo "FAILED PIPELINE ❌"
         }
     }
 }
