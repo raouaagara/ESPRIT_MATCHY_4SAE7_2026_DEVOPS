@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'APP_VERSION', defaultValue: '0.0.1-SNAPSHOT', description: 'Version Maven et Docker')
+        string(name: 'APP_VERSION', defaultValue: '1.0.0', description: 'Version Maven et Docker')
     }
 
     environment {
