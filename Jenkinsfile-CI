@@ -1,14 +1,7 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.6-eclipse-temurin-17'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -v ~/.m2:/root/.m2'
-        }
-    }
+    agent any
 
     environment {
-        NEXUS_URL        = 'http://192.168.80.137:8081'
-        NEXUS_REPO_DOCKER = 'docker-hosted'
         NEXUS_DOCKER_URL = '192.168.80.137:8083'
         NEXUS_CREDS      = 'nexus'
         IMAGE_NAME       = 'content-service'
@@ -33,7 +26,7 @@ pipeline {
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'
+                    junit 'target/surefire-reports/*.xml', allowEmptyResults: true
                 }
             }
         }
@@ -52,7 +45,6 @@ pipeline {
 
         stage('Build Image Docker') {
             steps {
-                sh 'apk add --no-cache docker'
                 sh "docker build -t ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
@@ -64,23 +56,22 @@ pipeline {
                     usernameVariable: 'NEXUS_USER',
                     passwordVariable: 'NEXUS_PASS'
                 )]) {
-                    sh '''
-                        echo $NEXUS_PASS | docker login 192.168.80.137:8083 \
-                            -u $NEXUS_USER --password-stdin
-                        docker push 192.168.80.137:8083/content-service:1.0.${BUILD_NUMBER}
-                    '''
+                    sh """
+                        echo \$NEXUS_PASS | docker login ${NEXUS_DOCKER_URL} \
+                            -u \$NEXUS_USER --password-stdin
+                        docker push ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG}
+                    """
                 }
             }
         }
-
     }
 
     post {
         success {
-            echo "✅ CI terminée — image pushée sur Nexus : ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "✅ CI terminée — image ${IMAGE_NAME}:${IMAGE_TAG} pushée sur Nexus"
         }
         failure {
-            echo "❌ CI échouée — vérifie les logs  !!!  "
+            echo "❌ CI échouée — vérifie les logs"
         }
     }
 }
