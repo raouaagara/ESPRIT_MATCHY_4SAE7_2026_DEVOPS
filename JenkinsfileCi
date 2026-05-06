@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+
+    environment {
+        NEXUS_URL        = 'http://192.168.80.137:8081'
+        NEXUS_REPO_DOCKER = 'docker-hosted'
+        NEXUS_DOCKER_URL = '192.168.80.137:8083'
+        NEXUS_CREDS      = 'nexus'
+        IMAGE_NAME       = 'content-service'
+        IMAGE_TAG        = "1.0.${BUILD_NUMBER}"
+    }
+
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Tests Unitaires') {
+            steps {
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Build Maven') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Deploy JAR → Nexus') {
+            steps {
+                sh 'mvn deploy -DskipTests'
+            }
+        }
+
+        stage('Build Image Docker') {
+            steps {
+                sh "docker build -t ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG} ."
+            }
+        }
+
+        stage('Push Image → Nexus Docker Registry') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: "${NEXUS_CREDS}",
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+                    sh '''
+                        echo $NEXUS_PASS | docker login 192.168.80.137:8083 \
+                            -u $NEXUS_USER --password-stdin
+                        docker push 192.168.80.137:8083/content-service:1.0.${BUILD_NUMBER}
+                    '''
+                }
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "✅ CI terminée — image pushée sur Nexus : ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
+        }
+        failure {
+            echo "❌ CI échouée — vérifie les logs"
+        }
+    }
+}

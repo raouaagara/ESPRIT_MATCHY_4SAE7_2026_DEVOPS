@@ -11,7 +11,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>content-service</artifactId>
-    <version>1.0.0</version>  <!-- ← changé : plus de SNAPSHOT, Nexus releases ne les accepte pas -->
+    <version>1.0.0</version>
     <name>content-service</name>
     <description>content-service</description>
 
@@ -88,18 +88,11 @@
         </dependencies>
     </dependencyManagement>
 
-    <!-- ============================================ -->
-    <!--         CONFIG NEXUS — ajout ici            -->
-    <!-- ============================================ -->
     <distributionManagement>
         <repository>
             <id>nexus-releases</id>
-            <url>http://localhost:8081/repository/maven-releases/</url>
+            <url>http://192.168.80.137:8081/repository/maven-releases/</url>
         </repository>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>http://localhost:8081/repository/maven-snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <build>
