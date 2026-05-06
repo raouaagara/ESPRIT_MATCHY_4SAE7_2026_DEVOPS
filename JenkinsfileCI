@@ -11,11 +11,12 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
 
         SONARQUBE = 'sonarqube-server'
+
+        NEXUS_REPO = 'http://192.168.183.128:8081/repository/maven-releases/'
     }
 
     triggers {
-        // soit webhook GitHub, soit polling
-        pollSCM('H/2 * * * *')
+        pollSCM('H/2 * * * *')   // ou webhook GitHub si configuré
     }
 
     stages {
@@ -47,20 +48,39 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh 'mvn package -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Archive Artifact') {
+        stage('Deploy JAR to Nexus') {
             steps {
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-cred',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+
+                    writeFile file: 'settings.xml', text: """
+<settings>
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>${USER}</username>
+      <password>${PASS}</password>
+    </server>
+  </servers>
+</settings>
+"""
+
+                    sh "mvn -s settings.xml deploy -DskipTests"
+                }
             }
         }
     }
 
     post {
         success {
-            echo "✅ CI SUCCESS — Build + Test + Sonar OK"
+            echo "✅ CI SUCCESS : Build + Test + Sonar + Nexus OK"
         }
 
         failure {
