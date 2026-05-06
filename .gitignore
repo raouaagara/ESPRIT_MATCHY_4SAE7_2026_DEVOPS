@@ -1,0 +1,3 @@
+target/
+src/main/resources/google-credentials.json
+src/main/resources/application.properties
