@@ -1,0 +1,340 @@
+<div class="my-applications-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>📋 My Applications</h1>
+      <p>Track your milestone applications and collaborate with your team</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ getPendingCount() }}</span>
+        <span class="stat-label">Pending</span>
+      </div>
+    </div>
+    <div class="stat-card interview">
+      <div class="stat-icon">📅</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ getInterviewCount() }}</span>
+        <span class="stat-label">Interviews</span>
+      </div>
+    </div>
+    <div class="stat-card accepted">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ getAcceptedCount() }}</span>
+        <span class="stat-label">Accepted</span>
+      </div>
+    </div>
+    <div class="stat-card rejected">
+      <div class="stat-icon">❌</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ getRejectedCount() }}</span>
+        <span class="stat-label">Rejected</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedStatus === 'all'"
+      (click)="selectedStatus = 'all'; applyFilters()">
+      All Applications
+    </button>
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedStatus === 'pending'"
+      (click)="selectedStatus = 'pending'; applyFilters()">
+      Pending
+    </button>
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedStatus === 'accepted'"
+      (click)="selectedStatus = 'accepted'; applyFilters()">
+      Accepted
+    </button>
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedStatus === 'interview_scheduled'"
+      (click)="selectedStatus = 'interview_scheduled'; applyFilters()">
+      Interviews
+    </button>
+  </div>
+
+  <!-- Applications List -->
+  <div class="applications-container">
+    <div *ngIf="filteredApplications.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h3>No applications yet</h3>
+      <p>Start applying to milestones to see them here</p>
+    </div>
+
+    <div *ngFor="let app of filteredApplications" class="application-card" [class]="app.status">
+      <div class="card-header">
+        <div class="milestone-info">
+          <h3>{{ getMilestone(app.milestoneId)?.title || 'Milestone' }}</h3>
+          <p class="project-name">{{ getProject(app.projectId)?.projectTitle || 'Project' }}</p>
+        </div>
+        <span class="status-badge" [class]="app.status">
+          {{ getStatusLabel(app.status) }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Applied</span>
+            <span class="info-value">{{ formatDate(app.appliedAt) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Budget</span>
+            <span class="info-value">{{ app.proposedBudget || 0 }} TND</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Experience</span>
+            <span class="info-value">{{ app.yearsOfExperience }} years</span>
+          </div>
+        </div>
+
+        <!-- Interview Info -->
+        <div *ngIf="app.interview" class="interview-section">
+          <div class="interview-header">
+            <h4>📅 Interview Scheduled</h4>
+            <span *ngIf="app.interview.confirmedByFreelancer" class="confirmed-badge">✓ Confirmed</span>
+          </div>
+          <div class="interview-details">
+            <p><strong>Date:</strong> {{ formatDate(app.interview.date) }}</p>
+            <p><strong>Time:</strong> {{ app.interview.time }}</p>
+            <p><strong>Meet Link:</strong> <a [href]="app.interview.meetLink" target="_blank">Join Meeting</a></p>
+            <p *ngIf="app.interview.notes"><strong>Notes:</strong> {{ app.interview.notes }}</p>
+          </div>
+          <button 
+            *ngIf="!app.interview.confirmedByFreelancer" 
+            class="btn-confirm"
+            (click)="confirmInterview(app.id)">
+            Confirm Attendance
+          </button>
+        </div>
+
+        <!-- Workspace Access -->
+        <div *ngIf="app.status === 'accepted'" class="workspace-access">
+          <div class="workspace-info">
+            <span class="workspace-icon">🎉</span>
+            <div>
+              <h4>Congratulations! You've been accepted</h4>
+              <p>Access your workspace to collaborate with the team and submit your work</p>
+            </div>
+          </div>
+          <button class="btn-workspace" (click)="openWorkspace(app)">
+            Open Workspace →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Workspace Modal -->
+<div class="workspace-modal" *ngIf="showWorkspace && selectedApplication">
+  <div class="workspace-overlay" (click)="closeWorkspace()"></div>
+  <div class="workspace-container">
+    <!-- Header -->
+    <div class="workspace-header">
+      <div class="workspace-title">
+        <h2>🚀 {{ getMilestone(selectedApplication.milestoneId)?.title }}</h2>
+        <p>{{ getProject(selectedApplication.projectId)?.projectTitle }}</p>
+      </div>
+      <button class="btn-close" (click)="closeWorkspace()">×</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="workspace-tabs">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'overview'"
+        (click)="switchTab('overview')">
+        📊 Overview
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'chat'"
+        (click)="switchTab('chat')">
+        💬 Team Chat
+        <span class="team-count">{{ teamMembers.length }}</span>
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'submit'"
+        (click)="switchTab('submit')">
+        📤 Submit Work
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'submissions'"
+        (click)="switchTab('submissions')">
+        📋 My Submissions
+        <span class="submission-count">{{ mySubmissions.length }}</span>
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="workspace-content">
+      <!-- Overview Tab -->
+      <div *ngIf="activeTab === 'overview'" class="tab-content">
+        <div class="overview-grid">
+          <div class="overview-card">
+            <h3>👥 Team Members</h3>
+            <div class="team-list">
+              <div *ngFor="let member of teamMembers" class="team-member">
+                <div class="member-avatar">{{ member.freelancer_name.charAt(0) }}</div>
+                <div class="member-info">
+                  <span class="member-name">{{ member.freelancer_name }}</span>
+                  <span class="member-email">{{ member.freelancer_email }}</span>
+                </div>
+              </div>
+              <div *ngIf="teamMembers.length === 0" class="empty-team">
+                <p>Loading team members...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="overview-card">
+            <h3>📝 Milestone Details</h3>
+            <div class="milestone-details">
+              <p><strong>Description:</strong></p>
+              <p>{{ getMilestone(selectedApplication.milestoneId)?.description }}</p>
+              <p><strong>Budget:</strong> {{ getMilestone(selectedApplication.milestoneId)?.budget }} {{ getMilestone(selectedApplication.milestoneId)?.currency }}</p>
+              <p><strong>Duration:</strong> {{ getMilestone(selectedApplication.milestoneId)?.duration }}</p>
+              <p><strong>Skills:</strong></p>
+              <div class="skills-list">
+                <span *ngFor="let skill of getMilestone(selectedApplication.milestoneId)?.skills" class="skill-tag">
+                  {{ skill }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Tab -->
+      <div *ngIf="activeTab === 'chat'" class="tab-content chat-tab">
+        <div class="chat-container">
+          <div class="chat-messages">
+            <div *ngFor="let msg of chatMessages" 
+                 class="chat-message" 
+                 [class.own-message]="msg.user_id === authService.currentUser?.id">
+              <div class="message-avatar">{{ msg.user_name.charAt(0) }}</div>
+              <div class="message-content">
+                <div class="message-header">
+                  <span class="message-author">{{ msg.user_name }}</span>
+                  <span class="message-time">{{ formatTime(msg.created_at) }}</span>
+                </div>
+                <p class="message-text">{{ msg.message }}</p>
+              </div>
+            </div>
+            <div *ngIf="chatMessages.length === 0" class="empty-chat">
+              <p>No messages yet. Start the conversation!</p>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input 
+              type="text" 
+              [(ngModel)]="newMessage"
+              (keyup.enter)="sendMessage()"
+              placeholder="Type your message...">
+            <button class="btn-send" (click)="sendMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Work Tab -->
+      <div *ngIf="activeTab === 'submit'" class="tab-content submit-tab">
+        <div class="submit-form">
+          <h3>📤 Submit Your Work</h3>
+          <p class="form-description">Upload your completed work for review</p>
+
+          <div class="form-group">
+            <label>Title *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="submissionForm.title"
+              placeholder="e.g., Homepage Design - Final Version">
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea 
+              [(ngModel)]="submissionForm.description"
+              rows="4"
+              placeholder="Describe what you've completed..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>File URL *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="submissionForm.file_url"
+              placeholder="https://drive.google.com/... or https://github.com/...">
+            <small>Provide a link to your work (Google Drive, GitHub, Figma, etc.)</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>File Name</label>
+              <input 
+                type="text" 
+                [(ngModel)]="submissionForm.file_name"
+                placeholder="project-files.zip">
+            </div>
+            <div class="form-group">
+              <label>File Type</label>
+              <input 
+                type="text" 
+                [(ngModel)]="submissionForm.file_type"
+                placeholder="ZIP, PDF, etc.">
+            </div>
+          </div>
+
+          <button class="btn-submit-work" (click)="submitWork()">
+            Submit Work
+          </button>
+        </div>
+      </div>
+
+      <!-- Submissions Tab -->
+      <div *ngIf="activeTab === 'submissions'" class="tab-content submissions-tab">
+        <h3>📋 My Submissions</h3>
+        
+        <div *ngIf="mySubmissions.length === 0" class="empty-submissions">
+          <p>No submissions yet. Submit your work to get started!</p>
+        </div>
+
+        <div *ngFor="let submission of mySubmissions" class="submission-card">
+          <div class="submission-header">
+            <h4>{{ submission.title }}</h4>
+            <span class="submission-status" [class]="submission.status">
+              {{ getSubmissionStatusLabel(submission.status) }}
+            </span>
+          </div>
+          <p class="submission-description">{{ submission.description }}</p>
+          <div class="submission-meta">
+            <span>📅 {{ formatDate(submission.submitted_at) }}</span>
+            <a *ngIf="submission.file_url" [href]="submission.file_url" target="_blank" class="file-link">
+              📎 {{ submission.file_name || 'View File' }}
+            </a>
+          </div>
+          <div *ngIf="submission.feedback" class="submission-feedback">
+            <strong>Feedback:</strong>
+            <p>{{ submission.feedback }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

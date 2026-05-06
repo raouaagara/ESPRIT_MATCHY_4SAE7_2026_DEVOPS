@@ -1,0 +1,186 @@
+<div class="review-applications-page" *ngIf="project">
+  <div class="page-header">
+    <div>
+      <button class="btn-back" (click)="goBack()">← Back to Projects</button>
+      <h1 class="page-title">Review Applications</h1>
+      <p class="page-sub">{{ project.projectTitle }} - {{ project.companyName }}</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="mini-stat">
+      <div class="ms-val">{{ applications.length }}</div>
+      <div class="ms-label">Total Applications</div>
+    </div>
+    <div class="mini-stat">
+      <div class="ms-val">{{ getPendingCount() }}</div>
+      <div class="ms-label">Pending Review</div>
+    </div>
+    <div class="mini-stat">
+      <div class="ms-val">{{ getInterviewCount() }}</div>
+      <div class="ms-label">Interviews</div>
+    </div>
+    <div class="mini-stat">
+      <div class="ms-val">{{ getAcceptedCount() }}</div>
+      <div class="ms-label">Accepted</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
+      <option value="all">All Applications</option>
+      <option value="pending">Pending</option>
+      <option value="interview_scheduled">Interview Scheduled</option>
+      <option value="interview_confirmed">Interview Confirmed</option>
+      <option value="accepted">Accepted</option>
+      <option value="rejected">Rejected</option>
+    </select>
+
+    <div class="filter-spacer"></div>
+    <span class="results-count">{{ filteredApplications.length }} application(s)</span>
+  </div>
+
+  <!-- Applications List -->
+  <div class="applications-container">
+    <div class="empty-state" *ngIf="filteredApplications.length === 0">
+      <span class="empty-icon">📝</span>
+      <p>No applications found</p>
+      <small>Applications will appear here when freelancers apply to your milestones</small>
+    </div>
+
+    <div class="application-card" *ngFor="let app of filteredApplications">
+      <!-- Status Badge -->
+      <div class="card-status" [class]="getStatusClass(app.status)">
+        {{ app.status === 'pending' ? 'Pending Review' : 
+           app.status === 'interview_scheduled' ? 'Interview Scheduled' :
+           app.status === 'interview_confirmed' ? 'Interview Confirmed' :
+           app.status === 'accepted' ? 'Accepted' : 'Rejected' }}
+      </div>
+
+      <!-- Freelancer Info -->
+      <div class="card-header">
+        <div class="freelancer-info">
+          <div class="freelancer-avatar">{{ app.freelancerName.charAt(0) }}</div>
+          <div>
+            <h3 class="freelancer-name">{{ app.freelancerName }}</h3>
+            <p class="freelancer-email">{{ app.freelancerEmail }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Milestone Info -->
+      <div class="milestone-badge">
+        🎯 {{ getMilestone(app.milestoneId)?.title }}
+      </div>
+
+      <!-- Application Details -->
+      <div class="application-details">
+        <div class="detail-item">
+          <span class="detail-label">Experience</span>
+          <span class="detail-value">{{ app.yearsOfExperience }} years</span>
+        </div>
+        <div class="detail-item" *ngIf="app.proposedBudget">
+          <span class="detail-label">Proposed Budget</span>
+          <span class="detail-value">{{ app.proposedBudget }} TND</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Applied</span>
+          <span class="detail-value">{{ app.appliedAt | date:'MMM d, y' }}</span>
+        </div>
+      </div>
+
+      <!-- CV Link -->
+      <div class="cv-section" *ngIf="app.cvUrl">
+        <button (click)="viewCV(app.cvUrl)" class="btn-cv">📥 Download CV/Portfolio</button>
+      </div>
+
+      <!-- Motivation Letter -->
+      <div class="motivation-section">
+        <h4>Motivation Letter</h4>
+        <p>{{ app.motivationLetter }}</p>
+      </div>
+
+      <!-- Interview Section -->
+      <div class="interview-section" *ngIf="app.interview">
+        <div class="interview-header">
+          <h4>📅 Interview Scheduled</h4>
+          <span class="interview-status" [class.confirmed]="app.interview.confirmedByFreelancer">
+            {{ app.interview.confirmedByFreelancer ? '✓ Confirmed' : '⏳ Waiting Confirmation' }}
+          </span>
+        </div>
+        <div class="interview-details">
+          <div class="interview-item">
+            <span class="interview-label">Date & Time</span>
+            <span class="interview-value">{{ app.interview.date | date:'MMM d, y' }} at {{ app.interview.time }}</span>
+          </div>
+          <div class="interview-item">
+            <span class="interview-label">Meet Link</span>
+            <a [href]="app.interview.meetLink" target="_blank" class="interview-link">{{ app.interview.meetLink }}</a>
+          </div>
+          <div class="interview-item" *ngIf="app.interview.notes">
+            <span class="interview-label">Notes</span>
+            <span class="interview-value">{{ app.interview.notes }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions">
+        <button class="btn-schedule" (click)="openInterviewModal(app)" *ngIf="app.status !== 'accepted' && app.status !== 'rejected'">
+          📅 {{ app.interview ? 'Update Interview' : 'Schedule Interview' }}
+        </button>
+        <button class="btn-accept" (click)="updateApplicationStatus(app.id, 'accepted')" [disabled]="app.status === 'accepted'">
+          ✓ Accept
+        </button>
+        <button class="btn-reject" (click)="updateApplicationStatus(app.id, 'rejected')" [disabled]="app.status === 'rejected'">
+          ✗ Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Interview Scheduling Modal -->
+<div class="modal-overlay" *ngIf="showInterviewModal" (click)="closeInterviewModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>Schedule Interview</h2>
+        <p class="modal-subtitle" *ngIf="selectedApplication">{{ selectedApplication.freelancerName }}</p>
+      </div>
+      <button class="btn-close" (click)="closeInterviewModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label>Meet Link (Google Meet, Zoom, etc.) *</label>
+          <input type="url" [(ngModel)]="interviewForm.meetLink" placeholder="https://meet.google.com/xxx-xxxx-xxx">
+          <small>Provide a video conference link for the interview</small>
+        </div>
+
+        <div class="form-group">
+          <label>Interview Date *</label>
+          <input type="date" [(ngModel)]="interviewForm.date">
+        </div>
+
+        <div class="form-group">
+          <label>Interview Time *</label>
+          <input type="time" [(ngModel)]="interviewForm.time">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Notes (Optional)</label>
+          <textarea [(ngModel)]="interviewForm.notes" rows="3" placeholder="Any additional information for the freelancer..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeInterviewModal()">Cancel</button>
+      <button class="btn-save" (click)="scheduleInterview()">Schedule Interview</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+<div class="bo-page">
+    <div class="bo-page-header">
+        <div>
+            <h1 class="page-title">📊 Plan Comparison Details</h1>
+            <p class="page-sub">Deep dive into feature availability across all tiers</p>
+        </div>
+        <button class="btn-primary" (click)="goBack()">⬅ Back to Plans</button>
+    </div>
+
+    <div class="bo-table-card">
+        <table class="bo-data-table comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th *ngFor="let plan of plans" [style.color]="plan.color" class="plan-header">
+                        <span class="plan-icon">{{ plan.icon }}</span> {{ plan.name }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="price-row">
+                    <td><strong>Price</strong></td>
+                    <td *ngFor="let plan of plans">
+                        <strong [style.color]="plan.color">
+                            {{ plan.price === 0 ? 'Free' : plan.price + ' ' + plan.currency }}
+                        </strong>
+                        <span class="sub-price">/{{ billingCycle === 'monthly' ? 'mo' : 'yr' }}</span>
+                    </td>
+                </tr>
+                <tr *ngFor="let feature of getAllFeatures()">
+                    <td>{{ feature }}</td>
+                    <td *ngFor="let plan of plans">
+                        <span *ngIf="planHasFeature(plan, feature)" class="has-feature"
+                            [style.color]="plan.color">✓</span>
+                        <span *ngIf="!planHasFeature(plan, feature)" class="no-feature">—</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

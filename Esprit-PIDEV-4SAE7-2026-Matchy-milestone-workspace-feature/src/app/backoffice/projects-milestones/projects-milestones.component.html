@@ -1,0 +1,279 @@
+<div class="bo-page">
+  <div class="bo-page-header">
+    <div>
+      <h1>Projects & Milestones</h1>
+      <p>Monitor all projects and their milestone progress</p>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="mini-stat">
+      <span class="ms-val">{{ projectsWithMilestones.length }}</span>
+      <span class="ms-label">Total Projects</span>
+    </div>
+    <div class="mini-stat">
+      <span class="ms-val">{{ getTotalBudget() }} TND</span>
+      <span class="ms-label">Total Budget</span>
+    </div>
+    <div class="mini-stat">
+      <span class="ms-val">{{ getActiveCount() }}</span>
+      <span class="ms-label">Active</span>
+    </div>
+    <div class="mini-stat">
+      <span class="ms-val">{{ getCompletedCount() }}</span>
+      <span class="ms-label">Completed</span>
+    </div>
+  </div>
+
+  <div class="bo-filters-bar">
+    <input type="text" placeholder="🔍 Search projects..." [(ngModel)]="searchTerm" (input)="applyFilters()" class="bo-filter-input">
+    <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="bo-filter-select">
+      <option value="all">All Status</option>
+      <option value="open">Open</option>
+      <option value="in_progress">In Progress</option>
+      <option value="closed">Closed</option>
+    </select>
+    <div class="bo-filter-spacer"></div>
+    <button class="btn-export">📄 CSV</button>
+    <button class="btn-export">📊 Excel</button>
+  </div>
+
+  <div class="bo-table-card">
+    <table class="bo-data-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Company</th>
+          <th>Budget</th>
+          <th>Progress</th>
+          <th>Milestones</th>
+          <th>Applications</th>
+          <th>Accepted</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pw of filteredProjects">
+          <td><strong>{{ pw.project.projectTitle }}</strong></td>
+          <td>{{ pw.project.companyName }}</td>
+          <td class="budget-cell">{{ pw.project.budget || 0 }} {{ pw.project.currency }}</td>
+          <td>
+            <div class="progress-cell">
+              <div class="prog-bar">
+                <div class="prog-fill" [style.width.%]="getProgress(pw)"></div>
+              </div>
+              <span>{{ getProgress(pw) }}%</span>
+            </div>
+          </td>
+          <td>
+            <span class="milestone-chip">{{ getCompletedMilestones(pw) }}/{{ pw.milestones.length }}</span>
+          </td>
+          <td>
+            <span class="applications-badge">📝 {{ pw.totalApplications }}</span>
+          </td>
+          <td>
+            <span class="accepted-badge">✓ {{ pw.acceptedCount }}</span>
+          </td>
+          <td>
+            <span class="status-chip" [class]="getStatusClass(pw.project.status)">
+              <span class="dot"></span>
+              {{ pw.project.status === 'open' ? 'Open' : pw.project.status === 'in_progress' ? 'In Progress' : 'Closed' }}
+            </span>
+          </td>
+          <td class="bo-actions-cell">
+            <button class="btn-action view" (click)="viewMilestones(pw.project)" title="View Milestones">🎯</button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredProjects.length === 0">
+          <td colspan="9" class="bo-empty-row">No projects found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Milestones Expansion -->
+  <div class="milestones-section" *ngFor="let pw of filteredProjects">
+    <div class="milestones-header">
+      <h3>{{ pw.project.projectTitle }} - Milestones</h3>
+    </div>
+    
+    <div class="milestones-grid">
+      <div class="milestone-card" *ngFor="let milestone of pw.milestones">
+        <div class="milestone-header">
+          <h4>{{ milestone.title }}</h4>
+          <span class="milestone-status" [class]="getStatusClass(milestone.status)">
+            <span class="dot"></span>
+            {{ milestone.status === 'open' ? 'Open' : milestone.status === 'assigned' ? 'Assigned' : milestone.status === 'in_progress' ? 'In Progress' : 'Completed' }}
+          </span>
+        </div>
+        
+        <p class="milestone-desc">{{ milestone.description }}</p>
+        
+        <div class="milestone-stats">
+          <div class="stat-item">
+            <span class="stat-label">Applications</span>
+            <span class="stat-value">{{ milestone.applicationsCount }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Budget</span>
+            <span class="stat-value">{{ milestone.budget || 0 }} {{ milestone.currency }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Duration</span>
+            <span class="stat-value">{{ milestone.duration || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="milestone-actions">
+          <button class="btn-review" (click)="viewApplications(milestone)">
+            📝 Review Applications ({{ milestone.applicationsCount }})
+          </button>
+          <button class="btn-close-milestone" (click)="closeMilestone(milestone)" *ngIf="milestone.status === 'open'">
+            🔒 Close Milestone
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Applications Modal -->
+<div class="modal-overlay" *ngIf="showApplicationsModal" (click)="closeApplicationsModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>Applications for: {{ selectedMilestone?.title }}</h2>
+        <p class="modal-subtitle">{{ selectedMilestoneApplications.length }} application(s)</p>
+      </div>
+      <button class="btn-close" (click)="closeApplicationsModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="selectedMilestoneApplications.length === 0" class="empty-applications">
+        <span class="empty-icon">📝</span>
+        <p>No applications yet</p>
+      </div>
+
+      <div *ngFor="let app of selectedMilestoneApplications" class="application-card">
+        <div class="app-header">
+          <div class="freelancer-info">
+            <div class="freelancer-avatar">{{ app.freelancerName.charAt(0) }}</div>
+            <div>
+              <h3 class="freelancer-name">{{ app.freelancerName }}</h3>
+              <p class="freelancer-email">{{ app.freelancerEmail }}</p>
+            </div>
+          </div>
+          <span class="app-status" [class]="app.status">
+            {{ app.status === 'pending' ? 'Pending' : 
+               app.status === 'interview_scheduled' ? 'Interview Scheduled' :
+               app.status === 'interview_confirmed' ? 'Interview Confirmed' :
+               app.status === 'accepted' ? 'Accepted' : 'Rejected' }}
+          </span>
+        </div>
+
+        <div class="app-details">
+          <div class="detail-item">
+            <span class="detail-label">Experience</span>
+            <span class="detail-value">{{ app.yearsOfExperience }} years</span>
+          </div>
+          <div class="detail-item" *ngIf="app.proposedBudget">
+            <span class="detail-label">Proposed Budget</span>
+            <span class="detail-value">{{ app.proposedBudget }} TND</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Applied</span>
+            <span class="detail-value">{{ app.appliedAt | date:'MMM d, y' }}</span>
+          </div>
+        </div>
+
+        <div class="motivation-section">
+          <h4>Motivation Letter</h4>
+          <p>{{ app.motivationLetter }}</p>
+        </div>
+
+        <div class="app-actions" *ngIf="app.cvUrl">
+          <button (click)="viewCV(app.cvUrl)" class="btn-cv">📥 Download CV/Portfolio</button>
+        </div>
+
+        <div class="interview-section" *ngIf="app.interview">
+          <h4>📅 Interview Scheduled</h4>
+          <div class="interview-details">
+            <div class="interview-item">
+              <span class="interview-label">Date & Time</span>
+              <span class="interview-value">{{ app.interview.date | date:'MMM d, y' }} at {{ app.interview.time }}</span>
+            </div>
+            <div class="interview-item">
+              <span class="interview-label">Meet Link</span>
+              <a [href]="app.interview.meetLink" target="_blank" class="interview-link">{{ app.interview.meetLink }}</a>
+            </div>
+            <div class="interview-item" *ngIf="app.interview.notes">
+              <span class="interview-label">Notes</span>
+              <span class="interview-value">{{ app.interview.notes }}</span>
+            </div>
+            <div class="interview-item">
+              <span class="interview-label">Status</span>
+              <span class="interview-status" [class.confirmed]="app.interview.confirmedByFreelancer">
+                {{ app.interview.confirmedByFreelancer ? '✓ Confirmed' : '⏳ Waiting Confirmation' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-actions">
+          <button class="btn-interview" (click)="openInterviewModal(app)" *ngIf="app.status !== 'accepted' && app.status !== 'rejected'">
+            📅 {{ app.interview ? 'Update Interview' : 'Schedule Interview' }}
+          </button>
+          <button class="btn-accept" (click)="updateApplicationStatus(app.id, 'accepted')" [disabled]="app.status === 'accepted'">
+            ✓ Accept
+          </button>
+          <button class="btn-reject" (click)="updateApplicationStatus(app.id, 'rejected')" [disabled]="app.status === 'rejected'">
+            ✗ Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Interview Scheduling Modal -->
+<div class="modal-overlay" *ngIf="showInterviewModal" (click)="closeInterviewModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>Schedule Interview</h2>
+        <p class="modal-subtitle" *ngIf="selectedApplication">{{ selectedApplication.freelancerName }}</p>
+      </div>
+      <button class="btn-close" (click)="closeInterviewModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label>Meet Link (Google Meet, Zoom, etc.) *</label>
+          <input type="url" [(ngModel)]="interviewForm.meetLink" placeholder="https://meet.google.com/xxx-xxxx-xxx">
+        </div>
+
+        <div class="form-group">
+          <label>Interview Date *</label>
+          <input type="date" [(ngModel)]="interviewForm.date">
+        </div>
+
+        <div class="form-group">
+          <label>Interview Time *</label>
+          <input type="time" [(ngModel)]="interviewForm.time">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Notes (Optional)</label>
+          <textarea [(ngModel)]="interviewForm.notes" rows="3" placeholder="Any additional information..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeInterviewModal()">Cancel</button>
+      <button class="btn-save" (click)="scheduleInterview()">Schedule Interview</button>
+    </div>
+  </div>
+</div>

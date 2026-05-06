@@ -1,0 +1,203 @@
+<div class="company-projects-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Company Projects Management</h1>
+      <p class="page-sub">Manage all available projects for freelancers</p>
+    </div>
+    <button class="btn-add" (click)="openAddModal()">+ Add Project</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="mini-stat">
+      <div class="ms-val">{{ projects.length }}</div>
+      <div class="ms-label">Total Projects</div>
+    </div>
+    <div class="mini-stat">
+      <div class="ms-val">{{ getOpenProjectsCount() }}</div>
+      <div class="ms-label">Open Projects</div>
+    </div>
+    <div class="mini-stat">
+      <div class="ms-val">{{ getTotalViews() }}</div>
+      <div class="ms-label">Total Views</div>
+    </div>
+    <div class="mini-stat">
+      <div class="ms-val">{{ getTotalApplications() }}</div>
+      <div class="ms-label">Total Applications</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar bo-filters-bar">
+    <input
+      type="text"
+      placeholder="🔍 Search projects..."
+      [(ngModel)]="searchTerm"
+      (input)="applyFilters()"
+      class="filter-input bo-filter-input">
+
+    <select [(ngModel)]="selectedCategory" (change)="applyFilters()" class="filter-select bo-filter-select">
+      <option value="all">All Categories</option>
+      <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select bo-filter-select">
+      <option value="all">All Status</option>
+      <option value="open">Open</option>
+      <option value="in_progress">In Progress</option>
+      <option value="closed">Closed</option>
+    </select>
+
+    <div class="filter-spacer bo-filter-spacer"></div>
+    <button class="btn-export">📄 Export CSV</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Company & Project</th>
+          <th>Category</th>
+          <th>Team Size</th>
+          <th>Budget</th>
+          <th>Status</th>
+          <th>Views</th>
+          <th>Applications</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredProjects.length === 0">
+          <td colspan="9" class="empty-row">
+            <div class="empty-state">
+              <span class="empty-icon">📋</span>
+              <p>No projects found</p>
+              <small>Add your first project to get started</small>
+            </div>
+          </td>
+        </tr>
+        <tr *ngFor="let project of filteredProjects">
+          <td class="project-cell">
+            <div class="project-avatar">{{ project.companyName.charAt(0) }}</div>
+            <div class="project-info">
+              <span class="project-name">{{ project.projectTitle }}</span>
+              <span class="company-name">{{ project.companyName }}</span>
+            </div>
+          </td>
+          <td><span class="badge badge-primary">{{ project.category }}</span></td>
+          <td>{{ project.numberOfPeopleDemanded }} people</td>
+          <td>{{ project.budget ? (project.budget + ' ' + project.currency) : '—' }}</td>
+          <td>
+            <span class="status-chip" [class]="getStatusClass(project.status)">
+              <span class="dot"></span>
+              {{ project.status === 'open' ? 'Open' : project.status === 'in_progress' ? 'In Progress' : 'Closed' }}
+            </span>
+          </td>
+          <td>👁️ {{ project.clickCount }}</td>
+          <td>📝 {{ project.applicationsCount }}</td>
+          <td>{{ project.createdAt | date:'MMM d, y' }}</td>
+          <td class="actions-cell">
+            <button class="btn-action review" title="Review Applications" (click)="reviewApplications(project.id)">📝</button>
+            <button class="btn-action milestones" title="Manage Milestones" [routerLink]="['/backoffice/company-projects', project.id, 'milestones']">🎯</button>
+            <button class="btn-action view" title="View" (click)="openEditModal(project)">👁</button>
+            <button class="btn-action edit" title="Edit" (click)="openEditModal(project)">✏️</button>
+            <button class="btn-action delete" title="Delete" (click)="deleteProject(project.id)">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Edit Project' : 'Add New Project' }}</h2>
+      <button class="btn-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label>Company Name *</label>
+          <input type="text" [(ngModel)]="currentProject.companyName" placeholder="Enter company name">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Project Title *</label>
+          <input type="text" [(ngModel)]="currentProject.projectTitle" placeholder="Enter project title">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Short Description *</label>
+          <input type="text" [(ngModel)]="currentProject.description" placeholder="Brief description">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Details of Work *</label>
+          <textarea [(ngModel)]="currentProject.detailsOfWork" rows="4" placeholder="Detailed description of the work required"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Category *</label>
+          <select [(ngModel)]="currentProject.category">
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Number of People *</label>
+          <input type="number" [(ngModel)]="currentProject.numberOfPeopleDemanded" min="1">
+        </div>
+
+        <div class="form-group">
+          <label>Budget</label>
+          <input type="number" [(ngModel)]="currentProject.budget" placeholder="0">
+        </div>
+
+        <div class="form-group">
+          <label>Currency</label>
+          <select [(ngModel)]="currentProject.currency">
+            <option value="TND">TND</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Status *</label>
+          <select [(ngModel)]="currentProject.status">
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" [(ngModel)]="currentProject.location" placeholder="e.g., Tunis, Remote">
+        </div>
+
+        <div class="form-group">
+          <label>Deadline</label>
+          <input type="date" [(ngModel)]="currentProject.deadline">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Required Skills (comma-separated)</label>
+          <input type="text" [value]="getSkillsString(currentProject.skills)" 
+                 (input)="currentProject.skills = parseSkills($any($event.target).value)"
+                 placeholder="e.g., Angular, Node.js, MongoDB">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-save" (click)="saveProject()">{{ isEditMode ? 'Update' : 'Create' }} Project</button>
+    </div>
+  </div>
+</div>

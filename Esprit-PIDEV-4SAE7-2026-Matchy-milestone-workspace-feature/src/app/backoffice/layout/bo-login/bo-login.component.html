@@ -1,0 +1,51 @@
+<div class="login-page">
+  <div class="login-bg">
+    <div class="bg-glow g1"></div>
+    <div class="bg-glow g2"></div>
+  </div>
+
+  <div class="login-card">
+    <!-- Logo -->
+    <div class="login-logo">
+      <div class="logo-icon">M</div>
+      <span class="logo-text">Match<span class="accent">y</span></span>
+    </div>
+
+    <h1 class="login-title">Admin Login</h1>
+    <p class="login-sub">Access the Matchy backoffice dashboard</p>
+
+    <!-- Error -->
+    <div class="login-error" *ngIf="error">
+      <span>⚠️ {{ error }}</span>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="admin@matchy.tn"
+          class="form-input"
+          [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          class="form-input"
+          [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+      </div>
+
+      <button type="submit" class="btn-login" [disabled]="isLoading || loginForm.invalid">
+        <span *ngIf="!isLoading">Sign In →</span>
+        <span *ngIf="isLoading">Signing in...</span>
+      </button>
+    </form>
+
+    <a routerLink="/" class="back-link">← Back to Matchy</a>
+  </div>
+</div>

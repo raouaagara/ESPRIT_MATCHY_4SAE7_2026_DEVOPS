@@ -1,0 +1,371 @@
+<div class="admin-layout">
+  <div class="admin-container">
+    <main class="main-content">
+      <div class="admin-header">
+        <h1 class="page-title">Certification Management</h1>
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          + Create Certification
+        </button>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="stats-row">
+        <div class="stat-card admin-card">
+          <div class="stat-icon">🏅</div>
+          <div class="stat-details">
+            <h3>{{ adminCertifications.length }}</h3>
+            <p>Admin Verified</p>
+          </div>
+        </div>
+
+        <div class="stat-card system-card">
+          <div class="stat-icon">🤖</div>
+          <div class="stat-details">
+            <h3>{{ systemCertifications.length }}</h3>
+            <p>System Verified</p>
+          </div>
+        </div>
+
+        <div class="stat-card total-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-details">
+            <h3>{{ filteredCertifications.length }}</h3>
+            <p>Total Certifications</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs for Admin and System -->
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button
+            class="tab-button"
+            [class.active]="activeTab === 'admin'"
+            (click)="activeTab = 'admin'"
+          >
+            <span class="tab-icon">👤</span>
+            Admin Verified ({{ adminCertifications.length }})
+          </button>
+          <button
+            class="tab-button"
+            [class.active]="activeTab === 'system'"
+            (click)="activeTab = 'system'"
+          >
+            <span class="tab-icon">⚙️</span>
+            System Verified ({{ systemCertifications.length }})
+          </button>
+        </div>
+
+        <!-- ADMIN VERIFIED TAB -->
+        <div class="tab-content" *ngIf="activeTab === 'admin'">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="section-badge admin-badge">Admin Verified</span>
+              Showing {{ adminCertifications.length }} certifications
+            </h2>
+            <p class="section-description">
+              Certifications manually verified by administrators
+            </p>
+          </div>
+
+          <div class="contents-grid" *ngIf="adminCertifications.length > 0">
+            <div
+              *ngFor="let cert of adminCertifications"
+              class="content-card admin-cert-card"
+            >
+              <div class="card-header">
+                <span class="verified-badge admin-verified">
+                  👤 Admin Verified
+                </span>
+                <div class="content-date">
+                  🏆 {{ cert.issuedAt | date: "dd/MM/yyyy HH:mm" }}
+                </div>
+              </div>
+
+              <h3 class="content-title">
+                {{
+                  getContentTitle(cert.contentId) ||
+                    cert.contentTitle ||
+                    "Unknown"
+                }}
+              </h3>
+
+              <p class="content-description">
+                <strong>User:</strong>
+                {{ getUserDisplay(cert) }}<br />
+                <strong>Verified by:</strong>
+                <span class="admin-name">{{ cert.verifiedBy }}</span
+                ><br />
+                <strong>Validity:</strong> {{ cert.validity }}
+              </p>
+
+              <div class="badge-section">
+                <span class="badge-section-label">Gamification</span>
+                <div
+                  class="badge-stack"
+                  *ngIf="getUserBadges(cert).length > 0; else noBadgeState"
+                >
+                  <span
+                    *ngFor="let badge of getUserBadges(cert)"
+                    class="badge-chip"
+                    [ngClass]="getBadgeClass(badge)"
+                  >
+                    {{ badge }}
+                  </span>
+                </div>
+                <ng-template #noBadgeState>
+                  <span class="badge-empty-state">No badge unlocked yet</span>
+                </ng-template>
+              </div>
+
+              <div class="content-meta">
+                <span
+                  class="content-badge"
+                  [ngClass]="getScoreBadgeClass(cert.score)"
+                >
+                  Score: {{ cert.score }}%
+                </span>
+              </div>
+
+              <div class="card-actions">
+                <button class="btn btn-edit" (click)="openEditModal(cert)">
+                  ✏️ Edit
+                </button>
+                <button
+                  class="btn btn-delete"
+                  (click)="deleteCertification(cert)"
+                >
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="adminCertifications.length === 0" class="no-results">
+            <div class="no-results-icon">📋</div>
+            <h3>No Admin Verified Certifications</h3>
+            <p>There are no certifications verified by administrators yet.</p>
+          </div>
+        </div>
+
+        <!-- SYSTEM VERIFIED TAB -->
+        <div class="tab-content" *ngIf="activeTab === 'system'">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="section-badge system-badge">System Verified</span>
+              Showing {{ systemCertifications.length }} certifications
+            </h2>
+            <p class="section-description">
+              Certifications automatically verified by the system
+            </p>
+          </div>
+
+          <div class="contents-grid" *ngIf="systemCertifications.length > 0">
+            <div
+              *ngFor="let cert of systemCertifications"
+              class="content-card system-cert-card"
+            >
+              <div class="card-header">
+                <span class="verified-badge system-verified">
+                  🤖 System Verified
+                </span>
+                <div class="content-date">
+                  🏆 {{ cert.issuedAt | date: "dd/MM/yyyy HH:mm" }}
+                </div>
+              </div>
+
+              <h3 class="content-title">
+                {{
+                  getContentTitle(cert.contentId) ||
+                    cert.contentTitle ||
+                    "Unknown"
+                }}
+              </h3>
+
+              <p class="content-description">
+                <strong>User:</strong>
+                {{ getUserDisplay(cert) }}<br />
+                <strong>Verified by:</strong>
+                <span class="system-name">System (Automated)</span><br />
+                <strong>Validity:</strong> {{ cert.validity }}
+              </p>
+
+              <div class="badge-section">
+                <span class="badge-section-label">Gamification</span>
+                <div
+                  class="badge-stack"
+                  *ngIf="
+                    getUserBadges(cert).length > 0;
+                    else noSystemBadgeState
+                  "
+                >
+                  <span
+                    *ngFor="let badge of getUserBadges(cert)"
+                    class="badge-chip"
+                    [ngClass]="getBadgeClass(badge)"
+                  >
+                    {{ badge }}
+                  </span>
+                </div>
+                <ng-template #noSystemBadgeState>
+                  <span class="badge-empty-state">No badge unlocked yet</span>
+                </ng-template>
+              </div>
+
+              <div class="content-meta">
+                <span
+                  class="content-badge"
+                  [ngClass]="getScoreBadgeClass(cert.score)"
+                >
+                  Score: {{ cert.score }}%
+                </span>
+              </div>
+
+              <div class="card-actions">
+                <button class="btn btn-view" (click)="viewCertification(cert)">
+                  👁️ View
+                </button>
+                <button
+                  class="btn btn-delete"
+                  (click)="deleteCertification(cert)"
+                >
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="systemCertifications.length === 0" class="no-results">
+            <div class="no-results-icon">🤖</div>
+            <h3>No System Verified Certifications</h3>
+            <p>There are no certifications verified by the system yet.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        {{ isEditMode ? "Edit Certification" : "Create New Certification" }}
+      </h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+    <form #certForm="ngForm" (ngSubmit)="saveCertification()">
+      <div class="form-group">
+        <label>User</label>
+        <select
+          [(ngModel)]="currentCertification.userId"
+          name="userId"
+          required
+          class="form-input"
+          #userField="ngModel"
+        >
+          <option [value]="undefined">Select a user</option>
+          <option *ngFor="let user of users" [ngValue]="user.id">
+            {{ user.name }} ({{ user.email }})
+          </option>
+        </select>
+        <div *ngIf="userField.invalid && userField.touched" class="error">
+          Please select a user.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Content</label>
+        <select
+          [(ngModel)]="currentCertification.contentId"
+          name="contentId"
+          required
+          class="form-input"
+          #contentField="ngModel"
+        >
+          <option [value]="undefined">Select a content</option>
+          <option
+            *ngFor="let content of contents"
+            [ngValue]="content.contentId"
+          >
+            {{ content.title }}
+          </option>
+        </select>
+        <div *ngIf="contentField.invalid && contentField.touched" class="error">
+          Please select a content.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Score (%)</label>
+        <input
+          type="number"
+          [(ngModel)]="currentCertification.score"
+          name="score"
+          min="0"
+          max="100"
+          required
+          class="form-input"
+          #scoreField="ngModel"
+        />
+        <div *ngIf="scoreField.invalid && scoreField.touched" class="error">
+          Score is required and must be between 0 and 100.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Validity</label>
+        <input
+          type="text"
+          [(ngModel)]="currentCertification.validity"
+          name="validity"
+          required
+          class="form-input"
+          placeholder="e.g., 1 year"
+          #validityField="ngModel"
+        />
+        <div
+          *ngIf="validityField.invalid && validityField.touched"
+          class="error"
+        >
+          Validity period is required.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Verified By</label>
+        <select
+          [(ngModel)]="currentCertification.verifiedBy"
+          name="verifiedBy"
+          required
+          class="form-input"
+          #verifiedField="ngModel"
+        >
+          <option value="">Select verification type</option>
+          <option value="Admin">Admin</option>
+          <option value="System">System</option>
+        </select>
+        <div
+          *ngIf="verifiedField.invalid && verifiedField.touched"
+          class="error"
+        >
+          Please specify who verified the certification.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-cancel" (click)="closeModal()">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="certForm.invalid"
+        >
+          {{ isEditMode ? "Update" : "Create" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

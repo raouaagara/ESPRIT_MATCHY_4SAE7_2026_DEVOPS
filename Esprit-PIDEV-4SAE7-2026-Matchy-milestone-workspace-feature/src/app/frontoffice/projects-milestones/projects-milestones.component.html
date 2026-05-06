@@ -1,0 +1,85 @@
+<div class="milestones-page">
+  <div class="page-header">
+    <div>
+      <div class="hero-badge">📁 My Projects</div>
+      <h1>Projects &amp; <span class="text-gradient">Milestones</span></h1>
+      <p>Track progress, deliverables and payments for all your projects.</p>
+    </div>
+  </div>
+
+  <div class="content-layout">
+    <!-- Project List -->
+    <div class="projects-sidebar">
+      <h3 class="sidebar-title">My Projects</h3>
+      <div class="project-item" *ngFor="let project of projects"
+        [class.active]="selectedProject?.id === project.id"
+        (click)="selectProject(project)">
+        <div class="proj-icon" [style.background]="project.color + '20'">{{ project.icon }}</div>
+        <div class="proj-info">
+          <span class="proj-title">{{ project.title }}</span>
+          <span class="proj-client">{{ project.client }}</span>
+        </div>
+        <div class="proj-status-dot" [class]="project.status"></div>
+      </div>
+    </div>
+
+    <!-- Project Detail -->
+    <div class="project-detail" *ngIf="selectedProject">
+      <!-- Project Header -->
+      <div class="detail-header" [style.border-color]="selectedProject.color + '40'">
+        <div class="detail-icon" [style.background]="selectedProject.color + '20'">
+          {{ selectedProject.icon }}
+        </div>
+        <div class="detail-info">
+          <h2>{{ selectedProject.title }}</h2>
+          <p>Client: <strong>{{ selectedProject.client }}</strong></p>
+        </div>
+        <div class="detail-budget">
+          <span class="budget-paid">{{ getPaidAmount(selectedProject) | number }} {{ selectedProject.currency }}</span>
+          <span class="budget-total">/ {{ selectedProject.totalBudget | number }} {{ selectedProject.currency }}</span>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>Overall Progress</span>
+          <span class="progress-value" [style.color]="selectedProject.color">{{ selectedProject.progress }}%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill"
+            [style.width.%]="selectedProject.progress"
+            [style.background]="selectedProject.color">
+          </div>
+        </div>
+      </div>
+
+      <!-- Milestones Timeline -->
+      <div class="milestones-section">
+        <h3 class="section-label">Milestones</h3>
+        <div class="timeline">
+          <div class="timeline-item" *ngFor="let m of selectedProject.milestones; let last = last">
+            <div class="timeline-connector" *ngIf="!last"></div>
+            <div class="timeline-dot" [class]="getMilestoneClass(m.status)"
+              [style.border-color]="selectedProject.color">
+              {{ getMilestoneStatusIcon(m.status) }}
+            </div>
+            <div class="timeline-content" [class]="'status-' + m.status">
+              <div class="milestone-header">
+                <h4>{{ m.title }}</h4>
+                <div class="milestone-right">
+                  <span class="milestone-amount">{{ m.amount | number }} TND</span>
+                  <span class="milestone-date">📅 {{ m.dueDate | date:'MMM d' }}</span>
+                </div>
+              </div>
+              <p>{{ m.description }}</p>
+              <span class="milestone-status-badge badge" [class]="'badge-' + getMilestoneClass(m.status)">
+                {{ m.status | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

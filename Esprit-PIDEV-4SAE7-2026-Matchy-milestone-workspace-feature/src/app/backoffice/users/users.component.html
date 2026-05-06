@@ -1,0 +1,95 @@
+<div class="users-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Users Management</h1>
+      <p class="page-sub">Manage all registered users on Matchy</p>
+    </div>
+    <button class="btn-add">+ Add User</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar bo-filters-bar">
+    <input
+      type="text" placeholder="🔍 Search users..."
+      [(ngModel)]="searchTerm" (input)="onSearch()" class="filter-input bo-filter-input">
+
+    <select [(ngModel)]="selectedRole" (change)="onSearch()" class="filter-select bo-filter-select">
+      <option value="all">All Roles</option>
+      <option value="admin">Admin</option>
+      <option value="client">Client</option>
+      <option value="freelancer">Freelancer</option>
+    </select>
+
+    <select [(ngModel)]="selectedStatus" (change)="onSearch()" class="filter-select bo-filter-select">
+      <option value="all">All Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="banned">Banned</option>
+    </select>
+
+    <div class="filter-spacer bo-filter-spacer"></div>
+    <button class="btn-export">📄 CSV</button>
+    <button class="btn-export">📊 Excel</button>
+  </div>
+
+  <!-- Loading / error -->
+  <p *ngIf="isLoading" style="text-align:center;padding:20px;color:#888;">Loading users…</p>
+  <p *ngIf="errorMessage" style="text-align:center;padding:12px;color:#c0392b;">{{ errorMessage }}</p>
+
+  <!-- Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Verified</th>
+          <th>Rating</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredUsers.length === 0">
+          <td colspan="8" class="empty-row">
+            <div class="empty-state">
+              <span class="empty-icon">👥</span>
+              <p>No users registered yet</p>
+              <small>Users will appear here once they sign up</small>
+            </div>
+          </td>
+        </tr>
+        <tr *ngFor="let user of filteredUsers">
+          <td class="user-cell">
+            <div class="avatar">{{ getInitials(user.name) }}</div>
+            <div class="user-info">
+              <span class="user-name">{{ user.name }}</span>
+              <span class="user-city" *ngIf="user.city">{{ user.city }}</span>
+            </div>
+          </td>
+          <td>{{ user.email }}</td>
+          <td><span class="badge badge-primary">{{ user.role }}</span></td>
+          <td>
+            <span class="status-chip" [class]="user.status">
+              <span class="dot"></span>
+              {{ user.status | titlecase }}
+            </span>
+          </td>
+          <td>
+            <span class="verified-icon" *ngIf="user.verified">✅</span>
+            <span class="verified-icon unverified" *ngIf="!user.verified">❌</span>
+          </td>
+          <td>{{ user.rating ? '⭐ ' + user.rating : '—' }}</td>
+          <td>{{ user.createdAt | date:'MMM d, y' }}</td>
+          <td class="actions-cell">
+            <button class="btn-action view" title="View">👁</button>
+            <button class="btn-action edit" title="Edit">✏️</button>
+            <button class="btn-action delete" title="Delete" (click)="deleteUser(user.id)">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,220 @@
+/* ============================================
+   THEME TOGGLE SWITCH (iOS Style)
+   Modern, Animated, Professional
+   ============================================ */
+
+.theme-toggle-switch {
+  position: relative;
+  width: 64px;
+  height: 32px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  padding: 0;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+
+  /* Focus state */
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+
+  /* Active/Click state */
+  &:active .toggle-thumb {
+    width: 36px;
+  }
+}
+
+/* ===== TOGGLE TRACK (Background) ===== */
+.toggle-track {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  /* Light mode gradient (green/teal) */
+  .theme-toggle-switch:not(.dark) & {
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+  }
+
+  /* Dark mode gradient (dark blue/black) */
+  .theme-toggle-switch.dark & {
+    background: linear-gradient(135deg, #1a1d2e 0%, #0a0e27 100%);
+    box-shadow: 
+      inset 0 2px 8px rgba(0, 0, 0, 0.4),
+      0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Shine effect */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.6s;
+  }
+
+  .theme-toggle-switch:hover &::before {
+    left: 100%;
+  }
+}
+
+/* ===== TOGGLE THUMB (Circle) ===== */
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+
+  /* Light mode position (left) */
+  .theme-toggle-switch:not(.dark) & {
+    left: 3px;
+    background: white;
+  }
+
+  /* Dark mode position (right) */
+  .theme-toggle-switch.dark & {
+    left: calc(100% - 29px);
+    background: #f0f0f0;
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Hover effect */
+  .theme-toggle-switch:hover & {
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+  }
+}
+
+/* ===== THUMB ICON ===== */
+.thumb-icon {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+
+  /* Light mode icon (sun) */
+  .theme-toggle-switch:not(.dark) & {
+    animation: sunRotate 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Dark mode icon (moon) */
+  .theme-toggle-switch.dark & {
+    animation: moonRotate 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes sunRotate {
+  0% {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0);
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes moonRotate {
+  0% {
+    opacity: 0;
+    transform: rotate(180deg) scale(0);
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== HOVER EFFECTS ===== */
+.theme-toggle-switch:hover {
+  transform: translateY(-1px);
+}
+
+.theme-toggle-switch:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .theme-toggle-switch {
+    width: 56px;
+    height: 28px;
+  }
+
+  .toggle-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
+  .theme-toggle-switch.dark .toggle-thumb {
+    left: calc(100% - 25px);
+  }
+
+  .thumb-icon {
+    font-size: 12px;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-switch,
+  .toggle-track,
+  .toggle-thumb,
+  .thumb-icon {
+    transition: none;
+    animation: none;
+  }
+}

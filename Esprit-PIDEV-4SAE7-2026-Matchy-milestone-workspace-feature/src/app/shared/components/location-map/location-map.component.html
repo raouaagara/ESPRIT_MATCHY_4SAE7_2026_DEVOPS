@@ -1,0 +1,133 @@
+<div class="location-overlay" *ngIf="isVisible" (click)="hide()">
+  <div class="location-modal" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <span class="header-icon">📍</span>
+        <h2>Event Locations</h2>
+      </div>
+      <button class="close-btn" (click)="hide()" title="Close">
+        <span class="close-icon">✕</span>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      <!-- Single Event View -->
+      <div class="single-event-view" *ngIf="selectedEvent">
+        <!-- Online Event -->
+        <div class="online-event-card" *ngIf="selectedEvent.isOnline">
+          <div class="online-icon-large">💻</div>
+          <h3>{{ selectedEvent.title }}</h3>
+          <p class="online-label">Get it Online</p>
+          <div class="online-info">
+            <span class="info-icon">🌐</span>
+            <span>This is a virtual event</span>
+          </div>
+          <div class="online-features">
+            <div class="feature">
+              <span class="feature-icon">📹</span>
+              <span>Video Conference</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">💬</span>
+              <span>Live Chat</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">📱</span>
+              <span>Join from Anywhere</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offline Event with Map -->
+        <div class="offline-event-map" *ngIf="!selectedEvent.isOnline">
+          <div class="map-info">
+            <h3>{{ selectedEvent.title }}</h3>
+            <p class="location-address">
+              <span class="address-icon">📍</span>
+              {{ selectedEvent.location }}
+            </p>
+            <button class="open-maps-btn" (click)="openInGoogleMaps(selectedEvent)">
+              <span class="btn-icon">🗺️</span>
+              Open in Google Maps
+            </button>
+          </div>
+          <div class="map-container">
+            <iframe
+              *ngIf="selectedEvent.latitude && selectedEvent.longitude"
+              [src]="getOpenStreetMapUrl(selectedEvent) | safe: 'resourceUrl'"
+              frameborder="0"
+              allowfullscreen>
+            </iframe>
+            <div class="map-placeholder" *ngIf="!selectedEvent.latitude || !selectedEvent.longitude">
+              <span class="placeholder-icon">🗺️</span>
+              <p>Map preview not available</p>
+              <p class="placeholder-hint">{{ selectedEvent.location }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Events View -->
+      <div class="all-events-view" *ngIf="!selectedEvent">
+        <!-- Offline Events Section -->
+        <div class="events-section" *ngIf="offlineEvents.length > 0">
+          <h3 class="section-title">
+            <span class="title-icon">📍</span>
+            Physical Events
+          </h3>
+          <div class="events-grid">
+            <div class="event-card offline" *ngFor="let event of offlineEvents" (click)="selectedEvent = event">
+              <div class="card-icon">🏢</div>
+              <div class="card-content">
+                <h4>{{ event.title }}</h4>
+                <p class="card-location">
+                  <span class="loc-icon">📍</span>
+                  {{ event.location }}
+                </p>
+              </div>
+              <button class="view-map-btn">
+                <span>View Map</span>
+                <span class="arrow">→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Online Events Section -->
+        <div class="events-section" *ngIf="onlineEvents.length > 0">
+          <h3 class="section-title">
+            <span class="title-icon">💻</span>
+            Online Events
+          </h3>
+          <div class="events-grid">
+            <div class="event-card online" *ngFor="let event of onlineEvents">
+              <div class="card-icon">💻</div>
+              <div class="card-content">
+                <h4>{{ event.title }}</h4>
+                <p class="card-location online-text">
+                  <span class="loc-icon">🌐</span>
+                  Get it Online
+                </p>
+              </div>
+              <span class="online-badge">Virtual</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="events.length === 0">
+          <span class="empty-icon">📍</span>
+          <p>No events available</p>
+        </div>
+      </div>
+
+      <!-- Back Button (when viewing single event) -->
+      <button class="back-btn" *ngIf="selectedEvent" (click)="selectedEvent = null">
+        <span class="back-icon">←</span>
+        Back to all events
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,332 @@
+<div class="workspace-manager">
+  <div class="page-header">
+    <h1>Workspace Manager</h1>
+    <p>View team chat and review freelancer submissions</p>
+  </div>
+
+  <div class="content-wrapper">
+    <!-- Left Panel: Milestones List -->
+    <div class="milestones-panel">
+      <div class="panel-header">
+        <h2>Active Milestones</h2>
+        <select class="project-filter" (change)="filterByProject(+$any($event.target).value)">
+          <option value="0">All Projects</option>
+          <option *ngFor="let project of projects" [value]="project.id">
+            {{ project.companyName }} - {{ project.projectTitle }}
+          </option>
+        </select>
+      </div>
+
+      <div class="milestones-list">
+        <div 
+          *ngFor="let milestone of filteredMilestones"
+          class="milestone-card"
+          [class.active]="selectedMilestone?.id === milestone.id"
+          (click)="selectMilestone(milestone)"
+        >
+          <div class="milestone-header">
+            <h3>{{ milestone.title }}</h3>
+            <span class="status-badge" [class]="'status-' + milestone.status">
+              {{ milestone.status }}
+            </span>
+          </div>
+          <p class="milestone-description">{{ milestone.description }}</p>
+          <div class="milestone-meta">
+            <span class="meta-item">💰 ${{ milestone.budget }}</span>
+            <span class="meta-item">⏱️ {{ milestone.duration }}</span>
+          </div>
+          <div class="project-name">
+            {{ getProject(milestone.projectId)?.projectTitle }}
+          </div>
+        </div>
+
+        <div *ngIf="filteredMilestones.length === 0" class="empty-state">
+          <p>No active milestones found</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Workspace Details -->
+    <div class="workspace-panel" *ngIf="selectedMilestone">
+      <div class="workspace-header">
+        <div class="milestone-info">
+          <h2>{{ selectedMilestone.title }}</h2>
+          <p>{{ getProject(selectedMilestone.projectId)?.projectTitle }}</p>
+        </div>
+        <div class="team-count">
+          👥 {{ teamMembers.length }} team members
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'chat'"
+          (click)="switchTab('chat')"
+        >
+          <span class="tab-icon">💬</span>
+          <span class="tab-label">Team Chat</span>
+        </button>
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'submissions'"
+          (click)="switchTab('submissions')"
+        >
+          <span class="tab-icon">📤</span>
+          <span class="tab-label">Submissions</span>
+          <span class="tab-badge" *ngIf="submissions.length > 0">{{ submissions.length }}</span>
+        </button>
+      </div>
+
+      <!-- Chat Tab -->
+      <div class="tab-content" *ngIf="activeTab === 'chat'">
+        <div class="chat-container">
+          <div class="chat-messages">
+            <div 
+              *ngFor="let msg of chatMessages"
+              class="message"
+              [class.own-message]="msg.user_type === 'company'"
+            >
+              <div class="message-header">
+                <span class="user-name">{{ msg.user_name }}</span>
+                <span class="user-badge" [class]="'badge-' + msg.user_type">
+                  {{ msg.user_type === 'company' ? '🏢' : '👤' }}
+                </span>
+                <span class="message-time">{{ formatTime(msg.created_at) }}</span>
+              </div>
+              <div class="message-content">{{ msg.message }}</div>
+            </div>
+
+            <div *ngIf="chatMessages.length === 0" class="empty-chat">
+              <p>No messages yet. Start the conversation!</p>
+            </div>
+          </div>
+
+          <div class="chat-input">
+            <input 
+              type="text" 
+              [(ngModel)]="newMessage"
+              (keyup.enter)="sendMessage()"
+              placeholder="Type your message..."
+            />
+            <button (click)="sendMessage()" [disabled]="!newMessage.trim()">
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submissions Tab -->
+      <div class="tab-content" *ngIf="activeTab === 'submissions'">
+        <div class="submissions-list">
+          <div 
+            *ngFor="let submission of submissions"
+            class="submission-card"
+          >
+            <div class="submission-header">
+              <div class="submission-title">
+                <h3>{{ submission.title }}</h3>
+                <span class="freelancer-name">by {{ submission.freelancer_name }}</span>
+              </div>
+              <span class="status-badge" [class]="'status-' + submission.status">
+                {{ getSubmissionStatusLabel(submission.status) }}
+              </span>
+            </div>
+
+            <p class="submission-description" *ngIf="submission.description">
+              {{ submission.description }}
+            </p>
+
+            <div class="submission-meta">
+              <span class="meta-item">📅 {{ formatDate(submission.submitted_at) }}</span>
+              <a 
+                *ngIf="submission.file_url" 
+                [href]="submission.file_url" 
+                target="_blank"
+                class="file-link"
+              >
+                📎 {{ submission.file_name || 'View File' }}
+              </a>
+            </div>
+
+            <div class="submission-feedback" *ngIf="submission.feedback">
+              <strong>Feedback:</strong>
+              <p>{{ submission.feedback }}</p>
+            </div>
+
+            <div class="submission-actions">
+              <button 
+                class="btn-review"
+                (click)="openReviewModal(submission)"
+              >
+                {{ submission.status === 'pending' ? 'Review' : 'Update Review' }}
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="submissions.length === 0" class="empty-state">
+            <p>No submissions yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="workspace-panel empty" *ngIf="!selectedMilestone">
+      <div class="empty-state-large">
+        <div class="icon">📋</div>
+        <h2>Select a Milestone</h2>
+        <p>Choose a milestone from the list to view team chat and submissions</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal-overlay" *ngIf="showReviewModal" (click)="closeReviewModal()">
+  <div class="modal-content review-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Review Submission</h2>
+      <button class="close-btn" (click)="closeReviewModal()">×</button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedSubmission">
+      <!-- Submission Preview -->
+      <div class="submission-preview">
+        <div class="preview-header">
+          <h3>{{ selectedSubmission.title }}</h3>
+          <span class="current-status" [class]="'status-' + selectedSubmission.status">
+            {{ getSubmissionStatusLabel(selectedSubmission.status) }}
+          </span>
+        </div>
+        <p class="freelancer-info">
+          <span class="label">Submitted by:</span> {{ selectedSubmission.freelancer_name }}
+        </p>
+        <p class="submission-date">
+          <span class="label">Date:</span> {{ formatDate(selectedSubmission.submitted_at) }}
+        </p>
+        
+        <div class="description-box" *ngIf="selectedSubmission.description">
+          <strong>Description:</strong>
+          <p>{{ selectedSubmission.description }}</p>
+        </div>
+
+        <a 
+          *ngIf="selectedSubmission.file_url" 
+          [href]="selectedSubmission.file_url" 
+          target="_blank"
+          class="file-preview-link"
+        >
+          <span class="icon">📎</span>
+          <span class="text">{{ selectedSubmission.file_name || 'View Submitted File' }}</span>
+          <span class="external">↗</span>
+        </a>
+      </div>
+
+      <div class="review-divider"></div>
+
+      <!-- Review Form -->
+      <div class="review-section">
+        <h4>Your Review</h4>
+        
+        <!-- Rating (only for approval) -->
+        <div class="form-group rating-group" *ngIf="reviewForm.status === 'approved'">
+          <label>Rating <span class="required">*</span></label>
+          <div class="star-rating">
+            <span 
+              *ngFor="let star of [1,2,3,4,5]"
+              class="star"
+              [class.filled]="star <= (hoveredRating || reviewForm.rating)"
+              [class.hovered]="star <= hoveredRating"
+              (click)="setRating(star)"
+              (mouseenter)="setHoveredRating(star)"
+              (mouseleave)="clearHoveredRating()"
+            >
+              ★
+            </span>
+            <span class="rating-text" *ngIf="reviewForm.rating > 0">
+              {{ reviewForm.rating }} / 5
+            </span>
+          </div>
+        </div>
+
+        <!-- Decision Buttons -->
+        <div class="form-group">
+          <label>Decision <span class="required">*</span></label>
+          <div class="decision-buttons">
+            <button 
+              type="button"
+              class="decision-btn approve"
+              [class.active]="reviewForm.status === 'approved'"
+              (click)="reviewForm.status = 'approved'"
+            >
+              <span class="icon">✓</span>
+              <span class="text">Approve</span>
+            </button>
+            <button 
+              type="button"
+              class="decision-btn revision"
+              [class.active]="reviewForm.status === 'revision_requested'"
+              (click)="reviewForm.status = 'revision_requested'"
+            >
+              <span class="icon">↻</span>
+              <span class="text">Request Revision</span>
+            </button>
+            <button 
+              type="button"
+              class="decision-btn reject"
+              [class.active]="reviewForm.status === 'rejected'"
+              (click)="reviewForm.status = 'rejected'"
+            >
+              <span class="icon">✕</span>
+              <span class="text">Reject</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Feedback/Notes -->
+        <div class="form-group">
+          <label>
+            {{ reviewForm.status === 'approved' ? 'Notes & Feedback' : 'Feedback' }}
+            <span class="required" *ngIf="reviewForm.status !== 'pending'">*</span>
+          </label>
+          <textarea 
+            [(ngModel)]="reviewForm.feedback"
+            class="form-control feedback-textarea"
+            rows="5"
+            [placeholder]="getFeedbackPlaceholder()"
+          ></textarea>
+          <small class="helper-text">
+            {{ reviewForm.status === 'approved' ? 'Share what you liked about the work' : 
+               reviewForm.status === 'revision_requested' ? 'Explain what needs to be changed' :
+               reviewForm.status === 'rejected' ? 'Explain why the work is not acceptable' :
+               'Provide detailed feedback for the freelancer' }}
+          </small>
+        </div>
+
+        <!-- Previous Feedback (if exists) -->
+        <div class="previous-feedback" *ngIf="selectedSubmission.feedback">
+          <strong>Previous Feedback:</strong>
+          <p>{{ selectedSubmission.feedback }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeReviewModal()">Cancel</button>
+      <button 
+        class="btn-submit" 
+        [class.approve]="reviewForm.status === 'approved'"
+        [class.revision]="reviewForm.status === 'revision_requested'"
+        [class.reject]="reviewForm.status === 'rejected'"
+        (click)="submitReview()"
+      >
+        <span *ngIf="reviewForm.status === 'approved'">✓ Approve Work</span>
+        <span *ngIf="reviewForm.status === 'revision_requested'">↻ Request Revision</span>
+        <span *ngIf="reviewForm.status === 'rejected'">✕ Reject Work</span>
+        <span *ngIf="reviewForm.status === 'pending'">Submit Review</span>
+      </button>
+    </div>
+  </div>
+</div>

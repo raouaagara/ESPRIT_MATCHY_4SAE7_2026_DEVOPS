@@ -1,0 +1,159 @@
+<div class="profile-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="user-card">
+      <div class="avatar-large">{{ getInitials() }}</div>
+      <div class="user-info">
+        <h1>{{ profileForm.get('firstName')?.value }} {{ profileForm.get('lastName')?.value }}</h1>
+        <p>{{ profileForm.get('email')?.value }}</p>
+        <span class="role-badge">Admin · Matchy</span>
+      </div>
+    </div>
+    <div class="success-toast" *ngIf="saveSuccess">
+      ✅ Profile saved successfully!
+    </div>
+  </div>
+
+  <div class="settings-layout">
+    <!-- Tabs Sidebar -->
+    <nav class="tabs-nav">
+      <button *ngFor="let tab of tabs"
+        class="tab-btn" [class.active]="activeTab === tab.id"
+        (click)="activeTab = tab.id">
+        <span class="tab-icon">{{ tab.icon }}</span>
+        {{ tab.label }}
+      </button>
+    </nav>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+
+      <!-- Profile Tab -->
+      <div *ngIf="activeTab === 'profile'">
+        <h2 class="section-title">Personal Information</h2>
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" formControlName="firstName" class="form-input" placeholder="First name">
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" formControlName="lastName" class="form-input" placeholder="Last name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" formControlName="email" class="form-input" placeholder="Email">
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="text" formControlName="phone" class="form-input" placeholder="+216 ...">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>City</label>
+              <input type="text" formControlName="city" class="form-input" placeholder="City">
+            </div>
+            <div class="form-group">
+              <label>Website</label>
+              <input type="url" formControlName="website" class="form-input" placeholder="https://...">
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>Bio</label>
+            <textarea formControlName="bio" class="form-textarea" rows="4" placeholder="Tell us about yourself..."></textarea>
+          </div>
+          <button type="submit" class="btn-save" [disabled]="profileForm.invalid">Save Changes</button>
+        </form>
+      </div>
+
+      <!-- Skills Tab -->
+      <div *ngIf="activeTab === 'skills'">
+        <h2 class="section-title">Métiers &amp; compétences</h2>
+        <p class="section-sub">Choisissez votre ou vos métiers (recherche et filtres par catégorie).</p>
+        <app-job-selector
+          [multiple]="true"
+          [maxSelected]="5"
+          [(selectedIds)]="selectedJobIds">
+        </app-job-selector>
+
+        <h3 class="subsection-title">Compétences libres</h3>
+        <div class="skills-grid">
+          <span class="skill-tag" *ngFor="let skill of skills">
+            {{ skill }}
+            <button class="skill-remove" (click)="removeSkill(skill)">×</button>
+          </span>
+        </div>
+        <div class="add-skill">
+          <input type="text" [(ngModel)]="newSkill" (keyup.enter)="addSkill()"
+            class="form-input" placeholder="Add a skill (press Enter)...">
+          <button class="btn-add-skill" (click)="addSkill()">Add</button>
+        </div>
+      </div>
+
+      <!-- Security Tab -->
+      <div *ngIf="activeTab === 'security'">
+        <h2 class="section-title">Password &amp; Security</h2>
+        <form [formGroup]="securityForm" class="security-form">
+          <div class="form-group full">
+            <label>Current Password</label>
+            <input type="password" formControlName="currentPassword" class="form-input" placeholder="••••••••">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" formControlName="newPassword" class="form-input" placeholder="Min. 8 characters">
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" formControlName="confirmPassword" class="form-input" placeholder="Repeat password">
+            </div>
+          </div>
+          <button type="submit" class="btn-save danger">Update Password</button>
+        </form>
+      </div>
+
+      <!-- Notifications Tab -->
+      <div *ngIf="activeTab === 'notifications'">
+        <h2 class="section-title">Notification Preferences</h2>
+        <div class="notif-section">
+          <h3>Email Notifications</h3>
+          <div class="toggle-row">
+            <div>
+              <strong>New Project Matches</strong>
+              <p>Get notified when a project matches your skills</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" [(ngModel)]="notifications.emailProjects">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <strong>Messages</strong>
+              <p>New messages from clients or freelancers</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" [(ngModel)]="notifications.emailMessages">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <strong>Payment Updates</strong>
+              <p>Invoice and payment status notifications</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" [(ngModel)]="notifications.emailPayments">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

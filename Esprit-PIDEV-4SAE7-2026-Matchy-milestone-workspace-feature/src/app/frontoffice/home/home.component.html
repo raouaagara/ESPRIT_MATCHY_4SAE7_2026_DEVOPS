@@ -1,0 +1,94 @@
+<section class="hero">
+  <!-- Background Effects -->
+  <div class="hero-bg">
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-grid"></div>
+  </div>
+
+  <div class="hero-container">
+    <!-- Left Content -->
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        #1 Tunisian Freelance Platform
+      </div>
+
+      <h1 class="hero-title">
+        Connect your<br>
+        projects<br>
+        with the best<br>
+        <span class="title-accent">freelancers</span>
+      </h1>
+
+      <p class="hero-description">
+        Matchy connects Tunisian clients and freelancers for efficient,
+        transparent, and secure collaborations.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn-primary" (click)="getStarted()">
+          Get started for free →
+        </button>
+        <button class="btn-secondary" (click)="goToLogin()">
+          I already have an account
+        </button>
+        <button class="btn-secondary" (click)="explorePortal()" style="background: linear-gradient(135deg,#6366f1,#a855f7); color:#fff; border:none;">
+          ✨ Explore alternative experience
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="hero-stats">
+        <div class="stat" *ngFor="let stat of stats">
+          <span class="stat-value">{{ stat.value }}</span>
+          <span class="stat-label">{{ stat.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Cards -->
+    <div class="hero-cards">
+      <div class="project-card" *ngFor="let card of projectCards; let i = index"
+           [style.animation-delay]="(i * 0.15) + 's'">
+        <div class="card-icon" [style.background]="card.iconBg + '20'">
+          <span [style.filter]="'drop-shadow(0 0 6px ' + card.iconBg + ')'">{{ card.icon }}</span>
+        </div>
+        <div class="card-content">
+          <span class="card-label">{{ card.label }}</span>
+          <span class="card-title" *ngIf="card.title">{{ card.title }}</span>
+          <div class="card-stars" *ngIf="card.stars">
+            <span *ngFor="let s of getStarsArray(card.stars)">⭐</span>
+          </div>
+          <span class="card-sub" *ngIf="card.sub">{{ card.sub }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features" id="how-it-works">
+  <div class="features-container">
+    <h2 class="section-title">How it <span class="text-gradient">works</span></h2>
+    <p class="section-sub">Simple, fast, and secure in 3 steps</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Post your project</h3>
+        <p>Describe your project, set a budget and timeline, and publish it on the platform.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Receive applications</h3>
+        <p>Qualified freelancers apply. Review profiles, ratings, and portfolios easily.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Collaborate securely</h3>
+        <p>Work with your chosen freelancer with payment protection and milestone tracking.</p>
+      </div>
+    </div>
+  </div>
+</section>

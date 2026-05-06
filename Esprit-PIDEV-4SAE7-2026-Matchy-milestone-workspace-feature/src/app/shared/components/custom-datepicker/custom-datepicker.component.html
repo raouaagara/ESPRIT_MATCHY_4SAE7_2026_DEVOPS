@@ -1,0 +1,55 @@
+<div class="datepicker-wrapper">
+  <div class="datepicker-input" (click)="toggleCalendar()">
+    <input 
+      type="text" 
+      [value]="displayValue" 
+      [placeholder]="placeholder"
+      readonly
+      class="form-input"
+    />
+    <span class="calendar-icon">📅</span>
+  </div>
+
+  <div class="calendar-dropdown" *ngIf="isOpen" (click)="$event.stopPropagation()">
+    <div class="calendar-header">
+      <button type="button" class="nav-btn" (click)="previousMonth()">
+        <span>←</span>
+      </button>
+      <div class="month-year">
+        {{ monthNames[currentMonth.getMonth()] }} {{ currentMonth.getFullYear() }}
+      </div>
+      <button type="button" class="nav-btn" (click)="nextMonth()">
+        <span>→</span>
+      </button>
+    </div>
+
+    <div class="calendar-body">
+      <div class="day-names">
+        <div class="day-name" *ngFor="let day of dayNames">{{ day }}</div>
+      </div>
+
+      <div class="weeks">
+        <div class="week" *ngFor="let week of weeks">
+          <button
+            type="button"
+            class="day"
+            *ngFor="let date of week"
+            [class.other-month]="!isCurrentMonth(date)"
+            [class.today]="isToday(date)"
+            [class.selected]="isSelected(date)"
+            (click)="selectDate(date)"
+          >
+            {{ date.getDate() }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-footer">
+      <button type="button" class="footer-btn clear" (click)="clear()">Clear</button>
+      <button type="button" class="footer-btn today" (click)="selectToday()">Today</button>
+    </div>
+  </div>
+</div>
+
+<div class="calendar-overlay" *ngIf="isOpen" (click)="closeCalendar()"></div>

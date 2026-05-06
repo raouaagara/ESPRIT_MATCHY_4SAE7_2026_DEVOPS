@@ -1,0 +1,205 @@
+<div class="modal-backdrop" *ngIf="!showSuccessModal">
+  <div class="payment-shell">
+
+    <div class="payment-main" [formGroup]="paymentForm">
+      <div class="payment-header">
+        <div class="header-top">
+          <div>
+            <h2>Secure Payment</h2>
+            <p class="sub">Step {{ currentStep }} / 4 — {{ plan.name }}</p>
+          </div>
+          <div class="header-actions">
+            <span class="session-timer" title="Session">⏱ {{ timerLabel }}</span>
+            <app-currency-selector></app-currency-selector>
+            <button type="button" class="close-btn" (click)="close.emit()">✕</button>
+          </div>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-fill" [style.width.%]="progressPercent"></div>
+        </div>
+      </div>
+
+      <!-- Step 1 — Summary -->
+      <div class="step-panel" *ngIf="currentStep === 1">
+        <h3 class="step-title">Order Summary</h3>
+        <div class="order-recap">
+          <div class="recap-row"><span>Plan</span><strong [style.color]="plan.color">{{ plan.name }}</strong></div>
+          <div class="recap-row"><span>Duration</span><strong>{{ subscription.duration }} month{{ (subscription.duration || 1) > 1 ? 's' : '' }}</strong></div>
+          <div class="recap-row"><span>Currency</span><strong>{{ currencyService.getCurrency() }}</strong></div>
+          <div class="recap-row total"><span>Total</span><strong>{{ currencyService.formatAmount(effectivePriceTnd) }}</strong></div>
+        </div>
+        <div class="promo-box">
+          <label>Promo Code</label>
+          <div class="promo-row">
+            <input type="text" formControlName="promoCode" placeholder="e.g. LAUNCH50" class="promo-input">
+            <button type="button" class="btn-secondary" (click)="validatePromo()" [disabled]="promoChecking">
+              {{ promoChecking ? '…' : 'Apply' }}
+            </button>
+          </div>
+          <p class="promo-msg" *ngIf="promoMessage" [class.ok]="promoResult?.valid" [class.err]="promoResult && !promoResult.valid">{{ promoMessage }}</p>
+        </div>
+        <div class="security-badges">
+          <span class="sec-badge">🔒 Secure Payment</span>
+          <span class="sec-badge">SSL</span>
+        </div>
+        <div class="step-nav">
+          <button type="button" class="btn-primary" (click)="goStep1Next()">Continue</button>
+        </div>
+      </div>
+
+      <!-- Step 2 — Method -->
+      <div class="step-panel" *ngIf="currentStep === 2">
+        <h3 class="step-title">Payment Method</h3>
+        <p class="step-hint">Choose how you want to pay.</p>
+        <div class="method-grid">
+          <button type="button" class="method-card" [class.selected]="activeMethod === 'CARD'" (click)="selectMethod('CARD')">
+            <span class="mi">💳</span>
+            <span>Card</span>
+            <small>Visa · Mastercard</small>
+          </button>
+          <button type="button" class="method-card" [class.selected]="activeMethod === 'PAYPAL'" (click)="selectMethod('PAYPAL')">
+            <span class="mi">🅿️</span>
+            <span>PayPal</span>
+            <small>Pay with PayPal</small>
+          </button>
+        </div>
+        <p class="error-inline" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <div class="step-nav">
+          <button type="button" class="btn-back" (click)="goBack()">← Back</button>
+          <button type="button" class="btn-primary" (click)="goStep2Next()">Continue</button>
+        </div>
+      </div>
+
+      <!-- Step 3 — Details -->
+      <div class="step-panel" *ngIf="currentStep === 3">
+        <h3 class="step-title">Details</h3>
+
+        <!-- CARD -->
+        <ng-container *ngIf="activeMethod === 'CARD'">
+          <div class="card-brand-row">
+            <span *ngIf="cardBrand === 'visa'" class="brand visa">VISA</span>
+            <span *ngIf="cardBrand === 'mastercard'" class="brand mc">Mastercard</span>
+            <span *ngIf="cardBrand === 'unknown'" class="brand">Card</span>
+          </div>
+          <div class="card-visual" [style.background]="'linear-gradient(135deg, ' + plan.color + 'cc, ' + plan.color + '55)'">
+            <div class="card-logo">MATCHY</div>
+            <div class="card-number-display">
+              {{ paymentForm.get('cardNumber')?.value ?
+                (paymentForm.get('cardNumber')?.value | slice:0:4) + ' ' +
+                (paymentForm.get('cardNumber')?.value | slice:4:8) + ' ' +
+                (paymentForm.get('cardNumber')?.value | slice:8:12) + ' ' +
+                (paymentForm.get('cardNumber')?.value | slice:12:16)
+                : '•••• •••• •••• ••••' }}
+            </div>
+            <div class="card-info">
+              <span>{{ paymentForm.get('cardholderName')?.value || 'CARDHOLDER NAME' }}</span>
+              <span>{{ paymentForm.get('expiryDate')?.value || 'MM/YY' }}</span>
+            </div>
+            <div class="card-cvv-row">
+              <span class="card-cvv-label">CVV</span>
+              <span class="card-cvv-value">{{ paymentForm.get('cvv')?.value ? paymentForm.get('cvv')!.value : '•••' }}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Cardholder Name</label>
+            <input type="text" formControlName="cardholderName" [class.error]="isFieldInvalid('cardholderName')" autocomplete="cc-name">
+            <span class="error-msg" *ngIf="isFieldInvalid('cardholderName')">{{ fieldError('cardholderName') }}</span>
+          </div>
+          <div class="form-group">
+            <label>Card Number</label>
+            <input type="text" formControlName="cardNumber" maxlength="19" (input)="formatCardNumber($event)" [class.error]="isFieldInvalid('cardNumber')" autocomplete="cc-number" placeholder="1234 5678 9012 3456">
+            <span class="error-msg" *ngIf="isFieldInvalid('cardNumber')">{{ fieldError('cardNumber') }}</span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Expiry Date</label>
+              <input type="text" formControlName="expiryDate" maxlength="5" placeholder="MM/YY" (input)="formatExpiry($event)" [class.error]="isFieldInvalid('expiryDate')">
+              <span class="error-msg" *ngIf="isFieldInvalid('expiryDate')">{{ fieldError('expiryDate') }}</span>
+            </div>
+            <div class="form-group">
+              <label>CVV</label>
+              <input type="password" formControlName="cvv" maxlength="4" placeholder="•••" [class.error]="isFieldInvalid('cvv')" autocomplete="cc-csc">
+              <span class="error-msg" *ngIf="isFieldInvalid('cvv')">{{ fieldError('cvv') }}</span>
+            </div>
+          </div>
+          <div class="save-card">
+            <input type="checkbox" formControlName="saveCard" id="saveCard">
+            <label for="saveCard">Save card for future payments</label>
+          </div>
+        </ng-container>
+
+        <!-- PAYPAL -->
+        <ng-container *ngIf="activeMethod === 'PAYPAL'">
+          <div class="paypal-info-box">
+            <div class="paypal-logo">🅿️ PayPal</div>
+            <p>Enter your PayPal email address to proceed with the payment.</p>
+          </div>
+          <div class="form-group">
+            <label>PayPal Email</label>
+            <input type="email" formControlName="paypalEmail" placeholder="your@paypal.com" [class.error]="isFieldInvalid('paypalEmail')">
+            <span class="error-msg" *ngIf="isFieldInvalid('paypalEmail')">{{ fieldError('paypalEmail') }}</span>
+          </div>
+          <p class="security-note">🔒 You will be redirected to PayPal to confirm the payment securely.</p>
+        </ng-container>
+
+        <div class="step-nav">
+          <button type="button" class="btn-back" (click)="goBack()">← Back</button>
+          <button type="button" class="btn-primary" (click)="goStep3Next()">Continue</button>
+        </div>
+      </div>
+
+      <!-- Step 4 — Confirm -->
+      <div class="step-panel" *ngIf="currentStep === 4">
+        <h3 class="step-title">Confirmation</h3>
+        <div class="confirm-block">
+          <p><strong>Plan:</strong> <span [style.color]="plan.color">{{ plan.name }}</span></p>
+          <p><strong>Amount:</strong> {{ currencyService.formatAmount(effectivePriceTnd) }}</p>
+          <p><strong>Method:</strong>
+            <span *ngIf="activeMethod === 'CARD'">💳 Card</span>
+            <span *ngIf="activeMethod === 'PAYPAL'">🅿️ PayPal</span>
+          </p>
+          <p *ngIf="discountTnd > 0"><strong>Discount:</strong> -{{ discountTnd }} TND</p>
+          <p *ngIf="paymentForm.get('promoCode')?.value"><strong>Promo:</strong> {{ paymentForm.get('promoCode')?.value }}</p>
+        </div>
+        <p class="legal-note">By confirming, you agree to our terms and conditions.</p>
+        <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
+        <div class="step-nav">
+          <button type="button" class="btn-back" (click)="goBack()">← Back</button>
+          <button type="button" class="btn-primary" [style.background]="plan.color" [disabled]="isLoading" (click)="onSubmit()">
+            {{ isLoading ? 'Processing…' : 'Confirm & Pay' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="payment-sidebar">
+      <div class="side-card sticky">
+        <h4>Summary</h4>
+        <div class="side-row"><span>Plan</span><strong [style.color]="plan.color">{{ plan.name }}</strong></div>
+        <div class="side-row"><span>Amount</span><strong>{{ currencyService.formatAmount(effectivePriceTnd) }}</strong></div>
+        <div class="side-row" *ngIf="activeMethod">
+          <span>Method</span>
+          <strong>
+            <span *ngIf="activeMethod === 'CARD'">💳 Card</span>
+            <span *ngIf="activeMethod === 'PAYPAL'">🅿️ PayPal</span>
+          </strong>
+        </div>
+        <div class="side-row muted"><span>Session</span><span>{{ timerLabel }}</span></div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<app-payment-success-modal
+  *ngIf="showSuccessModal"
+  [isOpen]="showSuccessModal"
+  [transactionRef]="lastResponse?.transactionRef || lastResponse?.transactionId || ''"
+  [plan]="plan.name + ''"
+  [amount]="convertedAmount"
+  [currency]="currencyService.getCurrency()"
+  [currencySymbol]="currencyService.getSymbol()"
+  (downloadInvoicePdf)="downloadInvoicePreview()"
+  (closed)="onDashboard()">
+</app-payment-success-modal>

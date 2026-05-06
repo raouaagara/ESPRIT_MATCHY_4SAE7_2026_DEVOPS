@@ -1,0 +1,292 @@
+/* ═══════════════════════════════════════════════════
+   PREDICTION WIDGET STYLES
+   À ajouter dans projects.component.scss
+═══════════════════════════════════════════════════ */
+
+/* ── Trigger Button ──────────────────────────────── */
+.prediction-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 8px;
+  flex-wrap: wrap;
+}
+
+.btn-predict {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  color: #15803d;
+  border: 1.5px solid #86efac;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.18s;
+
+  .predict-icon { font-size: 15px; }
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    border-color: #4ade80;
+    box-shadow: 0 3px 12px rgba(34, 197, 94, 0.25);
+  }
+
+  &.loading {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.predict-hint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ── Prediction Card ─────────────────────────────── */
+.prediction-card {
+  background: linear-gradient(145deg, #f8faff, #fff);
+  border: 1.5px solid #c7d7fd;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-top: 6px;
+  animation: slideDown 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.prediction-section {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prediction-divider {
+  height: 1px;
+  background: #e8eef8;
+  margin: 0 18px;
+}
+
+.prediction-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .prediction-section-icon { font-size: 16px; }
+
+  .prediction-section-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+    flex: 1;
+  }
+}
+
+/* ── Confidence Badge ────────────────────────────── */
+.confidence-badge {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 50px;
+  letter-spacing: 0.04em;
+
+  &.conf-high { background: #dcfce7; color: #15803d; }
+  &.conf-med  { background: #fef3c7; color: #b45309; }
+  &.conf-low  { background: #fee2e2; color: #b91c1c; }
+}
+
+/* ── Range Bar ───────────────────────────────────── */
+.prediction-range {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.range-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.range-bar {
+  position: relative;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  overflow: visible;
+
+  .range-fill {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(90deg, #60a5fa, #2563EB);
+    border-radius: 6px;
+    top: 0;
+  }
+
+  .range-dot {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 2.5px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
+    &.recommended {
+      background: #2563EB;
+      z-index: 2;
+    }
+  }
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+/* ── Stats Row ───────────────────────────────────── */
+.prediction-stats {
+  display: flex;
+  gap: 0;
+  border: 1px solid #e8eef8;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 6px;
+  border-right: 1px solid #e8eef8;
+
+  &:last-child { border-right: none; }
+
+  &.stat-recommended {
+    background: #eff6ff;
+  }
+
+  .stat-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9.5px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+
+    &.highlight {
+      color: #2563EB;
+      font-size: 14px;
+    }
+  }
+}
+
+/* ── On-time Rate ────────────────────────────────── */
+.ontime-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ontime-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .ontime-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: #6b7280;
+  }
+
+  .ontime-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+
+    &.ontime-good { color: #15803d; }
+    &.ontime-med  { color: #b45309; }
+    &.ontime-bad  { color: #b91c1c; }
+  }
+}
+
+.ontime-bar {
+  height: 5px;
+  background: #f0f0f0;
+  border-radius: 5px;
+  overflow: hidden;
+
+  .ontime-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+
+    &.fill-good { background: linear-gradient(90deg, #4ade80, #16a34a); }
+    &.fill-med  { background: linear-gradient(90deg, #fbbf24, #d97706); }
+    &.fill-bad  { background: linear-gradient(90deg, #f87171, #dc2626); }
+  }
+}
+
+/* ── Apply Button ────────────────────────────────── */
+.btn-apply {
+  align-self: flex-start;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  background: #2563EB;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+
+  &:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  }
+}
+
+/* ── Footer ──────────────────────────────────────── */
+.prediction-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 18px;
+  background: #f8faff;
+  border-top: 1px solid #e8eef8;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10.5px;
+  color: #9ca3af;
+  font-style: italic;
+}

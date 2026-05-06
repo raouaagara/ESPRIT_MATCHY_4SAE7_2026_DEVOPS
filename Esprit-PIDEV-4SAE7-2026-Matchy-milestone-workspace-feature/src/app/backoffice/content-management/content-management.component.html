@@ -1,0 +1,166 @@
+<div class="admin-layout">
+  <div class="admin-container">
+    <main class="main-content">
+      <div class="admin-header">
+        <h1 class="page-title">Content Management</h1>
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          + Create Content
+        </button>
+      </div>
+
+      <div class="filter-tabs">
+        <button
+          class="filter-tab"
+          [class.active]="selectedFilter === 'all'"
+          (click)="filterContents('all')"
+        >
+          All Contents
+        </button>
+        <button
+          class="filter-tab"
+          [class.active]="selectedFilter === 'cours'"
+          (click)="filterContents('cours')"
+        >
+          Courses
+        </button>
+        <button
+          class="filter-tab"
+          [class.active]="selectedFilter === 'article'"
+          (click)="filterContents('article')"
+        >
+          Articles
+        </button>
+        <button
+          class="filter-tab"
+          [class.active]="selectedFilter === 'video'"
+          (click)="filterContents('video')"
+        >
+          Videos
+        </button>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">
+          Showing {{ filteredContents.length }} of
+          {{ contents.length }} contents
+        </h2>
+      </div>
+
+      <div class="contents-grid">
+        <div *ngFor="let content of filteredContents" class="content-card">
+          <div class="content-date">
+            {{ getContentIcon(content.type) }}
+            {{ content.createdAt | date: "dd/MM/yyyy" }}
+          </div>
+          <h3 class="content-title">{{ content.title }}</h3>
+          <p class="content-description">{{ content.description }}</p>
+          <div class="content-meta">
+            <span
+              class="content-badge"
+              [ngClass]="getContentBadgeClass(content.type)"
+            >
+              {{ content.type }}
+            </span>
+            <span class="content-level">{{ getLevelLabel(content) }}</span>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-edit" (click)="openEditModal(content)">
+              ✏️ Edit
+            </button>
+            <button class="btn btn-delete" (click)="deleteContent(content)">
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="filteredContents.length === 0" class="no-results">
+        <p>No contents found.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? "Edit Content" : "Create New Content" }}</h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+    <form #contentForm="ngForm" (ngSubmit)="saveContent()">
+      <div class="form-group">
+        <label>Title</label>
+        <input
+          type="text"
+          [(ngModel)]="currentContent.title"
+          name="title"
+          required
+          minlength="3"
+          class="form-input"
+          #titleField="ngModel"
+        />
+        <div *ngIf="titleField.invalid && titleField.touched" class="error">
+          Title is required (min 3 characters).
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea
+          [(ngModel)]="currentContent.description"
+          name="description"
+          required
+          minlength="10"
+          rows="4"
+          class="form-input"
+          #descField="ngModel"
+        ></textarea>
+        <div *ngIf="descField.invalid && descField.touched" class="error">
+          Description is required (min 10 characters).
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select
+          [(ngModel)]="currentContent.type"
+          name="type"
+          required
+          class="form-input"
+        >
+          <option value="COURS">📚 Cours</option>
+          <option value="ARTICLE">📝 Article</option>
+          <option value="VIDEO">🎥 Video</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Level</label>
+        <select
+          [(ngModel)]="currentContent.level"
+          name="level"
+          required
+          class="form-input"
+        >
+          <option value="DEBUTANT">
+            {{ getLevelOptionLabel("DEBUTANT") }}
+          </option>
+          <option value="INTERMEDIAIRE">
+            {{ getLevelOptionLabel("INTERMEDIAIRE") }}
+          </option>
+          <option value="AVANCE">{{ getLevelOptionLabel("AVANCE") }}</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-cancel" (click)="closeModal()">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="contentForm.invalid"
+        >
+          {{ isEditMode ? "Update" : "Create" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

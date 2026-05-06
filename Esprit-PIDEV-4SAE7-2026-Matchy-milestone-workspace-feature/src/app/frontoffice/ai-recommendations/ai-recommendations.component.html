@@ -1,0 +1,126 @@
+<div class="ai-recommendations-container">
+  <div class="header">
+    <h2>
+      <i class="fas fa-magic"></i>
+      AI-Powered Project Recommendations
+    </h2>
+    <p class="subtitle">Projects that match your skills and experience</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Finding best matches for you...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && recommendations.length === 0" class="no-results">
+    <i class="fas fa-inbox"></i>
+    <p>No recommendations available at the moment</p>
+  </div>
+
+  <div class="recommendations-grid" *ngIf="!loading && recommendations.length > 0">
+    <div class="recommendation-card" *ngFor="let project of recommendations">
+      <!-- Match Score Badge -->
+      <div class="match-score-badge" [style.background-color]="getMatchScoreColor(project.match_score)">
+        <div class="score">{{ project.match_score }}%</div>
+        <div class="label">{{ getMatchScoreLabel(project.match_score) }}</div>
+      </div>
+
+      <!-- Project Info -->
+      <div class="project-header">
+        <h3>{{ project.project_title }}</h3>
+        <p class="company">{{ project.company_name }}</p>
+      </div>
+
+      <p class="description">{{ project.description }}</p>
+
+      <!-- Matching Skills -->
+      <div class="matching-skills">
+        <strong>
+          <i class="fas fa-check-circle"></i>
+          {{ project.matching_skills.length }} Matching Skills:
+        </strong>
+        <div class="skills-tags">
+          <span class="skill-tag matched" *ngFor="let skill of project.matching_skills">
+            {{ skill }}
+          </span>
+        </div>
+      </div>
+
+      <!-- All Skills -->
+      <div class="all-skills">
+        <strong>Required Skills:</strong>
+        <div class="skills-tags">
+          <span 
+            class="skill-tag" 
+            *ngFor="let skill of project.skills"
+            [class.matched]="project.matching_skills.includes(skill)">
+            {{ skill }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Project Details -->
+      <div class="project-details">
+        <div class="detail-item">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>{{ project.budget }} {{ project.currency }}</span>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>{{ project.location }}</span>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-calendar-alt"></i>
+          <span>{{ project.deadline | date: 'MMM d, y' }}</span>
+        </div>
+        <div class="detail-item">
+          <i class="fas fa-folder"></i>
+          <span>{{ project.category }}</span>
+        </div>
+      </div>
+
+      <!-- Score Breakdown -->
+      <div class="score-breakdown">
+        <h4>Match Score Breakdown:</h4>
+        <div class="breakdown-item">
+          <span>Skills Match</span>
+          <div class="progress-bar">
+            <div class="progress" [style.width.%]="project.score_breakdown.skills * 2.5"></div>
+          </div>
+          <span class="score-value">{{ project.score_breakdown.skills }}/40</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Experience</span>
+          <div class="progress-bar">
+            <div class="progress" [style.width.%]="project.score_breakdown.experience * 5"></div>
+          </div>
+          <span class="score-value">{{ project.score_breakdown.experience }}/20</span>
+        </div>
+        <div class="breakdown-item">
+          <span>Rating</span>
+          <div class="progress-bar">
+            <div class="progress" [style.width.%]="project.score_breakdown.rating * 5"></div>
+          </div>
+          <span class="score-value">{{ project.score_breakdown.rating }}/20</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions">
+        <button class="btn-primary" [routerLink]="['/frontoffice/projects', project.id]">
+          <i class="fas fa-eye"></i>
+          View Project
+        </button>
+        <button class="btn-secondary">
+          <i class="fas fa-paper-plane"></i>
+          Apply Now
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

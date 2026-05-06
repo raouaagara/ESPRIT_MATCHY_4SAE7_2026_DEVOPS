@@ -1,0 +1,477 @@
+.subscription-page {
+  min-height: 100vh;
+  background: var(--fo-bg-primary);
+  padding: 100px 32px 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(79, 110, 247, 0.12);
+    border: 1px solid rgba(79, 110, 247, 0.25);
+    border-radius: 20px;
+    color: var(--primary-light);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1.5px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--fo-text-secondary);
+    font-size: 15px;
+  }
+}
+
+.current-plan-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--fo-bg-card);
+  border: 1px solid var(--fo-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  align-self: flex-start;
+
+  .plan-icon {
+    font-size: 28px;
+  }
+
+  .plan-label {
+    display: block;
+    font-size: 11px;
+    color: var(--fo-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .plan-name {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .renew-date {
+    font-size: 12px;
+    color: var(--fo-text-muted);
+    border-left: 1px solid var(--fo-border);
+    padding-left: 14px;
+  }
+}
+
+.billing-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 0 auto 40px;
+}
+
+.billing-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--fo-bg-card);
+  border: 1px solid var(--fo-border);
+  border-radius: 10px;
+  padding: 4px;
+  width: fit-content;
+  margin: 0;
+
+  button {
+    padding: 9px 20px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: var(--fo-text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+
+    &.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .discount-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border-radius: 6px;
+      font-size: 11px;
+      margin-left: 6px;
+    }
+  }
+}
+
+.plans-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 60px;
+}
+
+.plan-card {
+  background: var(--fo-bg-card);
+  border: 1px solid var(--fo-border);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  &.popular {
+    border-color: rgba(79, 110, 247, 0.4) !important;
+    box-shadow: 0 0 0 1px rgba(79, 110, 247, 0.2);
+  }
+
+  .popular-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .plan-header {
+    margin-bottom: 24px;
+    text-align: center;
+
+    .plan-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin: 0 auto 12px;
+    }
+
+    .plan-name {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 4px;
+    }
+
+    .plan-desc {
+      font-size: 13px;
+      color: var(--fo-text-muted);
+      margin-bottom: 16px;
+    }
+
+    .plan-price {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 4px;
+      flex-wrap: wrap;
+
+      .price-amount {
+        font-family: var(--font-display);
+        font-size: 36px;
+        font-weight: 800;
+      }
+
+      .price-currency {
+        font-size: 13px;
+        color: var(--fo-text-muted);
+      }
+
+      .price-note {
+        width: 100%;
+        text-align: center;
+        font-size: 12px;
+        color: var(--success);
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .plan-features {
+    list-style: none;
+    flex: 1;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    li {
+      font-size: 13px;
+      color: var(--fo-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .check {
+      font-weight: 700;
+      font-size: 14px;
+    }
+  }
+
+  .plan-btn {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.2s;
+
+    &:not(.current):hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    &.current {
+      cursor: default;
+      background: transparent !important;
+    }
+  }
+}
+
+/* Modals & Payment Method Cards */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--fo-bg-card);
+  border: 1px solid var(--fo-border);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+  &.modal-sm {
+    max-width: 420px;
+  }
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--fo-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    margin: 0;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--fo-text-muted);
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+      color: white;
+    }
+  }
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--fo-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.payment-method-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.payment-method-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--fo-border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .pm-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .pm-label {
+    font-weight: 700;
+    color: white;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .pm-desc {
+    font-size: 11px;
+    color: var(--fo-text-muted);
+    line-height: 1.4;
+  }
+}
+
+/* Success Modal */
+.success-modal {
+  text-align: center;
+
+  .success-icon-large {
+    width: 64px;
+    height: 64px;
+    background: var(--success);
+    color: white;
+    border-radius: 50%;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+  }
+
+  .success-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 8px;
+  }
+
+  .success-message {
+    color: var(--fo-text-secondary);
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+
+  .success-details {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--fo-text-secondary);
+    margin-bottom: 24px;
+  }
+
+  .btn-download-invoice {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--fo-border);
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: white;
+    }
+
+    .pdf-icon {
+      font-size: 18px;
+    }
+  }
+}
+
+.btn-primary {
+  padding: 10px 24px;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 900px) {
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-method-grid {
+    grid-template-columns: 1fr;
+  }
+}

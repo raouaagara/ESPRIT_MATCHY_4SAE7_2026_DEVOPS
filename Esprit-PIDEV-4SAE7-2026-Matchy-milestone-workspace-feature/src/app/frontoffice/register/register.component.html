@@ -1,0 +1,246 @@
+<button class="theme-toggle" (click)="toggleTheme()" [attr.aria-label]="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+  <svg *ngIf="isDark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+  <svg *ngIf="!isDark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+</button>
+
+<div class="register-page">
+
+  <!-- Canvas animation -->
+  <canvas #canvasEl class="register-canvas"></canvas>
+
+  <!-- Glow orbs -->
+  <div class="bg-glow g1"></div>
+  <div class="bg-glow g2"></div>
+  <div class="bg-glow g3"></div>
+
+  <!-- Back to Home -->
+  <a routerLink="/" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to home
+  </a>
+
+  <!-- ═══ STEP 1: Choose Role ═══ -->
+  <div class="register-container" *ngIf="step === 'role'">
+
+    <div class="brand">
+      <div class="logo-icon">M</div>
+      <span class="logo-text">Match<span class="accent">y</span></span>
+    </div>
+
+    <div class="steps">
+      <div class="step on"></div>
+      <div class="step"></div>
+      <div class="step"></div>
+      <span class="step-label">Choose your role</span>
+    </div>
+
+    <h1 class="title">Join <span class="title-gradient">Matchy</span></h1>
+    <p class="subtitle">How do you want to use Matchy?</p>
+
+    <div class="role-cards">
+
+      <!-- CLIENT -->
+      <div class="role-card client-card" (click)="selectRole('CLIENT')">
+        <div class="role-card-shine"></div>
+        <div class="role-icon client-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          </svg>
+        </div>
+        <h3>I'm a Client</h3>
+        <p>Post projects and hire talented freelancers for your business needs.</p>
+        <ul class="role-perks">
+          <li><span class="perk-dot client-dot"></span>Post unlimited projects</li>
+          <li><span class="perk-dot client-dot"></span>Review proposals</li>
+          <li><span class="perk-dot client-dot"></span>Hire top freelancers</li>
+          <li><span class="perk-dot client-dot"></span>Track milestones</li>
+        </ul>
+        <button class="btn-role btn-client">
+          Get started as Client
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- FREELANCER -->
+      <div class="role-card freelancer-card" (click)="selectRole('FREELANCER')">
+        <div class="role-card-shine"></div>
+        <div class="role-icon freelancer-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </div>
+        <h3>I'm a Freelancer</h3>
+        <p>Find exciting projects and work with clients across Tunisia.</p>
+        <ul class="role-perks">
+          <li><span class="perk-dot freelancer-dot"></span>Browse open projects</li>
+          <li><span class="perk-dot freelancer-dot"></span>Submit proposals</li>
+          <li><span class="perk-dot freelancer-dot"></span>Build your portfolio</li>
+          <li><span class="perk-dot freelancer-dot"></span>Get paid securely</li>
+        </ul>
+        <button class="btn-role btn-freelancer">
+          Get started as Freelancer
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+    </div>
+
+    <p class="login-hint">
+      Already have an account?
+      <a routerLink="/login" class="login-link">Sign in</a>
+    </p>
+  </div>
+
+  <!-- ═══ STEP 2: Registration Form ═══ -->
+  <div class="register-container form-step" *ngIf="step === 'form'">
+
+    <button class="back-btn" (click)="goBackToRole()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Change role
+    </button>
+
+    <div class="brand">
+      <div class="logo-icon">M</div>
+      <span class="logo-text">Match<span class="accent">y</span></span>
+    </div>
+
+    <div class="steps">
+      <div class="step on"></div>
+      <div class="step on"></div>
+      <div class="step"></div>
+      <span class="step-label">Create account</span>
+    </div>
+
+    <div class="role-badge" [class.client]="selectedRole === 'CLIENT'" [class.freelancer]="selectedRole === 'FREELANCER'">
+      <svg *ngIf="selectedRole === 'CLIENT'" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      <svg *ngIf="selectedRole === 'FREELANCER'" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      {{ selectedRole === 'CLIENT' ? 'Client Account' : 'Freelancer Account' }}
+    </div>
+
+    <h1 class="title">Create your <span class="title-gradient">account</span></h1>
+
+    <!-- Form card -->
+    <div class="form-card">
+
+      <!-- Error -->
+      <div class="login-error" *ngIf="error">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>{{ error }}</span>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="reg-form" novalidate>
+
+        <!-- Name row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input formControlName="firstName" class="form-input"
+                   [class.invalid]="isInvalid('firstName')" placeholder="Sara">
+            <span class="field-error" *ngIf="isInvalid('firstName')">Required (min 2 chars)</span>
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input formControlName="lastName" class="form-input"
+                   [class.invalid]="isInvalid('lastName')" placeholder="Ben Ali">
+            <span class="field-error" *ngIf="isInvalid('lastName')">Required (min 2 chars)</span>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input formControlName="email" type="email" class="form-input"
+                 [class.invalid]="isInvalid('email')" placeholder="sara@example.com">
+          <span class="field-error" *ngIf="isInvalid('email')">Valid email required</span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label>Password *</label>
+          <div class="password-wrapper">
+            <input formControlName="password" [type]="showPassword ? 'text' : 'password'"
+                   class="form-input" [class.invalid]="isInvalid('password')"
+                   placeholder="Min. 6 characters" style="padding-right: 48px">
+            <button type="button" class="eye-btn" (click)="togglePassword()" tabindex="-1">
+              <svg *ngIf="!showPassword" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg *ngIf="showPassword" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <span class="field-error" *ngIf="isInvalid('password')">Min 6 characters required</span>
+
+        <!-- Password strength -->
+        <div class="pw-strength" *ngIf="form.get('password')?.value">
+          <div class="pw-bars">
+            <div class="pw-bar" *ngFor="let i of [1,2,3,4,5]"
+                 [style.background]="i <= passwordStrength.score ? passwordStrength.color : 'rgba(255,255,255,0.08)'">
+            </div>
+          </div>
+          <span class="pw-label" [style.color]="passwordStrength.color">
+            {{ passwordStrength.label }}
+          </span>
+        </div>
+        </div>
+
+        <!-- Location -->
+        <div class="form-group">
+          <label>City / Location</label>
+          <input formControlName="location" class="form-input" placeholder="Tunis, Sfax, Sousse...">
+        </div>
+
+        <!-- Skills (freelancer only) -->
+        <div class="form-group" *ngIf="selectedRole === 'FREELANCER'">
+          <label>Your Skills <span class="hint">(comma separated)</span></label>
+          <input formControlName="skills" class="form-input" placeholder="React, Node.js, Figma, Spring Boot...">
+        </div>
+
+        <!-- Bio -->
+        <div class="form-group">
+          <label>Bio <span class="hint">(optional)</span></label>
+          <textarea formControlName="bio" class="form-input form-textarea"
+                    placeholder="Tell us a bit about yourself..."></textarea>
+        </div>
+
+        <!-- Captcha disabled in this build -->
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit"
+                [class.client-btn]="selectedRole === 'CLIENT'"
+                [class.freelancer-btn]="selectedRole === 'FREELANCER'"
+                [disabled]="isLoading">
+          <span class="btn-inner" *ngIf="!isLoading">
+            Create my account
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+          <span class="btn-spinner" *ngIf="isLoading">
+            <span class="spinner"></span>
+          </span>
+        </button>
+
+        <p class="login-hint">
+          Already have an account?
+          <a routerLink="/login" class="login-link">Sign in</a>
+        </p>
+
+      </form>
+    </div>
+  </div>
+
+</div>

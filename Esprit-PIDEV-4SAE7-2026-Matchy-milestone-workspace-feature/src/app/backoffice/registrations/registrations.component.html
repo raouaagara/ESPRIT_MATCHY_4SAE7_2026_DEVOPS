@@ -1,0 +1,107 @@
+<div class="registrations-container">
+  <div class="page-header">
+    <h1>Registration Management</h1>
+    <div class="header-actions">
+      <div class="filter-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="currentFilter === 'ALL'"
+          (click)="filterByStatus('ALL')">
+          All ({{ allCount }})
+        </button>
+        <button 
+          class="tab-btn pending" 
+          [class.active]="currentFilter === 'PENDING'"
+          (click)="filterByStatus('PENDING')">
+          Pending ({{ pendingCount }})
+        </button>
+        <button 
+          class="tab-btn approved" 
+          [class.active]="currentFilter === 'APPROVED'"
+          (click)="filterByStatus('APPROVED')">
+          Approved ({{ approvedCount }})
+        </button>
+        <button 
+          class="tab-btn rejected" 
+          [class.active]="currentFilter === 'REJECTED'"
+          (click)="filterByStatus('REJECTED')">
+          Rejected ({{ rejectedCount }})
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-info" *ngIf="pendingCount > 0">
+    <i class="icon">🔔</i>
+    You have {{ pendingCount }} pending registration(s) waiting for approval.
+  </div>
+
+  <div class="registrations-table" *ngIf="filteredRegistrations.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User Name</th>
+          <th>Email</th>
+          <th>Event</th>
+          <th>Status</th>
+          <th>Registered At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let registration of filteredRegistrations" [class]="'status-' + registration.status.toLowerCase()">
+          <td>{{ registration.id }}</td>
+          <td>
+            <div class="user-info">
+              <div class="user-avatar">{{ getInitials(registration.firstName, registration.lastName) }}</div>
+              <div>
+                <div class="user-name">{{ registration.firstName }} {{ registration.lastName }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ registration.email }}</td>
+          <td>
+            <div class="event-title">{{ registration.evenementTitle }}</div>
+          </td>
+          <td>
+            <span class="status-badge" [class]="'status-' + registration.status.toLowerCase()">
+              {{ registration.status }}
+            </span>
+          </td>
+          <td>{{ registration.createdAt | date: 'short' }}</td>
+          <td>
+            <div class="action-buttons">
+              <button 
+                *ngIf="registration.status === 'PENDING'"
+                class="btn btn-approve" 
+                (click)="approveRegistration(registration.id)"
+                title="Approve">
+                ✓ Approve
+              </button>
+              <button 
+                *ngIf="registration.status === 'PENDING' || registration.status === 'APPROVED'"
+                class="btn btn-reject" 
+                (click)="rejectRegistration(registration.id)"
+                title="Reject">
+                ✗ Reject
+              </button>
+              <button 
+                class="btn btn-delete" 
+                (click)="deleteRegistration(registration.id)"
+                title="Delete">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="empty-state" *ngIf="filteredRegistrations.length === 0">
+    <div class="empty-icon">📋</div>
+    <h3>No registrations found</h3>
+    <p>There are no {{ currentFilter.toLowerCase() }} registrations at the moment.</p>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<div class="chat-page">
+
+  <!-- Header -->
+  <div class="chat-header">
+    <button class="back-btn" (click)="goBack()">
+      <span>←</span> Back to Events
+    </button>
+    <div class="header-center">
+      <div class="ai-avatar">
+        <span class="avatar-icon">🤖</span>
+        <span class="online-dot"></span>
+      </div>
+      <div class="header-info">
+        <h1>Matchy AI Assistant</h1>
+        <span class="status">● Online · Powered by Llama 3.1</span>
+      </div>
+    </div>
+    <button class="clear-btn" (click)="clearChat()" title="Clear chat">
+      🗑️
+    </button>
+  </div>
+
+  <!-- Chat Body -->
+  <div class="chat-body">
+
+    <!-- Messages -->
+    <div class="messages-container" #messagesContainer>
+      <div
+        *ngFor="let msg of messages"
+        class="message-wrapper"
+        [class.user-wrapper]="msg.role === 'user'"
+        [class.assistant-wrapper]="msg.role === 'assistant'"
+      >
+        <!-- Assistant avatar -->
+        <div class="msg-avatar" *ngIf="msg.role === 'assistant'">🤖</div>
+
+        <div class="message-bubble" [class.user-bubble]="msg.role === 'user'" [class.assistant-bubble]="msg.role === 'assistant'">
+          <div class="msg-content" [innerHTML]="formatMessage(msg.content)"></div>
+          <div class="msg-time">{{ formatTime(msg.timestamp) }}</div>
+        </div>
+
+        <!-- User avatar -->
+        <div class="msg-avatar user-avatar" *ngIf="msg.role === 'user'">👤</div>
+      </div>
+
+      <!-- Typing indicator -->
+      <div class="message-wrapper assistant-wrapper" *ngIf="isLoading">
+        <div class="msg-avatar">🤖</div>
+        <div class="message-bubble assistant-bubble typing-bubble">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggestions (shown when only welcome message) -->
+    <div class="suggestions-bar" *ngIf="messages.length === 1 && !isLoading">
+      <p class="suggestions-label">💡 Try asking:</p>
+      <div class="suggestions-grid">
+        <button
+          *ngFor="let s of suggestions"
+          class="suggestion-chip"
+          (click)="useSuggestion(s)"
+        >
+          {{ s }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Input Area -->
+  <div class="chat-input-area">
+    <div class="input-wrapper">
+      <textarea
+        [(ngModel)]="userInput"
+        (keydown)="onKeyDown($event)"
+        placeholder="Ask about events, dates, registration..."
+        rows="1"
+        [disabled]="isLoading"
+        class="chat-input"
+      ></textarea>
+      <button
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="!userInput.trim() || isLoading"
+      >
+        <span *ngIf="!isLoading">➤</span>
+        <span *ngIf="isLoading" class="spin">⟳</span>
+      </button>
+    </div>
+    <p class="input-hint">Press Enter to send · Shift+Enter for new line</p>
+  </div>
+
+</div>

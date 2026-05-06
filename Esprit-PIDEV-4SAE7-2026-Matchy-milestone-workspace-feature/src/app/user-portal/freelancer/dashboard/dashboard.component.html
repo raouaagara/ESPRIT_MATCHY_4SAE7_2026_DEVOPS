@@ -1,0 +1,412 @@
+<div class="dash" [class.dark]="isDark">
+
+  <!-- ══ HERO ══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
+    <div class="hero-content">
+      <div class="hero-text">
+        <p class="hero-greeting">
+          <span class="greeting-dot"></span>
+          Good {{ getGreeting() }},
+        </p>
+        <h1 class="hero-name">
+          {{ authService.currentUser?.firstName || authService.currentUser?.name }}
+          <span class="wave-emoji">👋</span>
+        </h1>
+        <p class="hero-sub">Track your proposals, discover projects and grow your freelance career.</p>
+
+        <!-- ── Détecteur de profil incomplet ── -->
+        <div class="profile-completeness" *ngIf="completeness.score < 100">
+          <div class="completeness-header">
+            <span class="completeness-label">Profile {{ completeness.score }}%</span>
+            <span class="completeness-tip" *ngIf="completeness.missing.length > 0">
+              Missing: {{ completeness.missing.join(', ') }}
+            </span>
+          </div>
+          <div class="completeness-bar">
+            <div
+              class="completeness-fill"
+              [style.width.%]="completeness.score"
+              [class.fill-low]="completeness.score < 40"
+              [class.fill-mid]="completeness.score >= 40 && completeness.score < 80"
+              [class.fill-high]="completeness.score >= 80">
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <a routerLink="/freelancer/projects" class="btn-hero">
+        <span class="btn-hero-icon">🚀</span>
+        <span>Browse Projects</span>
+        <span class="btn-hero-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ LOADING ════════════════════════════════════════════════ -->
+  <div class="loading-wrap" *ngIf="isLoading">
+    <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
+    <span>Loading your dashboard…</span>
+  </div>
+
+  <div class="content-wrap" *ngIf="!isLoading">
+
+    <!-- ══ STATS ══════════════════════════════════════════════ -->
+    <div class="stats-row">
+      <div class="stat-card card-purple" style="--delay:0s">
+        <div class="card-bg-glow"></div>
+        <div class="card-icon-wrap">🔍</div>
+        <div class="card-body">
+          <span class="card-val">{{ stats.openProjects }}</span>
+          <span class="card-lbl">Open Projects</span>
+        </div>
+        <div class="card-bar"></div>
+      </div>
+      <div class="stat-card card-blue" style="--delay:0.07s">
+        <div class="card-bg-glow"></div>
+        <div class="card-icon-wrap">📝</div>
+        <div class="card-body">
+          <span class="card-val">{{ stats.myProposals }}</span>
+          <span class="card-lbl">My Proposals</span>
+        </div>
+        <div class="card-bar"></div>
+      </div>
+      <div class="stat-card card-green" style="--delay:0.14s">
+        <div class="card-bg-glow"></div>
+        <div class="card-icon-wrap">✅</div>
+        <div class="card-body">
+          <span class="card-val">{{ stats.accepted }}</span>
+          <span class="card-lbl">Accepted</span>
+        </div>
+        <div class="card-bar"></div>
+      </div>
+      <div class="stat-card card-teal" style="--delay:0.21s">
+        <div class="card-bg-glow"></div>
+        <div class="card-icon-wrap">⚡</div>
+        <div class="card-body">
+          <span class="card-val">{{ stats.inProgress }}</span>
+          <span class="card-lbl">In Progress</span>
+        </div>
+        <div class="card-bar"></div>
+      </div>
+      <div class="stat-card card-amber" style="--delay:0.28s">
+        <div class="card-bg-glow"></div>
+        <div class="card-icon-wrap">⏳</div>
+        <div class="card-body">
+          <span class="card-val">{{ stats.pending }}</span>
+          <span class="card-lbl">Pending</span>
+        </div>
+        <div class="card-bar"></div>
+      </div>
+
+      <!-- ── Score de réactivité ── -->
+      <div class="stat-card card-pink" style="--delay:0.35s" *ngIf="reactivity.score > 0">
+        <div class="card-bg-glow"></div>
+        <div class="card-icon-wrap">🎯</div>
+        <div class="card-body">
+          <span class="card-val">{{ reactivity.score }}</span>
+          <span class="card-lbl">Reactivity · {{ reactivity.label }}</span>
+        </div>
+        <div class="card-bar"></div>
+      </div>
+    </div>
+
+    <!-- ══ RATING STRIP ════════════════════════════════════════ -->
+    <div class="rating-strip" *ngIf="authService.currentUser?.rating">
+      <div class="rating-stars">
+        <span *ngFor="let s of [1,2,3,4,5]" class="star"
+          [class.on]="s <= (authService.currentUser?.rating || 0)">★</span>
+      </div>
+      <span class="rating-num">{{ authService.currentUser?.rating | number:'1.1-1' }}</span>
+      <span class="rating-label">/ 5.0 · Your Rating</span>
+      <div class="skill-chips" *ngIf="authService.currentUser?.skills">
+        <span class="skill-chip">{{ authService.currentUser?.skills }}</span>
+      </div>
+    </div>
+
+    <!-- ══ ALERTE SURCHARGE ════════════════════════════════════ -->
+    <div class="overload-alert" *ngIf="overload.overloaded">
+      <span class="overload-icon">⚠️</span>
+      <div>
+        <strong>Maximum workload reached</strong>
+        <span>
+          {{ overload.activeProjects }} active projects out of {{ overload.threshold }} max. You cannot accept new proposals at this time.
+        </span>
+      </div>
+    </div>
+
+    <div class="panel panel-analytics">
+      <div class="panel-head">
+        <div class="panel-title">
+          <span class="panel-icon-wrap">📈</span>
+          <h3>Proposal Performance Analytics</h3>
+        </div>
+      </div>
+      <div class="analytics-top">
+        <div class="analytics-chip">
+          <span class="chip-label">Global acceptance</span>
+          <strong>{{ proposalAnalytics.globalAcceptanceRate | number:'1.0-1' }}%</strong>
+        </div>
+        <div class="analytics-chip">
+          <span class="chip-label">Avg client response</span>
+          <strong>{{ getAvgClientResponseLabel() }}</strong>
+        </div>
+        <div class="analytics-chip">
+          <span class="chip-label">Best submit window</span>
+          <strong>{{ proposalAnalytics.bestSubmitWindow.day }} · {{ getBestSubmitHourRange() }}</strong>
+        </div>
+      </div>
+      <div class="analytics-cats" *ngIf="proposalAnalytics.acceptanceByCategory.length > 0">
+        <div class="analytics-cat" *ngFor="let c of proposalAnalytics.acceptanceByCategory | slice:0:4">
+          <span class="cat-name">{{ c.category }}</span>
+          <div class="cat-bar">
+            <div class="cat-bar-fill" [style.width.%]="c.acceptanceRate"></div>
+          </div>
+          <span class="cat-rate">{{ c.acceptanceRate | number:'1.0-1' }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PROJECTS IN PROGRESS ════════════════════════════════ -->
+    <div class="panel-inprogress" *ngIf="inProgressProposals.length > 0">
+      <div class="panel-head">
+        <div class="panel-title">
+          <span class="panel-icon-wrap">⚡</span>
+          <h3>Projects in Progress</h3>
+          <span class="count-pill">{{ inProgressProposals.length }}</span>
+        </div>
+        <a routerLink="/freelancer/proposals" class="see-all">View all <span>→</span></a>
+      </div>
+      <div class="inprogress-list">
+        <div class="inprogress-item"
+          *ngFor="let p of inProgressProposals; let i = index"
+          [style.--i]="i">
+          <div class="item-left">
+            <div class="item-color-dot" [class.dot-delivered]="p.status === 'DELIVERED'"></div>
+            <span class="item-emoji">🚀</span>
+          </div>
+          <div class="item-info">
+            <div class="item-title">{{ p.projectTitle || 'Project #' + p.projectId }}</div>
+            <div class="item-meta">
+              <span class="meta-budget" *ngIf="p.proposedBudget">💰 {{ p.proposedBudget }} TND</span>
+              <span *ngIf="p.deliveryTime">⏱ {{ p.deliveryTime }}</span>
+              <span *ngIf="p.clientEmail">👤 {{ p.clientEmail }}</span>
+            </div>
+          </div>
+          <button class="btn-deliver" *ngIf="p.status === 'ACCEPTED'" (click)="openDeliveryModal(p)">
+            📦 Submit Delivery
+          </button>
+          <div class="delivered-badge" *ngIf="p.status === 'DELIVERED'">
+            ⏳ Awaiting client
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DISPONIBILITÉ + MARCHÉ ══════════════════════════════ -->
+    <div class="advanced-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+      <!-- Availability -->
+      <div class="panel panel-availability">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="panel-icon-wrap">📅</span>
+            <h3>My Availability</h3>
+            <span class="status-badge" [ngClass]="getAvailabilityClass()">
+              {{ getAvailabilityLabel() }}
+            </span>
+          </div>
+        </div>
+        <div class="availability-body">
+          <div class="avail-big">
+            <div class="avail-circle">
+              <span class="avail-num">{{ availability.occupiedSlots }}</span>
+              <span class="avail-of">/ {{ availability.maxSlots }}</span>
+            </div>
+            <div class="avail-desc">
+              <div class="avail-label">Slots used</div>
+              <div class="avail-slots">
+                <div class="slot" *ngFor="let i of range(availability.maxSlots)" [class.slot-used]="i < availability.occupiedSlots"></div>
+              </div>
+              <p class="avail-from">Available from: <strong>{{ availability.availableFrom }}</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Market -->
+      <div class="panel panel-market">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="panel-icon-wrap">📊</span>
+            <h3>Market right now</h3>
+          </div>
+        </div>
+        <div class="market-list" *ngIf="marketStats.length > 0">
+          <div class="market-item" *ngFor="let m of marketStats; let i = index">
+            <div class="market-dot" [style.background]="['#7F77DD','#1D9E75','#D85A30','#BA7517','#D4537E'][i % 5]"></div>
+            <span class="market-cat">{{ m.category }}</span>
+            <div class="market-bar-wrap">
+              <div class="market-bar-fill"
+                   [style.width.%]="getMarketBarWidth(m.projectCount)"
+                   [style.background]="['#7F77DD','#1D9E75','#D85A30','#BA7517','#D4537E'][i % 5]">
+              </div>
+            </div>
+            <span class="market-count">{{ m.projectCount }}</span>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="marketStats.length === 0">
+          <span class="empty-icon">📊</span><p>No market data available</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MAIN GRID ═══════════════════════════════════════════ -->
+    <div class="main-grid">
+      <div class="panel panel-projects">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="panel-icon-wrap">💼</span>
+            <h3>New Opportunities</h3>
+          </div>
+          <a routerLink="/freelancer/projects" class="see-all">Browse all <span>→</span></a>
+        </div>
+        <div class="empty-state" *ngIf="openProjects.length === 0">
+          <span class="empty-icon">🌐</span><p>No open projects right now</p>
+        </div>
+        <div class="item-feed" *ngIf="openProjects.length > 0">
+          <div class="project-item" *ngFor="let p of openProjects; let i = index" [style.--i]="i">
+            <div class="item-dot"></div>
+            <div class="item-info">
+              <div class="item-name">{{ p.title }}</div>
+              <div class="item-tags">
+                <span class="tag tag-budget" *ngIf="p.budget">💰 {{ p.budget }} TND</span>
+                <span class="tag tag-cat">{{ p.category }}</span>
+              </div>
+            </div>
+            <a routerLink="/freelancer/projects" class="btn-apply">Apply</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-proposals">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="panel-icon-wrap">📋</span>
+            <h3>My Recent Proposals</h3>
+          </div>
+          <a routerLink="/freelancer/proposals" class="see-all">View all <span>→</span></a>
+        </div>
+        <div class="empty-state" *ngIf="myProposals.length === 0">
+          <span class="empty-icon">✉️</span><p>No proposals sent yet</p>
+        </div>
+        <div class="item-feed" *ngIf="myProposals.length > 0">
+          <div class="proposal-item" *ngFor="let p of myProposals; let i = index" [style.--i]="i">
+            <div class="proposal-avatar">{{ p.projectTitle?.charAt(0) }}</div>
+            <div class="item-info">
+              <div class="item-name">{{ p.projectTitle }}</div>
+              <div class="proposal-amount" *ngIf="p.proposedBudget">
+                <span>💰</span> {{ p.proposedBudget }} TND
+              </div>
+            </div>
+            <span class="status-badge" [ngClass]="getProposalStatusClass(p.status)">{{ p.status }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ NOTIFICATIONS ══════════════════════════════════════ -->
+    <div class="panel notif-panel" *ngIf="notifications.length > 0">
+      <div class="panel-head">
+        <div class="panel-title">
+          <span class="panel-icon-wrap">🔔</span>
+          <h3>Notifications</h3>
+          <span class="count-badge">{{ notifications.length }}</span>
+        </div>
+        <a routerLink="/freelancer/notifications" class="see-all">View all <span>→</span></a>
+      </div>
+      <div class="notif-grid">
+        <div class="notif-item" *ngFor="let n of notifications; let i = index" [style.--i]="i">
+          <span class="notif-pulse-dot"></span>
+          <div class="notif-body">
+            <div class="notif-title">{{ n.title }}</div>
+            <div class="notif-msg">{{ n.message }}</div>
+          </div>
+          <span class="notif-arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-wrap -->
+
+</div><!-- /dash -->
+
+<!-- ══ DELIVERY MODAL ════════════════════════════════════════ -->
+<div class="delivery-overlay" *ngIf="deliveryModal" (click)="closeDeliveryModal()">
+  <div class="delivery-modal" (click)="$event.stopPropagation()" *ngIf="selectedProposal as prop">
+
+    <div class="dm-header">
+      <div>
+        <div class="dm-eyebrow">Submit your work</div>
+        <div class="dm-title">📦 Submit Delivery</div>
+      </div>
+      <button class="dm-close" (click)="closeDeliveryModal()">✕</button>
+    </div>
+
+    <div class="dm-body">
+
+      <div class="dm-project-box">
+        <span class="dm-proj-icon">🚀</span>
+        <div>
+          <div class="dm-proj-name">{{ prop.projectTitle || 'Project #' + prop.projectId }}</div>
+          <div class="dm-proj-client" *ngIf="prop.clientEmail">Client: {{ prop.clientEmail }}</div>
+        </div>
+      </div>
+
+      <div class="dm-field">
+        <label class="dm-label">Delivery link / URL</label>
+        <input class="dm-input" type="url"
+          placeholder="https://github.com/yourrepo or https://drive.google.com/..."
+          [(ngModel)]="deliveryForm.link" />
+      </div>
+
+      <div class="dm-field">
+        <label class="dm-label">
+          Delivery message <span class="dm-optional">(optional)</span>
+        </label>
+        <textarea class="dm-input dm-textarea"
+          placeholder="Describe what you've delivered, how to test it, any notes for the client..."
+          [(ngModel)]="deliveryForm.message"
+          maxlength="500"></textarea>
+        <div class="dm-charcount">{{ deliveryForm.message.length }} / 500</div>
+      </div>
+
+      <div class="dm-error" *ngIf="deliveryError">⚠️ {{ deliveryError }}</div>
+    </div>
+
+    <div class="dm-footer">
+      <div class="dm-hint">📧 Client will be notified by email</div>
+      <div class="dm-btns">
+        <button class="dm-btn-cancel" (click)="closeDeliveryModal()">Cancel</button>
+        <button class="dm-btn-submit" (click)="submitDelivery()" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">📦 Submit Delivery</span>
+          <span *ngIf="isSubmitting" class="dm-dots">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+

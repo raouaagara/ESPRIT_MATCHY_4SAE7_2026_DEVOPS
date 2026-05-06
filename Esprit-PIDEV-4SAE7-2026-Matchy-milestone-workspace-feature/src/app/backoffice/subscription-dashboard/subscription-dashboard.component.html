@@ -1,0 +1,36 @@
+<div class="bo-sub-dash">
+  <div class="dash-head">
+    <h1>📈 Abonnements — Tableau de bord</h1>
+    <p>KPIs et tendances (données de démonstration).</p>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi" *ngFor="let k of kpis" [class]="'tone-' + k.tone">
+      <span class="kpi-label">{{ k.label }}</span>
+      <span class="kpi-val">{{ k.value }}</span>
+      <span class="kpi-sub">{{ k.sub }}</span>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>MRR (12 mois)</h3>
+      <div class="line-chart">
+        <div class="line-bar" *ngFor="let v of mrrSeries; let i = index" [style.height.%]="v * 6" [title]="v + 'k'"></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Répartition plans</h3>
+      <div class="pie-mock">
+        <div class="slice free"></div>
+        <div class="slice pro"></div>
+        <div class="slice prem"></div>
+      </div>
+      <ul class="legend">
+        <li><span class="dot free"></span> Free</li>
+        <li><span class="dot pro"></span> Pro</li>
+        <li><span class="dot prem"></span> Premium</li>
+      </ul>
+    </div>
+  </div>
+</div>

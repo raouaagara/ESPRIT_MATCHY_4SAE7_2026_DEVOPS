@@ -1,0 +1,25 @@
+<div class="confirm-overlay" *ngIf="isOpen" (click)="onCancel()">
+  <div class="confirm-container" [class]="type" (click)="$event.stopPropagation()">
+    <div class="confirm-icon-wrapper">
+      <div class="confirm-icon-circle">
+        <span class="confirm-icon">{{ icon }}</span>
+      </div>
+    </div>
+
+    <div class="confirm-content">
+      <h3 class="confirm-title">{{ title }}</h3>
+      <p class="confirm-message">{{ message }}</p>
+    </div>
+
+    <div class="confirm-actions">
+      <button class="btn-cancel" (click)="onCancel()">
+        <span class="btn-icon">✕</span>
+        {{ cancelText }}
+      </button>
+      <button class="btn-confirm" [class]="type" (click)="onConfirm()">
+        <span class="btn-icon">✓</span>
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

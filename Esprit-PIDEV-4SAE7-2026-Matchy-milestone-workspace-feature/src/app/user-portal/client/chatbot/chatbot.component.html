@@ -1,0 +1,131 @@
+<!-- Badge Notification Toast -->
+<div class="badge-toast" *ngIf="badgeToast" (click)="dismissToast()">
+  <div class="badge-toast-icon">{{ badgeToast.icon }}</div>
+  <div class="badge-toast-content">
+    <div class="badge-toast-title">🎉 Badge débloqué !</div>
+    <div class="badge-toast-name">{{ badgeToast.name }}</div>
+    <div class="badge-toast-desc">{{ badgeToast.desc }}</div>
+  </div>
+  <button class="badge-toast-close" (click)="dismissToast()">✕</button>
+</div>
+
+<!-- FAB Button — Robot -->
+<button class="cw-fab" (click)="toggle()" [class.open]="isOpen" title="Chat with Matchy">
+  <div class="robot-icon">
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="white">
+      <!-- Head -->
+      <rect x="14" y="18" width="36" height="28" rx="6" fill="white" opacity="0.95"/>
+      <!-- Eyes -->
+      <circle cx="24" cy="30" r="4" fill="#6366f1"/>
+      <circle cx="40" cy="30" r="4" fill="#6366f1"/>
+      <circle cx="25.5" cy="28.5" r="1.5" fill="white"/>
+      <circle cx="41.5" cy="28.5" r="1.5" fill="white"/>
+      <!-- Mouth -->
+      <rect x="22" y="37" width="20" height="3" rx="1.5" fill="#6366f1" opacity="0.7"/>
+      <!-- Antenna -->
+      <line x1="32" y1="18" x2="32" y2="10" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="32" cy="8" r="3" fill="#a855f7"/>
+      <!-- Ears -->
+      <rect x="8" y="26" width="6" height="8" rx="2" fill="white" opacity="0.8"/>
+      <rect x="50" y="26" width="6" height="8" rx="2" fill="white" opacity="0.8"/>
+      <!-- Body hint -->
+      <rect x="22" y="46" width="20" height="4" rx="2" fill="white" opacity="0.4"/>
+    </svg>
+  </div>
+  <span class="cw-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+  <div class="fab-pulse"></div>
+</button>
+
+<div class="cw-window visible" *ngIf="isOpen">
+  <div class="cw-header">
+    <div class="cw-header-info">
+      <div class="cw-avatar">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="10" width="28" height="22" rx="5" fill="white" opacity="0.9"/>
+          <circle cx="14" cy="19" r="3.5" fill="#6366f1"/>
+          <circle cx="26" cy="19" r="3.5" fill="#6366f1"/>
+          <circle cx="15" cy="18" r="1.2" fill="white"/>
+          <circle cx="27" cy="18" r="1.2" fill="white"/>
+          <rect x="13" y="25" width="14" height="2.5" rx="1.2" fill="#6366f1" opacity="0.6"/>
+          <line x1="20" y1="10" x2="20" y2="5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="20" cy="4" r="2.5" fill="#a855f7"/>
+          <rect x="2" y="17" width="4" height="6" rx="1.5" fill="white" opacity="0.7"/>
+          <rect x="34" y="17" width="4" height="6" rx="1.5" fill="white" opacity="0.7"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cw-name">Matchy Bot</div>
+        <div class="cw-status">● Online</div>
+      </div>
+    </div>
+    <div class="cw-header-actions">
+      <button class="cw-action-btn" (click)="clearChat()" title="Clear">🗑</button>
+      <button class="cw-action-btn" (click)="close()" title="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="cw-suggestions">
+    <button class="cw-chip" *ngFor="let s of suggestions" (click)="sendSuggestion(s.text)" [disabled]="isLoading">
+      <span>{{ s.icon }}</span> {{ s.text }}
+    </button>
+  </div>
+
+  <div class="cw-messages" #messagesRef>
+    <div class="cw-empty" *ngIf="messages.length === 0 && !isLoading">
+      <div class="empty-orb">🤖</div>
+      <div class="empty-title">Hello, I am Matchy Bot</div>
+      <div class="empty-sub">I can help you post projects, find freelancers, and manage everything on the platform.</div>
+      <div class="quick-grid">
+        <button class="quick-btn" *ngFor="let q of quickStarts" (click)="sendSuggestion(q.text)">
+          {{ q.icon }} {{ q.text }}
+        </button>
+      </div>
+    </div>
+
+    <div class="msg-row" [class.user]="m.role === 'user'" [class.bot]="m.role === 'bot'" *ngFor="let m of messages">
+      <div class="msg-avatar">{{ m.role === 'bot' ? '🤖' : '👤' }}</div>
+      <div class="msg-content">
+        <div class="msg-bubble" [innerHTML]="formatContent(m.content)"></div>
+        <div class="msg-meta">
+          <span class="msg-time">{{ m.time }}</span>
+          <span class="msg-tick" *ngIf="m.role === 'user'">✔✔</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg-row bot" *ngIf="isLoading">
+      <div class="msg-avatar">🤖</div>
+      <div class="msg-content">
+        <div class="typing-bubble">
+          <span class="t-dot"></span>
+          <span class="t-dot"></span>
+          <span class="t-dot"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cw-input-area">
+    <div class="cw-input-wrap" [class.focused]="userInput.length > 0">
+      <textarea
+        #inputRef
+        class="cw-textarea"
+        [(ngModel)]="userInput"
+        (input)="onInput()"
+        (keydown)="onKeydown($event)"
+        placeholder="Ask your question..."
+        rows="1"
+        [disabled]="isLoading"
+        [maxlength]="MAX_CHARS"
+      ></textarea>
+      <button class="cw-send-btn" (click)="send()" [disabled]="isLoading || !userInput.trim()" title="Send">
+        <span *ngIf="!isLoading">➤</span>
+        <span class="btn-spinner" *ngIf="isLoading"></span>
+      </button>
+    </div>
+    <div class="cw-footer">
+      <span class="cw-hint">Enter ↵ to send</span>
+      <span class="cw-count" [class.warn]="charCount > 450">{{ charCount }}/{{ MAX_CHARS }}</span>
+    </div>
+  </div>
+</div>

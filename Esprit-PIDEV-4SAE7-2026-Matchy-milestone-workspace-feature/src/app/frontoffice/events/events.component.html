@@ -1,0 +1,109 @@
+<div class="events-page">
+  <!-- Loading State -->
+  <div *ngIf="loading" style="text-align: center; padding: 60px 0;">
+    <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+    <p style="color: #64748b;">Loading events...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading">
+  <!-- Hero -->
+  <div class="page-hero">
+    <div class="hero-badge">📅 Community</div>
+    <h1>Upcoming <span class="text-gradient">Events</span></h1>
+    <p>Join webinars, workshops and meetups to level up your freelance game.</p>
+    <a routerLink="/chat-assistant" class="chat-assistant-btn">
+      <span class="chat-btn-icon">🤖</span>
+      <span class="chat-btn-text">
+        <strong>Ask AI Assistant</strong>
+        <small>Find events, get answers instantly</small>
+      </span>
+      <span class="chat-btn-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- Featured Event -->
+  <div class="featured-event" *ngIf="featuredEvent">
+    <div class="featured-icon">{{ featuredEvent.icon }}</div>
+    <div class="featured-content">
+      <span class="featured-label">⭐ Featured Event</span>
+      <h2>{{ featuredEvent.title }}</h2>
+      <p>{{ featuredEvent.description }}</p>
+      <div class="featured-meta">
+        <span>📅 {{ formatDate(featuredEvent.date) }} · {{ featuredEvent.time }}</span>
+        <span>📍 {{ featuredEvent.location }}</span>
+        <span>👥 {{ featuredEvent.attendees }}/{{ featuredEvent.maxAttendees }} registered</span>
+      </div>
+    </div>
+    <div class="featured-action">
+      <div class="attendance-ring">
+        <svg viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="5"/>
+          <circle cx="30" cy="30" r="26" fill="none" [attr.stroke]="featuredEvent.color"
+            stroke-width="5" stroke-linecap="round"
+            [attr.stroke-dasharray]="'163.4'"
+            [attr.stroke-dashoffset]="163.4 - (163.4 * getAttendancePercent(featuredEvent) / 100)"
+            transform="rotate(-90 30 30)"/>
+        </svg>
+        <span>{{ getAttendancePercent(featuredEvent) }}%</span>
+      </div>
+      <button class="btn-register" [style.background]="featuredEvent.color" (click)="openRegistrationModal(featuredEvent)">Register Now →</button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="filters">
+      <button *ngFor="let f of filters" class="filter-btn" [class.active]="activeFilter === f"
+        (click)="activeFilter = f">{{ f | titlecase }}</button>
+    </div>
+    <span class="results-count">{{ filteredEvents.length }} events</span>
+  </div>
+
+  <!-- Events List -->
+  <div class="events-list">
+    <div class="event-card" *ngFor="let event of filteredEvents">
+      <div class="event-date-block" [style.background]="event.color + '20'" [style.border-color]="event.color + '40'">
+        <span class="day">{{ event.date | date:'d' }}</span>
+        <span class="month">{{ event.date | date:'MMM' }}</span>
+      </div>
+
+      <div class="event-icon" [style.background]="event.color + '20'">{{ event.icon }}</div>
+
+      <div class="event-content">
+        <div class="event-tags">
+          <span class="type-tag" [style.background]="event.color + '20'" [style.color]="event.color">
+            {{ event.type | titlecase }}
+          </span>
+          <span class="online-tag" *ngIf="event.isOnline">🌐 Online</span>
+          <span class="location-tag" *ngIf="!event.isOnline">📍 {{ event.location }}</span>
+        </div>
+        <h3>{{ event.title }}</h3>
+        <p>{{ event.description }}</p>
+        <div class="event-bottom">
+          <span class="event-time">⏰ {{ event.time }}</span>
+          <div class="attendance-bar">
+            <div class="bar-fill" [style.width.%]="getAttendancePercent(event)" [style.background]="event.color"></div>
+          </div>
+          <span class="attendance-text">{{ event.attendees }}/{{ event.maxAttendees }}</span>
+        </div>
+      </div>
+
+      <div class="event-action">
+        <button class="btn-register" [style.border-color]="event.color" [style.color]="event.color" (click)="openRegistrationModal(event)">
+          Join
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- Registration Modal -->
+<app-registration-modal
+  *ngIf="showRegistrationModal"
+  [evenementId]="selectedEventId"
+  [evenementTitle]="selectedEventTitle"
+  (close)="closeRegistrationModal()"
+  (registered)="onRegistrationSuccess()">
+</app-registration-modal>

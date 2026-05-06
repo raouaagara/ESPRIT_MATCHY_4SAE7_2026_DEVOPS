@@ -1,0 +1,149 @@
+<div class="statistics-overlay" *ngIf="isVisible" (click)="hide()">
+  <div class="statistics-panel" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="panel-header">
+      <div class="header-content">
+        <span class="header-icon">📊</span>
+        <div class="header-text">
+          <h2>Event Statistics</h2>
+          <p class="event-title">{{ eventTitle }}</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="refresh-btn" (click)="refresh()" title="Refresh">
+          <span class="refresh-icon">🔄</span>
+        </button>
+        <button class="close-btn" (click)="hide()" title="Close">
+          <span class="close-icon">✕</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading statistics...</p>
+    </div>
+
+    <!-- Statistics Content -->
+    <div class="panel-content" *ngIf="!isLoading && statistics">
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <!-- Total Registrations -->
+        <div class="stat-card total">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <div class="stat-label">Total Registrations</div>
+            <div class="stat-value">{{ statistics.totalRegistrations }}</div>
+          </div>
+        </div>
+
+        <!-- Approved -->
+        <div class="stat-card approved">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <div class="stat-label">Approved</div>
+            <div class="stat-value">{{ statistics.approvedCount }}</div>
+          </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="stat-card pending">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <div class="stat-label">Pending</div>
+            <div class="stat-value">{{ statistics.pendingCount }}</div>
+          </div>
+        </div>
+
+        <!-- Rejected -->
+        <div class="stat-card rejected">
+          <div class="stat-icon">❌</div>
+          <div class="stat-info">
+            <div class="stat-label">Rejected</div>
+            <div class="stat-value">{{ statistics.rejectedCount }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fill Rate Section -->
+      <div class="fill-rate-section">
+        <div class="fill-rate-header">
+          <h3>Event Fill Rate</h3>
+          <span class="fill-rate-badge" [style.background]="getFillRateColor()">
+            {{ getFillRateLabel() }}
+          </span>
+        </div>
+
+        <div class="fill-rate-info">
+          <div class="fill-rate-numbers">
+            <span class="current">{{ statistics.approvedCount }}</span>
+            <span class="separator">/</span>
+            <span class="capacity">{{ statistics.eventCapacity }}</span>
+            <span class="label">participants</span>
+          </div>
+          <div class="fill-rate-percentage">
+            {{ statistics.fillRate | number: '1.1-1' }}%
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar-container">
+          <div class="progress-bar-bg">
+            <div 
+              class="progress-bar-fill" 
+              [style.width.%]="statistics.fillRate"
+              [style.background]="getFillRateColor()">
+            </div>
+          </div>
+          <div class="progress-markers">
+            <span class="marker" style="left: 0%">0%</span>
+            <span class="marker" style="left: 25%">25%</span>
+            <span class="marker" style="left: 50%">50%</span>
+            <span class="marker" style="left: 75%">75%</span>
+            <span class="marker" style="left: 100%">100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Chart (Simple Bar Chart) -->
+      <div class="chart-section">
+        <h3>Registration Breakdown</h3>
+        <div class="bar-chart">
+          <div class="bar-item">
+            <div class="bar-label">Approved</div>
+            <div class="bar-container">
+              <div 
+                class="bar approved-bar" 
+                [style.width.%]="statistics.totalRegistrations > 0 ? (statistics.approvedCount / statistics.totalRegistrations * 100) : 0">
+                <span class="bar-value">{{ statistics.approvedCount }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bar-item">
+            <div class="bar-label">Pending</div>
+            <div class="bar-container">
+              <div 
+                class="bar pending-bar" 
+                [style.width.%]="statistics.totalRegistrations > 0 ? (statistics.pendingCount / statistics.totalRegistrations * 100) : 0">
+                <span class="bar-value">{{ statistics.pendingCount }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bar-item">
+            <div class="bar-label">Rejected</div>
+            <div class="bar-container">
+              <div 
+                class="bar rejected-bar" 
+                [style.width.%]="statistics.totalRegistrations > 0 ? (statistics.rejectedCount / statistics.totalRegistrations * 100) : 0">
+                <span class="bar-value">{{ statistics.rejectedCount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

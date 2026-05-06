@@ -1,0 +1,42 @@
+<div class="success-overlay" *ngIf="isOpen" (click)="onClose()" role="presentation">
+  <div
+    class="success-card"
+    (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="pending-title"
+    aria-describedby="pending-desc">
+
+    <!-- Pending icon -->
+    <div class="pending-icon-wrap" aria-hidden="true">
+      <svg class="pending-svg" viewBox="0 0 52 52" fill="none">
+        <circle class="pending-circle" cx="26" cy="26" r="24" />
+        <text x="26" y="33" text-anchor="middle" class="pending-clock-text">⏳</text>
+      </svg>
+    </div>
+
+    <h2 id="pending-title" class="pending-title">Payment Pending</h2>
+
+    <p id="pending-desc" class="pending-desc">
+      Your payment has been submitted successfully and is currently
+      <strong>awaiting admin approval</strong>.<br>
+      You will receive a confirmation email once it is approved.
+    </p>
+
+    <div class="detail-block">
+      <div class="detail-row"><span>Plan</span><strong>{{ plan }}</strong></div>
+      <div class="detail-row"><span>Amount</span><strong>{{ formatAmount() }}</strong></div>
+      <div class="detail-row mono"><span>Reference</span><strong>{{ transactionRef }}</strong></div>
+      <div class="detail-row status-row">
+        <span>Status</span>
+        <span class="badge-pending">⏳ Pending Approval</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn outline" (click)="downloadInvoicePdf.emit()">📄 Download Invoice (preview)</button>
+      <button type="button" class="btn ghost" (click)="onClose()">Close</button>
+      <button type="button" class="btn primary" (click)="goDashboard()">Go to Dashboard</button>
+    </div>
+  </div>
+</div>

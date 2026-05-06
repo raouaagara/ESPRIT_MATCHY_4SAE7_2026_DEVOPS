@@ -1,0 +1,8 @@
+<div class="location-icon-container">
+  <button class="location-icon-btn" (click)="openLocationMap()" title="Event Locations">
+    <span class="location-icon">📍</span>
+    <span class="location-badge" *ngIf="offlineEventsCount > 0">{{ offlineEventsCount }}</span>
+  </button>
+</div>
+
+<app-location-map #locationMap [events]="events"></app-location-map>

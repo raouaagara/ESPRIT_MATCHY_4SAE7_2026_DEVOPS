@@ -1,0 +1,25 @@
+/* Back link injected at the very top of the alternative home page. */
+.alt-back-link {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 13px;
+  color: #fff;
+  background: rgba(99, 102, 241, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    background: #6366f1;
+    transform: translateX(-2px);
+  }
+}

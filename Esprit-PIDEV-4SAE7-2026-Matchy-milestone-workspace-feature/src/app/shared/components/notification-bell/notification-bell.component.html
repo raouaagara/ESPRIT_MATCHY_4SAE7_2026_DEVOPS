@@ -1,0 +1,41 @@
+<div class="notification-bell-container">
+  <button class="notification-bell-btn" (click)="toggleDropdown()" [class.has-notifications]="pendingCount > 0">
+    <span class="bell-icon">🔔</span>
+    <span class="notification-badge" *ngIf="pendingCount > 0">{{ pendingCount }}</span>
+  </button>
+
+  <div class="notification-dropdown" *ngIf="isOpen" [@slideDown]>
+    <div class="dropdown-header">
+      <h3>Pending Registrations</h3>
+      <span class="count-badge">{{ pendingCount }}</span>
+    </div>
+
+    <div class="notification-list" *ngIf="pendingRegistrations.length > 0">
+      <div class="notification-item" *ngFor="let registration of pendingRegistrations">
+        <div class="notification-avatar">
+          {{ getInitials(registration.firstName, registration.lastName) }}
+        </div>
+        <div class="notification-content">
+          <div class="notification-user">{{ registration.firstName }} {{ registration.lastName }}</div>
+          <div class="notification-event">{{ registration.evenementTitle }}</div>
+          <div class="notification-status">
+            <span class="status-badge">PENDING</span>
+            <span class="notification-time">{{ registration.createdAt | date: 'short' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-notifications" *ngIf="pendingRegistrations.length === 0">
+      <span class="empty-icon">✅</span>
+      <p>No pending registrations</p>
+    </div>
+
+    <div class="dropdown-footer">
+      <button class="view-all-btn" (click)="goToRegistrations()">
+        <span class="btn-icon">👁️</span>
+        Check All Registrations
+      </button>
+    </div>
+  </div>
+</div>

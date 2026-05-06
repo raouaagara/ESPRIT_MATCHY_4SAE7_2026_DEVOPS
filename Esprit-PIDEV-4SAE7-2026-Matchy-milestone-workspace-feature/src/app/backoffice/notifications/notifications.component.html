@@ -1,0 +1,90 @@
+<div class="bo-notifications-page">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>🔔 Notifications</h1>
+      <p>Stay updated with application activities</p>
+    </div>
+    <button *ngIf="getUnreadCount() > 0" class="btn-mark-all" (click)="markAllAsRead()">
+      Mark all as read
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📬</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ notifications.length }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔔</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ getUnreadCount() }}</span>
+        <span class="stat-label">Unread</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedFilter === 'all'"
+      (click)="selectedFilter = 'all'; applyFilter()">
+      All
+    </button>
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedFilter === 'unread'"
+      (click)="selectedFilter = 'unread'; applyFilter()">
+      Unread
+    </button>
+    <button 
+      class="filter-btn" 
+      [class.active]="selectedFilter === 'application_received'"
+      (click)="selectedFilter = 'application_received'; applyFilter()">
+      Applications
+    </button>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="notifications-container">
+    <div *ngIf="filteredNotifications.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h3>No notifications</h3>
+      <p>You're all caught up!</p>
+    </div>
+
+    <div 
+      *ngFor="let notification of filteredNotifications" 
+      class="notification-card"
+      [class.unread]="!notification.is_read"
+      (click)="handleNotificationClick(notification)">
+      
+      <div class="notification-icon">
+        <span *ngIf="notification.type === 'application_received'">📨</span>
+        <span *ngIf="notification.type === 'application_accepted'">✅</span>
+        <span *ngIf="notification.type === 'application_rejected'">❌</span>
+        <span *ngIf="notification.type === 'interview_scheduled'">📅</span>
+      </div>
+
+      <div class="notification-content">
+        <h3>{{ notification.title }}</h3>
+        <p>{{ notification.message }}</p>
+        <div class="notification-meta">
+          <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+          <span *ngIf="!notification.is_read" class="unread-badge">New</span>
+        </div>
+      </div>
+
+      <button 
+        class="btn-delete" 
+        (click)="deleteNotification(notification.id); $event.stopPropagation()"
+        title="Delete notification">
+        🗑️
+      </button>
+    </div>
+  </div>
+</div>

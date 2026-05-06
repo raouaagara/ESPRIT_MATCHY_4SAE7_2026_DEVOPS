@@ -1,0 +1,82 @@
+.comparison-table {
+    th {
+        text-align: center;
+
+        &:first-child {
+            text-align: left;
+        }
+    }
+
+    td {
+        text-align: center;
+
+        &:first-child {
+            text-align: left;
+            font-weight: 500;
+        }
+    }
+
+    .plan-header {
+        .plan-icon {
+            font-size: 18px;
+            margin-right: 4px;
+        }
+
+        font-weight: 700;
+    }
+
+    .price-row {
+        background: rgba(79, 110, 247, 0.02);
+
+        td {
+            padding: 20px 16px;
+        }
+
+        .sub-price {
+            font-size: 11px;
+            opacity: 0.6;
+            font-weight: 400;
+        }
+    }
+
+    .has-feature {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .no-feature {
+        opacity: 0.3;
+    }
+}
+
+.btn-primary {
+    padding: 10px 22px;
+    background: var(--primary, #6366f1);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    }
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--bo-text-primary);
+    letter-spacing: -0.5px;
+}
+
+.page-sub {
+    color: var(--bo-text-secondary);
+    font-size: 14px;
+    margin-top: 4px;
+}

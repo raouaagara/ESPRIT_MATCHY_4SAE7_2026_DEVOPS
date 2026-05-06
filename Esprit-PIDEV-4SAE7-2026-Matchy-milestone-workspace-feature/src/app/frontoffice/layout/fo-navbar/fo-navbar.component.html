@@ -1,0 +1,104 @@
+<nav class="fo-navbar" [class.scrolled]="isScrolled">
+  <div class="nav-container">
+
+    <!-- Logo -->
+    <a routerLink="/" class="nav-logo">
+      <div class="logo-icon">M</div>
+      <span class="logo-text">Match<span class="logo-accent">y</span></span>
+    </a>
+
+    <!-- Center Links -->
+    <ul class="nav-links" [class.open]="isMenuOpen">
+      <li><a routerLink="/projects" class="nav-link">Projects</a></li>
+      <li><a routerLink="/events" class="nav-link">Events</a></li>
+      <li><a routerLink="/content-list" class="nav-link">📚 Contents</a></li>
+      <li><a routerLink="/courses-resources" class="nav-link">Courses</a></li>
+      <li *ngIf="authService.isAuthenticated">
+       
+      </li>
+      <li *ngIf="authService.isAuthenticated">
+        <a routerLink="/my-applications" class="nav-link">My Applications</a>
+      </li>
+      <li *ngIf="authService.isAuthenticated">
+        <a routerLink="/projects-milestones" class="nav-link">My Projects</a>
+      </li>
+      <li *ngIf="authService.isAuthenticated">
+        <a routerLink="/subscription-management" class="nav-link">Plans</a>
+      </li>
+      <li *ngIf="authService.isAuthenticated">
+        <a routerLink="/my-subscription" class="nav-link">My Subscription</a>
+      </li>
+      <li *ngIf="authService.isAuthenticated" class="nav-user">
+        <span class="user-greeting">Hello, {{ authService.currentUser?.name }}</span>
+        <span class="user-dot"></span>
+      </li>
+    </ul>
+
+    <!-- Right Actions -->
+    <div class="nav-actions">
+      <!-- Notifications -->
+      <div *ngIf="authService.isAuthenticated" class="notification-wrapper">
+        <button class="btn-notification" (click)="toggleNotifications()" title="Notifications">
+          🔔
+          <span *ngIf="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
+        </button>
+        
+        <!-- Notifications Dropdown -->
+        <div class="notifications-dropdown" *ngIf="showNotifications">
+          <div class="notifications-header">
+            <h3>Notifications</h3>
+            <button *ngIf="notifications.length > 0" class="btn-mark-all" (click)="markAllAsRead()">
+              Mark all as read
+            </button>
+          </div>
+          
+          <div class="notifications-list" *ngIf="notifications.length > 0">
+            <div *ngFor="let notification of notifications" 
+                 class="notification-item" 
+                 [class.unread]="!notification.is_read"
+                 (click)="handleNotificationClick(notification)">
+              <div class="notification-icon">
+                <span *ngIf="notification.type === 'application_accepted'">🎉</span>
+                <span *ngIf="notification.type === 'application_rejected'">📋</span>
+                <span *ngIf="notification.type === 'interview_scheduled'">📅</span>
+              </div>
+              <div class="notification-content">
+                <h4>{{ notification.title }}</h4>
+                <p>{{ notification.message }}</p>
+                <span class="notification-time">{{ getTimeAgo(notification.created_at) }}</span>
+              </div>
+              <button class="btn-delete-notification" (click)="deleteNotification($event, notification.id)">
+                ×
+              </button>
+            </div>
+          </div>
+          
+          <div class="notifications-empty" *ngIf="notifications.length === 0">
+            <p>No notifications yet</p>
+          </div>
+        </div>
+      </div>
+      
+      <a *ngIf="authService.isAuthenticated" routerLink="/profile-settings" class="btn-profile" title="Profile Settings">
+        ⚙️
+      </a>
+      <button *ngIf="authService.isAuthenticated && authService.isAdmin" class="btn-dashboard" (click)="goToDashboard()">
+        My Dashboard
+      </button>
+      <button *ngIf="authService.isAuthenticated" class="btn-logout" (click)="logout()">
+        Logout
+      </button>
+      <a *ngIf="!authService.isAuthenticated" routerLink="/backoffice/login" class="btn-login">
+        Login
+      </a>
+      <a *ngIf="!authService.isAuthenticated" routerLink="/register" class="btn-dashboard">
+        Get Started
+      </a>
+
+      <!-- Hamburger -->
+      <button class="hamburger" (click)="toggleMenu()" [class.active]="isMenuOpen">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>

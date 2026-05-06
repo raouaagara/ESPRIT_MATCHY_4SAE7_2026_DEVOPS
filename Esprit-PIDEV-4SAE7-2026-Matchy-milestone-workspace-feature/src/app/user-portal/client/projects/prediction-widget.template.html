@@ -1,0 +1,136 @@
+<!-- ═══════════════════════════════════════════════════════════════
+     PREDICTION WIDGET — à intégrer dans le form-card du projet
+     Appeler loadPrediction() quand category ou skills changent
+═══════════════════════════════════════════════════════════════ -->
+
+<!-- Bouton déclencheur (à placer sous les inputs category/skills) -->
+<div class="prediction-trigger" *ngIf="newProject.category">
+  <button class="btn-predict"
+    (click)="loadPrediction()"
+    [disabled]="isPredicting"
+    [class.loading]="isPredicting">
+    <span class="predict-icon">📊</span>
+    {{ isPredicting ? 'Analyzing...' : 'Suggest Budget & Deadline' }}
+  </button>
+  <span class="predict-hint">Based on {{ newProject.category }} completed projects</span>
+</div>
+
+<!-- Prediction Result Card -->
+<div class="prediction-card" *ngIf="prediction && !isPredicting">
+
+  <!-- Budget Section -->
+  <div class="prediction-section">
+    <div class="prediction-section-header">
+      <span class="prediction-section-icon">💰</span>
+      <span class="prediction-section-title">Budget Suggestion</span>
+      <span class="confidence-badge"
+        [class.conf-high]="prediction.budget.confidence === 'HIGH'"
+        [class.conf-med]="prediction.budget.confidence === 'MEDIUM'"
+        [class.conf-low]="prediction.budget.confidence === 'LOW'">
+        {{ prediction.budget.confidence }}
+      </span>
+    </div>
+
+    <div class="prediction-range">
+      <div class="range-bar-wrap">
+        <div class="range-bar">
+          <div class="range-fill"
+            [style.left.%]="getBudgetLeftPct()"
+            [style.width.%]="getBudgetWidthPct()">
+          </div>
+          <div class="range-dot recommended"
+            [style.left.%]="getBudgetRecommendedPct()"
+            title="Recommended">
+          </div>
+        </div>
+        <div class="range-labels">
+          <span>{{ prediction.budget.min | number:'1.0-0' }} TND</span>
+          <span>{{ prediction.budget.max | number:'1.0-0' }} TND</span>
+        </div>
+      </div>
+
+      <div class="prediction-stats">
+        <div class="stat-item">
+          <span class="stat-label">Min</span>
+          <span class="stat-value">{{ prediction.budget.min | number:'1.0-0' }} TND</span>
+        </div>
+        <div class="stat-item stat-recommended">
+          <span class="stat-label">Recommended ✓</span>
+          <span class="stat-value highlight">{{ prediction.budget.recommended | number:'1.0-0' }} TND</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Max</span>
+          <span class="stat-value">{{ prediction.budget.max | number:'1.0-0' }} TND</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-apply"
+      (click)="applyBudget()">
+      Apply {{ prediction.budget.recommended | number:'1.0-0' }} TND →
+    </button>
+  </div>
+
+  <div class="prediction-divider"></div>
+
+  <!-- Deadline Section -->
+  <div class="prediction-section">
+    <div class="prediction-section-header">
+      <span class="prediction-section-icon">📅</span>
+      <span class="prediction-section-title">Deadline Suggestion</span>
+      <span class="confidence-badge"
+        [class.conf-high]="prediction.deadline.confidence === 'HIGH'"
+        [class.conf-med]="prediction.deadline.confidence === 'MEDIUM'"
+        [class.conf-low]="prediction.deadline.confidence === 'LOW'">
+        {{ prediction.deadline.confidence }}
+      </span>
+    </div>
+
+    <div class="prediction-stats">
+      <div class="stat-item">
+        <span class="stat-label">Fastest</span>
+        <span class="stat-value">{{ prediction.deadline.minDays }}d</span>
+      </div>
+      <div class="stat-item stat-recommended">
+        <span class="stat-label">Recommended ✓</span>
+        <span class="stat-value highlight">{{ prediction.deadline.recommendedDays }} days</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Slowest</span>
+        <span class="stat-value">{{ prediction.deadline.maxDays }}d</span>
+      </div>
+    </div>
+
+    <!-- On-time rate bar -->
+    <div class="ontime-wrap">
+      <div class="ontime-header">
+        <span class="ontime-label">On-time delivery rate</span>
+        <span class="ontime-value"
+          [class.ontime-good]="prediction.deadline.onTimeRate >= 70"
+          [class.ontime-med]="prediction.deadline.onTimeRate >= 40 && prediction.deadline.onTimeRate < 70"
+          [class.ontime-bad]="prediction.deadline.onTimeRate < 40">
+          {{ prediction.deadline.onTimeRate }}%
+        </span>
+      </div>
+      <div class="ontime-bar">
+        <div class="ontime-fill"
+          [style.width.%]="prediction.deadline.onTimeRate"
+          [class.fill-good]="prediction.deadline.onTimeRate >= 70"
+          [class.fill-med]="prediction.deadline.onTimeRate >= 40 && prediction.deadline.onTimeRate < 70"
+          [class.fill-bad]="prediction.deadline.onTimeRate < 40">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-apply"
+      (click)="applyDeadline()">
+      Apply +{{ prediction.deadline.recommendedDays }} days from today →
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="prediction-footer">
+    <span>📊 Based on {{ prediction.budget.basedOn }} similar projects</span>
+    <span>{{ prediction.budget.message }}</span>
+  </div>
+</div>

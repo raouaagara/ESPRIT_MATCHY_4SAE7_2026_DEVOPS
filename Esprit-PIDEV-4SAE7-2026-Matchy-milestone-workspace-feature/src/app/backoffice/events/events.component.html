@@ -1,0 +1,180 @@
+<div class="bo-page">
+  <div class="bo-page-header">
+    <div><h1>Events Management</h1><p>Create and manage platform events</p></div>
+    <button class="btn-primary-enhanced" (click)="createEvent()">
+      <span class="btn-icon">✨</span>
+      Create Event
+    </button>
+  </div>
+
+  <div class="stats-row-enhanced">
+    <div class="mini-stat-enhanced primary">
+      <div class="stat-content">
+        <div class="ms-val">
+          <span class="number">{{ events.length }}</span>
+          <span class="trend">📈</span>
+        </div>
+        <div class="ms-label">
+          <span class="label-icon">📅</span>
+          Total Events
+        </div>
+      </div>
+      <div class="stat-progress">
+        <div class="progress-fill" style="width: 100%;"></div>
+      </div>
+    </div>
+
+    <div class="mini-stat-enhanced success">
+      <div class="stat-content">
+        <div class="ms-val">
+          <span class="number">696</span>
+          <span class="trend">✨</span>
+        </div>
+        <div class="ms-label">
+          <span class="label-icon">👥</span>
+          Total Registered
+        </div>
+      </div>
+      <div class="stat-progress">
+        <div class="progress-fill" style="width: 85%;"></div>
+      </div>
+    </div>
+
+    <div class="mini-stat-enhanced info">
+      <div class="stat-content">
+        <div class="ms-val">
+          <span class="number">3</span>
+          <span class="trend">🌐</span>
+        </div>
+        <div class="ms-label">
+          <span class="label-icon">💻</span>
+          Online
+        </div>
+      </div>
+      <div class="stat-progress">
+        <div class="progress-fill" style="width: 60%;"></div>
+      </div>
+    </div>
+
+    <div class="mini-stat-enhanced warning">
+      <div class="stat-content">
+        <div class="ms-val">
+          <span class="number">2</span>
+          <span class="trend">📍</span>
+        </div>
+        <div class="ms-label">
+          <span class="label-icon">🏢</span>
+          In-Person
+        </div>
+      </div>
+      <div class="stat-progress">
+        <div class="progress-fill" style="width: 40%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bo-filters-bar-enhanced">
+    <div class="bo-filter-input-enhanced">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        placeholder="Search events..." 
+        [(ngModel)]="searchTerm"
+        #searchInput
+      />
+      <button 
+        class="clear-btn" 
+        [class.visible]="searchTerm"
+        (click)="searchTerm = ''; searchInput.focus()"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="bo-filter-select-enhanced">
+      <select [(ngModel)]="selectedType">
+        <option *ngFor="let t of types" [value]="t">{{ t | titlecase }}</option>
+      </select>
+      <span class="select-arrow">▼</span>
+    </div>
+
+    <div class="bo-filter-spacer"></div>
+
+    <button class="btn-export-enhanced csv" (click)="exportToCSV()" [disabled]="exporting">
+      <span class="export-icon" *ngIf="!exporting">📄</span>
+      <span class="btn-spinner" *ngIf="exporting"></span>
+      CSV
+    </button>
+    <button class="btn-export-enhanced excel" (click)="exportToExcel()" [disabled]="exporting">
+      <span class="export-icon" *ngIf="!exporting">📊</span>
+      <span class="btn-spinner" *ngIf="exporting"></span>
+      Excel
+    </button>
+    <button class="btn-export-enhanced pdf" (click)="exportToPDF()" [disabled]="exporting">
+      <span class="export-icon" *ngIf="!exporting">📑</span>
+      <span class="btn-spinner" *ngIf="exporting"></span>
+      PDF
+    </button>
+  </div>
+
+  <div class="bo-table-card">
+    <table class="bo-data-table">
+      <thead>
+        <tr><th>Event</th><th>Type</th><th>Date</th><th>Location</th><th>Attendance</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let event of filteredEvents">
+          <td><strong>{{ event.title }}</strong></td>
+          <td><span class="badge-enhanced badge-primary">{{ event.type | titlecase }}</span></td>
+          <td>{{ event.date | date:'MMM d, y' }}</td>
+          <td>
+            <span *ngIf="event.isOnline" class="online-tag">🌐 Online</span>
+            <span *ngIf="!event.isOnline">📍 {{ event.location }}</span>
+          </td>
+          <td>
+            <div class="attendance-info">
+              <div class="bar-track"><div class="bar-fill" [style.width.%]="getAttendancePercent(event)"></div></div>
+              <span>{{ event.attendees }}/{{ event.maxAttendees }}</span>
+            </div>
+          </td>
+          <td><span class="badge-enhanced badge-success">{{ event.status | titlecase }}</span></td>
+          <td class="bo-actions-cell-enhanced">
+            <button class="btn-action-enhanced stats btn-tooltip" data-tooltip="View Statistics" (click)="openStatistics(event)">
+              <span class="action-icon">📊</span>
+            </button>
+            <button class="btn-action-enhanced view btn-tooltip" data-tooltip="View Details" (click)="viewEvent(event)">
+              <span class="action-icon">👁️</span>
+            </button>
+            <button class="btn-action-enhanced edit btn-tooltip" data-tooltip="Edit Event" (click)="editEvent(event)">
+              <span class="action-icon">✏️</span>
+            </button>
+            <button class="btn-action-enhanced delete btn-tooltip" data-tooltip="Delete Event" (click)="deleteEvent(event.id)">
+              <span class="action-icon">🗑️</span>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredEvents.length === 0"><td colspan="7" class="bo-empty-row">No events found</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create Event Modal -->
+<app-create-event-modal (eventCreated)="onEventCreated()"></app-create-event-modal>
+
+<!-- Statistics Panel -->
+<app-event-statistics-panel 
+  #statisticsPanel
+  [eventId]="selectedEventId"
+  [eventTitle]="selectedEventTitle"
+  [eventCapacity]="selectedEventCapacity">
+</app-event-statistics-panel>
+
+<!-- View Event Modal -->
+<app-view-event-modal></app-view-event-modal>
+
+<!-- Edit Event Modal -->
+<app-edit-event-modal (eventUpdated)="onEventUpdated()"></app-edit-event-modal>
+
+<!-- Confirm Delete Modal -->
+<app-confirm-modal (confirmed)="onDeleteConfirmed()" (cancelled)="onDeleteCancelled()"></app-confirm-modal>

@@ -1,0 +1,92 @@
+<div class="subscription-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="hero-badge">💳 Subscription</div>
+      <h1>Your <span class="text-gradient">Plan</span></h1>
+      <p>Upgrade to unlock more opportunities and grow your freelance career.</p>
+    </div>
+  </div>
+
+  <!-- Billing + devise -->
+  <div class="billing-row">
+    <div class="billing-toggle">
+      <button [class.active]="billingCycle === 'monthly'" (click)="toggleBillingCycle('monthly')">Monthly</button>
+      <button [class.active]="billingCycle === 'yearly'" (click)="toggleBillingCycle('yearly')">
+        Yearly <span class="discount-badge">-20%</span>
+      </button>
+    </div>
+    <app-currency-selector></app-currency-selector>
+  </div>
+
+  <!-- Plans Grid -->
+  <div class="plans-grid">
+    <div class="plan-card" *ngFor="let plan of plans" [class.popular]="plan.isPopular" [class.current]="plan.isCurrent"
+      [style.border-color]="plan.isCurrent ? plan.color + '60' : ''">
+
+      <div class="popular-badge" *ngIf="plan.isPopular">⭐ Most Popular</div>
+
+      <div class="plan-header">
+        <div class="plan-icon-wrap" [style.background]="plan.color + '20'">{{ plan.icon }}</div>
+        <h3 class="plan-name">{{ plan.name }}</h3>
+        <p class="plan-desc">{{ plan.description }}</p>
+        <div class="plan-price">
+          <span class="price-amount" [style.color]="plan.color">
+            {{ getPrice(plan) === 0 ? 'Free' : currencyService.formatAmount(getPrice(plan)) }}
+          </span>
+          <span class="price-currency" *ngIf="getPrice(plan) > 0">{{ getPeriod() }}</span>
+          <span class="price-note" *ngIf="billingCycle === 'yearly' && plan.price > 0">Save 20%</span>
+        </div>
+      </div>
+
+      <ul class="plan-features">
+        <li *ngFor="let feature of plan.features">
+          <span class="check" [style.color]="plan.color">✓</span> {{ feature }}
+        </li>
+      </ul>
+
+      <!-- ✅ BOUTON CLIQUABLE -->
+      <button class="plan-btn" [class.current]="plan.isCurrent"
+        [style.background]="plan.isCurrent ? 'transparent' : plan.color" [style.border-color]="plan.color"
+        [style.color]="plan.isCurrent ? plan.color : 'white'" [disabled]="plan.isCurrent" (click)="onSelectPlan(plan)">
+        {{ plan.isCurrent ? '✓ Current Plan' : ('Upgrade to ' + plan.name) }}
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Modal paiement (stepper V2) -->
+  <app-subscription-payment *ngIf="showPayment && selectedPlan && selectedPlan.price > 0" [plan]="selectedPlan"
+    [subscription]="buildSubscription(selectedPlan)" (close)="onClosePayment()"
+    (paymentSuccess)="onPaymentSuccess($event)">
+  </app-subscription-payment>
+
+  <!-- Success Modal (plan gratuit uniquement — les plans payants utilisent PaymentSuccessModal dans le flux paiement) -->
+  <div class="modal-overlay" *ngIf="showSuccessModal && selectedPlan && isFreePlanSuccess" (click)="closeModal()">
+    <div class="modal-content modal-sm success-modal" (click)="$event.stopPropagation()">
+      <div class="modal-body">
+        <div class="success-icon-large">✓</div>
+        <h2 class="success-title">Congratulations!</h2>
+        <p class="success-message">
+          {{ isFreePlanSuccess ? 'You are subscribed to Free during one month' : 'Payment Successfully Completed' }}
+        </p>
+        <div class="success-details" *ngIf="!isFreePlanSuccess">
+          You are now subscribed to the <strong [style.color]="selectedPlan.color">{{ selectedPlan.name }}</strong> plan
+        </div>
+        <button class="btn-download-invoice" (click)="downloadInvoice()" *ngIf="!isFreePlanSuccess">
+          <span class="pdf-icon">📄</span>
+          Download Invoice (PDF)
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" (click)="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ✅ MODAL CONFIRMATION -->
+<app-subscription-abonnement *ngIf="showConfirmation && selectedPlan && selectedPlan.id === 'free'"
+  [plan]="selectedPlan" [billingCycle]="billingCycle" (close)="onCloseConfirmation()" (confirm)="onConfirmFreePlan()">
+</app-subscription-abonnement>

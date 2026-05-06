@@ -1,0 +1,211 @@
+<div class="my-sub-page">
+
+  <!-- ══════════════════════════════════════════════════
+       LOADING
+  ══════════════════════════════════════════════════ -->
+  <div class="loading-wrap" *ngIf="state === 'loading'">
+    <div class="spinner"></div>
+    <p>Loading your subscription…</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       NO PLAN — upsell page
+  ══════════════════════════════════════════════════ -->
+  <div class="no-plan-page" *ngIf="state === 'no-plan'">
+
+    <div class="no-plan-hero">
+      <div class="hero-icon">🚀</div>
+      <h1>Unlock Your <span class="grad">Full Potential</span></h1>
+      <p class="hero-sub">
+        You don't have an active subscription yet.<br>
+        Join thousands of Tunisian freelancers growing their career on Matchy.
+      </p>
+    </div>
+
+    <!-- Benefits grid -->
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <span class="benefit-icon">⚡</span>
+        <h4>Unlimited Bids</h4>
+        <p>Apply to as many projects as you want with no restrictions.</p>
+      </div>
+      <div class="benefit-card">
+        <span class="benefit-icon">🏆</span>
+        <h4>Featured Profile</h4>
+        <p>Stand out from the crowd and get discovered by top clients.</p>
+      </div>
+      <div class="benefit-card">
+        <span class="benefit-icon">📊</span>
+        <h4>Analytics Dashboard</h4>
+        <p>Track your performance, views and proposal success rate.</p>
+      </div>
+      <div class="benefit-card">
+        <span class="benefit-icon">🎯</span>
+        <h4>Priority in Search</h4>
+        <p>Appear at the top of client searches for your skills.</p>
+      </div>
+      <div class="benefit-card">
+        <span class="benefit-icon">🛡️</span>
+        <h4>Secure Payments</h4>
+        <p>Get paid safely with Matchy's escrow payment system.</p>
+      </div>
+      <div class="benefit-card">
+        <span class="benefit-icon">💬</span>
+        <h4>Priority Support</h4>
+        <p>Get help from our team within 2 hours, any day of the week.</p>
+      </div>
+    </div>
+
+    <!-- CTA buttons -->
+    <div class="cta-section">
+      <div class="cta-card primary-cta">
+        <div class="cta-label">⭐ Most Popular</div>
+        <h3>Start with a Paid Plan</h3>
+        <p>From <strong>29 TND/month</strong> — cancel anytime.</p>
+        <button class="btn-cta-primary" (click)="goToPlans()">
+          View All Plans
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <div class="cta-divider">or</div>
+
+      <div class="cta-card free-cta">
+        <div class="free-badge">🌱 Free</div>
+        <h3>Try 1 Month for Free</h3>
+        <p>No credit card required. Access basic features for 30 days.</p>
+        <ul class="free-features">
+          <li>✓ Up to 3 active bids</li>
+          <li>✓ Basic profile</li>
+          <li>✓ Community access</li>
+          <li>✓ Standard support</li>
+        </ul>
+        <button class="btn-cta-free" (click)="startFreeTrial()" [disabled]="startingTrial">
+          <span *ngIf="!startingTrial">Start Free Month</span>
+          <span *ngIf="startingTrial">Activating…</span>
+        </button>
+        <p class="free-note">Then upgrade anytime to unlock more features.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PENDING — payment awaiting admin approval
+  ══════════════════════════════════════════════════ -->
+  <div class="pending-page" *ngIf="state === 'pending'">
+
+    <div class="page-header">
+      <div class="hero-badge">📋 My Subscription</div>
+      <h1>Your <span class="grad">Plan</span></h1>
+      <p>Manage your subscription and invoices.</p>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-icon-wrap">
+        <span class="pending-pulse">⏳</span>
+      </div>
+      <div class="pending-body">
+        <h2>
+          <span class="plan-icon">{{ planIcon }}</span>
+          {{ planName }} Plan
+          <span class="badge-pending">⏳ Pending Approval</span>
+        </h2>
+        <p class="pending-desc">
+          Your payment has been submitted and is currently
+          <strong>awaiting admin approval</strong>.
+          You will receive a confirmation email once your subscription is activated.
+        </p>
+        <div class="pending-details">
+          <div class="pd-row">
+            <span>Plan</span>
+            <strong [style.color]="planColor">{{ planName }}</strong>
+          </div>
+          <div class="pd-row">
+            <span>Status</span>
+            <span class="status-chip pending">⏳ Pending</span>
+          </div>
+          <div class="pd-row" *ngIf="pendingRef">
+            <span>Reference</span>
+            <strong class="mono">{{ pendingRef }}</strong>
+          </div>
+        </div>
+        <div class="pending-actions">
+          <button class="btn outline" (click)="goToPlans()">View Plans</button>
+          <button class="btn primary" (click)="contactSupport()">Contact Support</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pending-info-box">
+      <span class="info-icon">ℹ️</span>
+      <div>
+        <strong>What happens next?</strong>
+        <p>Our admin team reviews payments within <strong>24 hours</strong>. Once approved, your plan will be activated automatically and you'll receive a confirmation email.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       ACTIVE — subscription active
+  ══════════════════════════════════════════════════ -->
+  <div class="active-page" *ngIf="state === 'active'">
+
+    <div class="page-header">
+      <div class="hero-badge">📋 My Subscription</div>
+      <h1>Your <span class="grad">Plan</span></h1>
+      <p>Manage your subscription, renewal and invoices.</p>
+    </div>
+
+    <div class="status-card" [style.border-color]="planColor + '44'">
+      <div class="status-head">
+        <div class="status-left">
+          <div class="plan-icon-big" [style.background]="planColor + '20'">{{ planIcon }}</div>
+          <div>
+            <h2>
+              {{ planName }}
+              <span class="status-chip active">✓ Active</span>
+            </h2>
+            <p class="valid-until">Valid until {{ renewDate | date:'longDate' }}</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn outline" (click)="changePlan()">Change Plan</button>
+          <button type="button" class="btn primary" [style.background]="planColor" (click)="renew()">Renew</button>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <span [style.width.%]="progress * 100" [style.background]="'linear-gradient(90deg,' + planColor + ', #22c55e)'"></span>
+        </div>
+        <span class="pct">{{ progress * 100 | number:'1.0-0' }}% of the period used</span>
+      </div>
+
+      <div class="renew-row">
+        <label class="toggle-line">
+          <input type="checkbox" [checked]="autoRenew" (change)="toggleAutoRenew()">
+          <span>Auto-renewal</span>
+        </label>
+      </div>
+    </div>
+
+    <section class="section">
+      <h3>Payment History</h3>
+      <p class="muted">PDF invoices will appear here after admin validation.</p>
+      <div class="empty-box">No recent payments to display.</div>
+    </section>
+
+  </div>
+
+</div>
+
+<!-- Payment modal for renewal -->
+<app-subscription-payment
+  *ngIf="showPayment && plan && paymentSubscription"
+  [plan]="plan"
+  [subscription]="paymentSubscription"
+  (close)="closePayment()"
+  (paymentSuccess)="onRenewSuccess($event)">
+</app-subscription-payment>

@@ -1,0 +1,42 @@
+<aside class="bo-sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-icon">M</div>
+    <span class="logo-text">Match<span class="accent">y</span></span>
+  </div>
+
+  <!-- Admin Badge -->
+  <div class="admin-badge">
+    <span class="material-icons" style="font-size:14px;">admin_panel_settings</span>
+    ADMIN
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <a
+      *ngFor="let item of navItems"
+      [routerLink]="item.route"
+      class="nav-item"
+      [class.active]="isActive(item.route)"
+      routerLinkActive="active">
+      <span class="nav-icon">{{ item.icon }}</span>
+      <span class="nav-label">{{ item.label }}</span>
+      <span class="nav-badge" *ngIf="item.badge && item.badge > 0">{{ item.badge }}</span>
+      <span class="nav-indicator" *ngIf="isActive(item.route)"></span>
+    </a>
+  </nav>
+
+  <!-- User Footer -->
+  <div class="sidebar-footer" *ngIf="authService.currentUser">
+    <div class="user-avatar">
+      {{ getInitials(authService.currentUser.name) }}
+    </div>
+    <div class="user-info">
+      <span class="user-name">{{ authService.currentUser.name }}</span>
+      <span class="user-role">{{ authService.currentUser.role }}</span>
+    </div>
+    <button class="logout-btn" (click)="logout()" title="Logout">
+      →
+    </button>
+  </div>
+</aside>

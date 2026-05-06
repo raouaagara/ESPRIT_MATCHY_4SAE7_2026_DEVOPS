@@ -1,0 +1,422 @@
+/* ============================================
+   ENHANCED STATS CARDS
+   Modern, Animated, Interactive
+   ============================================ */
+
+/* ===== STATS ROW CONTAINER ===== */
+.stats-row-enhanced {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== MINI STAT CARD ===== */
+.mini-stat-enhanced {
+  flex: 1;
+  min-width: 140px;
+  background: var(--bo-bg-secondary);
+  border: 1.5px solid var(--bo-border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  /* Gradient overlay (hidden by default) */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+      rgba(79, 110, 247, 0.05) 0%, 
+      rgba(79, 110, 247, 0.02) 100%);
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+  }
+
+  /* Shine effect */
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%
+    );
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+  }
+
+  /* Content wrapper */
+  .stat-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Value */
+  .ms-val {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--bo-text-primary);
+    letter-spacing: -1px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+
+    /* Animated number */
+    .number {
+      display: inline-block;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Trend indicator */
+    .trend {
+      font-size: 14px;
+      font-weight: 600;
+      margin-left: 4px;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  /* Label */
+  .ms-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--bo-text-secondary);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    /* Icon */
+    .label-icon {
+      font-size: 14px;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  /* Progress bar (optional) */
+  .stat-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--bo-border);
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      transform: translateX(-100%);
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  /* Hover State */
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(79, 110, 247, 0.3);
+    box-shadow: 0 8px 24px rgba(79, 110, 247, 0.12);
+
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
+
+    .ms-val {
+      color: var(--primary);
+      transform: scale(1.05);
+
+      .number {
+        transform: translateY(-2px);
+      }
+
+      .trend {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .ms-label {
+      color: var(--bo-text-primary);
+
+      .label-icon {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .stat-progress {
+      opacity: 1;
+
+      .progress-fill {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  /* Active/Click State */
+  &:active {
+    transform: translateY(-2px) scale(0.98);
+    box-shadow: 0 4px 16px rgba(79, 110, 247, 0.15);
+  }
+
+  /* Color Variants */
+  &.primary {
+    &:hover {
+      border-color: rgba(79, 110, 247, 0.4);
+      .ms-val { color: var(--primary); }
+      .stat-progress .progress-fill {
+        background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      }
+    }
+  }
+
+  &.success {
+    &:hover {
+      border-color: rgba(34, 197, 94, 0.4);
+      .ms-val { color: var(--success); }
+      .stat-progress .progress-fill {
+        background: linear-gradient(90deg, var(--success), #4ade80);
+      }
+    }
+  }
+
+  &.warning {
+    &:hover {
+      border-color: rgba(245, 158, 11, 0.4);
+      .ms-val { color: var(--warning); }
+      .stat-progress .progress-fill {
+        background: linear-gradient(90deg, var(--warning), #fbbf24);
+      }
+    }
+  }
+
+  &.info {
+    &:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+      .ms-val { color: var(--info); }
+      .stat-progress .progress-fill {
+        background: linear-gradient(90deg, var(--info), #22d3ee);
+      }
+    }
+  }
+}
+
+/* ===== STAT CARD WITH ICON ===== */
+.mini-stat-enhanced.with-icon {
+  .stat-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 32px;
+    opacity: 0.15;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+  }
+
+  &:hover .stat-icon {
+    opacity: 0.3;
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+/* ===== STAT CARD WITH BADGE ===== */
+.mini-stat-enhanced.with-badge {
+  .stat-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 10px;
+    background: var(--primary);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+  }
+
+  &:hover .stat-badge {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== LOADING STATE ===== */
+.mini-stat-enhanced.loading {
+  pointer-events: none;
+
+  .ms-val {
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(79, 110, 247, 0.2),
+        transparent
+      );
+      animation: shimmer 1.5s infinite;
+    }
+  }
+}
+
+@keyframes shimmer {
+  to {
+    left: 100%;
+  }
+}
+
+/* ===== PULSE ANIMATION (for real-time updates) ===== */
+.mini-stat-enhanced.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(79, 110, 247, 0.15);
+  }
+}
+
+/* ===== NUMBER COUNTING ANIMATION ===== */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mini-stat-enhanced .ms-val .number {
+  animation: countUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== FADE IN UP ANIMATION ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger animation for multiple cards */
+.mini-stat-enhanced:nth-child(1) {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0s;
+}
+
+.mini-stat-enhanced:nth-child(2) {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+
+.mini-stat-enhanced:nth-child(3) {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+}
+
+.mini-stat-enhanced:nth-child(4) {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+}
+
+.mini-stat-enhanced:nth-child(5) {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+}
+
+.mini-stat-enhanced:nth-child(6) {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .stats-row-enhanced {
+    flex-direction: column;
+  }
+
+  .mini-stat-enhanced {
+    min-width: 100%;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+.mini-stat-enhanced:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ===== TOOLTIP (optional) ===== */
+.mini-stat-enhanced[data-tooltip] {
+  &::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    padding: 8px 12px;
+    background: var(--bo-text-primary);
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+  }
+
+  &:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

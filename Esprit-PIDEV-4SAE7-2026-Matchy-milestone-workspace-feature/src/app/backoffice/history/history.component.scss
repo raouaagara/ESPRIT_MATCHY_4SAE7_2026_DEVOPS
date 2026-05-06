@@ -1,0 +1,229 @@
+.bo-history-page {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--bo-bg-primary);
+  min-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 40px;
+
+  .header-content {
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--bo-text-primary);
+    }
+
+    p {
+      margin: 0;
+      color: var(--bo-text-secondary);
+      font-size: 16px;
+    }
+  }
+}
+
+.timeline-container {
+  position: relative;
+  background: var(--bo-bg-secondary);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.timeline-section {
+  margin-bottom: 40px;
+
+  &:last-child .timeline-item:last-child .marker-line {
+    display: none;
+  }
+}
+
+.timeline-date {
+  margin-bottom: 24px;
+  position: sticky;
+  top: 0;
+  background: var(--bo-bg-secondary);
+  padding: 12px 0;
+  z-index: 10;
+
+  .date-label {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+}
+
+.timeline-items {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover .timeline-card {
+    border-color: var(--primary);
+    transform: translateX(4px);
+  }
+}
+
+.timeline-marker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+
+  .marker-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid var(--primary);
+    background: var(--bo-bg-secondary);
+    z-index: 2;
+    flex-shrink: 0;
+
+    &.application_received {
+      border-color: var(--primary);
+    }
+
+    &.application_accepted {
+      border-color: #10b981;
+    }
+
+    &.application_rejected {
+      border-color: #ef4444;
+    }
+
+    &.interview_scheduled {
+      border-color: #f59e0b;
+    }
+  }
+
+  .marker-line {
+    width: 2px;
+    flex: 1;
+    background: var(--bo-border);
+    margin-top: 4px;
+  }
+}
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.timeline-time {
+  font-size: 13px;
+  color: var(--bo-text-secondary);
+  font-weight: 500;
+  min-width: 70px;
+  padding-top: 4px;
+}
+
+.timeline-card {
+  flex: 1;
+  background: var(--bo-bg-secondary);
+  border: 1px solid var(--bo-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  transition: all 0.3s ease;
+
+  .card-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .card-content {
+    flex: 1;
+    min-width: 0;
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+
+      h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--bo-text-primary);
+      }
+
+      .card-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 12px;
+        white-space: nowrap;
+        flex-shrink: 0;
+
+        &.application_received {
+          background: rgba(var(--primary-rgb), 0.1);
+          color: var(--primary);
+        }
+
+        &.application_accepted {
+          background: rgba(16, 185, 129, 0.1);
+          color: #10b981;
+        }
+
+        &.application_rejected {
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+        }
+
+        &.interview_scheduled {
+          background: rgba(245, 158, 11, 0.1);
+          color: #f59e0b;
+        }
+      }
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--bo-text-secondary);
+      line-height: 1.5;
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--bo-text-primary);
+  }
+
+  p {
+    margin: 0;
+    color: var(--bo-text-secondary);
+    font-size: 16px;
+  }
+}

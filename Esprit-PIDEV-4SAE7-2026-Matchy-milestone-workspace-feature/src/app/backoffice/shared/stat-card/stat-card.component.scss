@@ -1,0 +1,45 @@
+.stat-card {
+  background: var(--bo-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--bo-border);
+  border-top: 3px solid;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s;
+  cursor: default;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevated);
+  }
+}
+
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+.stat-body {
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 800;
+    color: var(--bo-text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+
+    .stat-suffix { font-size: 18px; }
+  }
+
+  .stat-label {
+    font-size: 13px; font-weight: 600;
+    color: var(--bo-text-primary); margin-bottom: 2px;
+  }
+
+  .stat-sublabel {
+    font-size: 11px; color: var(--bo-text-secondary);
+  }
+}

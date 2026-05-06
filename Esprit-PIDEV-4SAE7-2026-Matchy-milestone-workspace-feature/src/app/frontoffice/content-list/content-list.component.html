@@ -1,0 +1,178 @@
+<div class="content-list-page">
+  <div class="hero-section">
+    <h1 class="hero-title">Discover Amazing Contents</h1>
+    <p class="hero-subtitle">
+      Explore our collection of courses, articles and videos
+    </p>
+
+    <div class="hero-badge-panel">
+      <div class="hero-panel-top">
+        <div class="hero-badge-label">Gamification</div>
+        <div class="hero-badge-name">{{ currentUserName }}</div>
+      </div>
+
+      <div
+        class="hero-main-award"
+        [ngClass]="primaryBadge ? getBadgeClass(primaryBadge) : 'badge-muted'"
+      >
+        <div class="hero-main-award-icon">
+          {{
+            primaryBadge === "Gold Badge"
+              ? "🥇"
+              : primaryBadge === "Silver Badge"
+                ? "🥈"
+                : primaryBadge === "Bronze Badge"
+                  ? "🥉"
+                  : primaryBadge === "Perfect Score Badge"
+                    ? "🏆"
+                    : "🎯"
+          }}
+        </div>
+        <div class="hero-main-award-content">
+          <div class="hero-main-award-title">{{ badgeSummary }}</div>
+          <div class="hero-main-award-subtitle">Top unlocked badge</div>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat-card">
+          <div class="hero-stat-value">{{ currentUserCertificationCount }}</div>
+          <div class="hero-stat-label">Certifications</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-value">{{ currentUserBadges.length }}</div>
+          <div class="hero-stat-label">Badges unlocked</div>
+        </div>
+      </div>
+
+      <div
+        class="hero-badge-list"
+        *ngIf="currentUserBadges.length > 0; else noBadges"
+      >
+        <span
+          *ngFor="let badge of currentUserBadges"
+          class="hero-badge-chip"
+          [ngClass]="getBadgeClass(badge)"
+        >
+          <span class="hero-badge-chip-icon" aria-hidden="true">
+            {{
+              badge === "Gold Badge"
+                ? "🥇"
+                : badge === "Silver Badge"
+                  ? "🥈"
+                  : badge === "Bronze Badge"
+                    ? "🥉"
+                    : badge === "Perfect Score Badge"
+                      ? "🏆"
+                      : "🎖️"
+            }}
+          </span>
+          <span>{{ badge }}</span>
+        </span>
+      </div>
+      <ng-template #noBadges>
+        <p class="hero-badge-empty">
+          Complete certifications to unlock Bronze, Silver, Gold and Perfect Score badges.
+        </p>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <div class="content-list-container">
+      <!-- En-tête avec boutons favoris et notifications -->
+      <div class="page-header">
+        <div class="header-left">
+          <h1>📚 Explore Contents</h1>
+          <p class="subtitle">
+            Discover our collection of courses, articles, and videos
+          </p>
+        </div>
+
+        <div class="header-actions">
+          <app-notification-panel></app-notification-panel>
+          <button
+            class="btn-favorites"
+            routerLink="/favorites"
+          >
+            ⭐ My Favorites
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-tabs">
+        <button
+          class="filter-tab"
+          [class.active]="selectedFilter === 'all'"
+          (click)="filterContents('all')"
+        >
+          All Contents
+        </button>
+        <button
+          class="filter-tab"
+          [class.active]="selectedFilter === 'cours'"
+          (click)="filterContents('cours')"
+        >
+          Courses
+        </button>
+        <button
+          class="filter-tab"
+          [class.active]="selectedFilter === 'article'"
+          (click)="filterContents('article')"
+        >
+          Articles
+        </button>
+        <button
+          class="filter-tab"
+          [class.active]="selectedFilter === 'video'"
+          (click)="filterContents('video')"
+        >
+          Videos
+        </button>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">
+          {{ filteredContents.length }} Contents Available
+        </h2>
+      </div>
+
+      <div class="contents-grid">
+        <div *ngFor="let content of filteredContents" class="content-card">
+          <div class="content-date">
+            {{ getContentIcon(content.type) }}
+            {{ content.createdAt | date: "dd/MM/yyyy" }}
+          </div>
+          <h3 class="content-title">{{ content.title }}</h3>
+          <p class="content-description">{{ content.description }}</p>
+          <div class="content-meta">
+            <span
+              class="content-badge"
+              [ngClass]="getContentBadgeClass(content.type)"
+            >
+              {{ content.type }}
+            </span>
+            <span class="content-level">
+              {{ getLevelLabel(content) }}
+            </span>
+          </div>
+          <p class="unlock-hint" *ngIf="!isContentUnlocked(content)">
+            🔒 {{ getUnlockMessage(content) }}
+          </p>
+          <button
+            class="btn btn-view"
+            [disabled]="!isContentUnlocked(content)"
+            [class.btn-locked]="!isContentUnlocked(content)"
+            (click)="viewContent(content)"
+          >
+            {{ isContentUnlocked(content) ? "📖 View Content" : "🔒 Locked" }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="filteredContents.length === 0" class="no-results">
+        <p>No contents found.</p>
+      </div>
+    </div>
+  </div>
+</div>

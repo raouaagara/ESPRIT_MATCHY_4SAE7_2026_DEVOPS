@@ -1,0 +1,68 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-box" *ngIf="!showPayment">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-icon" [style.background]="plan.color + '22'">
+        <span>{{ plan.icon }}</span>
+      </div>
+      <h2>Confirm Subscription</h2>
+      <p>You're about to subscribe to the <strong [style.color]="plan.color">{{ plan.name }}</strong> plan</p>
+      <button class="close-btn" (click)="close.emit()">✕</button>
+    </div>
+
+    <!-- Subscription Summary -->
+    <div class="plan-summary">
+      <div class="summary-row">
+        <span class="label">Plan</span>
+        <span class="value" [style.color]="plan.color">{{ subscription.plan?.name }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Status</span>
+        <span class="status-badge pending">{{ subscription.status }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Duration</span>
+        <span class="value">{{ subscription.duration }} month{{ (subscription.duration || 1) > 1 ? 's' : '' }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Start Date</span>
+        <span class="value">{{ formatDate(subscription.startDate) }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">End Date</span>
+        <span class="value">{{ formatDate(subscription.endDate) }}</span>
+      </div>
+      <div class="summary-row total">
+        <span class="label">Total</span>
+        <span class="value total-amount" [style.color]="plan.color">
+          {{ subscription.priceAtPurchase }} TND / {{ subscription.duration === 1 ? 'month' : 'year' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Features Included -->
+    <div class="features-preview">
+      <p class="features-title">What's included:</p>
+      <div class="features-tags">
+        <span *ngFor="let feature of (plan.features || []).slice(0, 3)" class="feature-tag">
+          ✓ {{ feature }}
+        </span>
+        <span *ngIf="(plan.features?.length || 0) > 3" class="feature-tag more">
+          +{{ (plan.features?.length || 0) - 3 }} more
+        </span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="close.emit()">Cancel</button>
+      <button class="btn-confirm" (click)="onConfirmSubscription()">Confirm</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<app-subscription-payment *ngIf="showPayment" [plan]="plan" [subscription]="subscription" (close)="onClosePayment()">
+</app-subscription-payment>

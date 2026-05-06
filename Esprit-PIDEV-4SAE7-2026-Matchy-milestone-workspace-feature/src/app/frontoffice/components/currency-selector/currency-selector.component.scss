@@ -1,0 +1,44 @@
+.currency-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--fo-text-secondary, #9ca3af);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.pill-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pill-btn.active {
+  background: rgba(79, 110, 247, 0.25);
+  color: #fff;
+  border: 1px solid rgba(79, 110, 247, 0.45);
+}
+
+.flag {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.code {
+  letter-spacing: 0.02em;
+}

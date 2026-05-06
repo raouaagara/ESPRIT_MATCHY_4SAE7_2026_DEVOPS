@@ -1,0 +1,58 @@
+<div class="courses-page">
+  <!-- Header -->
+  <div class="page-hero">
+    <div class="hero-content">
+      <div class="hero-badge">📚 Matchy Academy</div>
+      <h1>Courses &amp; <span class="text-gradient">Resources</span></h1>
+      <p>Boost your skills and grow your freelance career with expert-led content.</p>
+    </div>
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search courses..." [(ngModel)]="searchTerm" class="search-input">
+    </div>
+  </div>
+
+  <!-- Category Filters -->
+  <div class="filters">
+    <button *ngFor="let cat of categories"
+      class="filter-btn" [class.active]="activeCategory === cat"
+      (click)="activeCategory = cat">
+      {{ cat | titlecase }}
+    </button>
+  </div>
+
+  <!-- Courses Grid -->
+  <div class="courses-grid">
+    <div class="course-card" *ngFor="let course of filteredCourses">
+      <div class="card-top" [style.background]="course.color + '15'">
+        <div class="course-icon" [style.background]="course.color + '25'">{{ course.icon }}</div>
+        <span class="free-badge" *ngIf="course.isFree">FREE</span>
+      </div>
+
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="badge" [class]="'badge-' + getLevelClass(course.level)">{{ course.level | titlecase }}</span>
+          <span class="duration">⏱ {{ course.duration }}</span>
+        </div>
+        <h3 class="course-title">{{ course.title }}</h3>
+        <p class="course-desc">{{ course.description }}</p>
+      </div>
+
+      <div class="card-footer">
+        <div class="course-stats">
+          <span>📖 {{ course.lessons }} lessons</span>
+          <span>👥 {{ course.students | number }}</span>
+        </div>
+        <button class="btn-enroll" [style.background]="course.color">
+          {{ course.isFree ? 'Start Free' : 'Enroll Now' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="filteredCourses.length === 0">
+      <span>🔍</span>
+      <p>No courses found for "{{ searchTerm }}"</p>
+    </div>
+  </div>
+</div>

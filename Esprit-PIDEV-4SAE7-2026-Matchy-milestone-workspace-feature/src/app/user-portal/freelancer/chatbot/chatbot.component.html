@@ -1,0 +1,127 @@
+<!-- ══════════════════════════════════════
+     FAB BUTTON (always visible)
+══════════════════════════════════════ -->
+<div class="chat-fab" (click)="toggle()" [class.open]="isOpen" [attr.aria-label]="isOpen ? 'Close chat' : 'Open support'">
+  <span class="fab-icon-open">🤖</span>
+  <span class="fab-icon-close">✕</span>
+  <span class="fab-badge" *ngIf="unreadCount > 0 && !isOpen">{{ unreadCount }}</span>
+  <div class="fab-ring"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHAT WINDOW
+══════════════════════════════════════ -->
+<div class="chat-window visible" *ngIf="isOpen" role="dialog" aria-label="Matchy AI Support">
+
+  <!-- HEADER -->
+  <div class="cw-header">
+    <div class="cw-avatar-wrap">
+      <div class="cw-avatar">🤖</div>
+      <span class="cw-status-dot"></span>
+    </div>
+    <div class="cw-info">
+      <div class="cw-name">Matchy AI Support</div>
+      <div class="cw-online">
+        <span class="online-dot"></span>
+        Online · Responds instantly
+      </div>
+    </div>
+    <div class="cw-actions">
+      <button class="cw-action-btn" (click)="clear()" title="New conversation">🗑️</button>
+      <button class="cw-action-btn" (click)="close()" title="Close">✕</button>
+    </div>
+  </div>
+
+  <!-- SUGGESTIONS BAR -->
+  <div class="cw-suggestions">
+    <button
+      class="cw-chip"
+      *ngFor="let s of suggestions"
+      (click)="sendSuggestion(s.text)"
+      [disabled]="isLoading"
+    >
+      <span>{{ s.icon }}</span> {{ s.text }}
+    </button>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="cw-messages" #messagesRef>
+
+    <!-- Empty / Welcome state -->
+    <div class="cw-empty" *ngIf="messages.length === 0 && !isLoading">
+      <div class="empty-orb">✨</div>
+      <div class="empty-title">Hello, I'm your Matchy assistant</div>
+      <div class="empty-sub">I can help you with your proposals, profile, and everything related to the platform.</div>
+      <div class="quick-grid">
+        <button
+          class="quick-btn"
+          *ngFor="let q of quickStarts"
+          (click)="sendSuggestion(q.text)"
+        >
+          {{ q.icon }} {{ q.text }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Message bubbles -->
+    <div
+      class="msg-row"
+      [class.user]="m.role === 'user'"
+      [class.bot]="m.role === 'bot'"
+      *ngFor="let m of messages"
+    >
+      <div class="msg-avatar">{{ m.role === 'bot' ? '🤖' : '👤' }}</div>
+      <div class="msg-content">
+        <div class="msg-bubble" [innerHTML]="formatContent(m.content)"></div>
+        <div class="msg-meta">
+          <span class="msg-time">{{ m.time }}</span>
+          <span class="msg-tick" *ngIf="m.role === 'user'">✓✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing indicator -->
+    <div class="msg-row bot" *ngIf="isLoading">
+      <div class="msg-avatar">🤖</div>
+      <div class="msg-content">
+        <div class="typing-bubble">
+          <span class="t-dot"></span>
+          <span class="t-dot"></span>
+          <span class="t-dot"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INPUT AREA -->
+  <div class="cw-input-area">
+    <div class="cw-input-wrap" [class.focused]="userInput.length > 0">
+      <textarea
+        #inputRef
+        class="cw-textarea"
+        [(ngModel)]="userInput"
+        (input)="onInput()"
+        (keydown)="onKeydown($event)"
+        placeholder="Ask your question…"
+        rows="1"
+        [disabled]="isLoading"
+        [maxlength]="MAX_CHARS"
+      ></textarea>
+      <button
+        class="cw-send-btn"
+        (click)="send()"
+        [disabled]="isLoading || !userInput.trim()"
+        title="Send"
+      >
+        <span *ngIf="!isLoading">➤</span>
+        <span class="btn-spinner" *ngIf="isLoading"></span>
+      </button>
+    </div>
+    <div class="cw-footer">
+      <span class="cw-hint">Enter ↵ to send</span>
+      <span class="cw-count" [class.warn]="charCount > 450">{{ charCount }}/{{ MAX_CHARS }}</span>
+    </div>
+  </div>
+
+</div>

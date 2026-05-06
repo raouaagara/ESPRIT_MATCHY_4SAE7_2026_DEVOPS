@@ -1,0 +1,142 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-content">
+        <span class="header-icon">✏️</span>
+        <h2>Edit Event</h2>
+      </div>
+      <button class="btn-close" (click)="closeModal()">
+        <span class="close-icon">✕</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form (ngSubmit)="onSubmit()">
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title">
+            <span class="label-icon">📝</span>
+            Event Title <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            [(ngModel)]="formData.title"
+            placeholder="e.g., Spring Boot Certification Program"
+            required
+            class="form-input"
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">
+            <span class="label-icon">📄</span>
+            Description <span class="required">*</span>
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="formData.description"
+            placeholder="Describe the event..."
+            rows="4"
+            required
+            class="form-input"
+          ></textarea>
+        </div>
+
+        <!-- Type and Date Row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="type">
+              <span class="label-icon">🏷️</span>
+              Event Type <span class="required">*</span>
+            </label>
+            <div class="select-wrapper">
+              <select
+                id="type"
+                name="type"
+                [(ngModel)]="formData.type"
+                required
+                class="form-input"
+              >
+                <option *ngFor="let type of eventTypes" [value]="type.value">
+                  {{ type.label }}
+                </option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="date">
+              <span class="label-icon">📅</span>
+              Date <span class="required">*</span>
+            </label>
+            <app-custom-datepicker
+              [(ngModel)]="formData.date"
+              name="date"
+              placeholder="Select event date"
+            ></app-custom-datepicker>
+          </div>
+        </div>
+
+        <!-- Location and Max Participants Row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="location">
+              <span class="label-icon">📍</span>
+              Location <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              [(ngModel)]="formData.location"
+              placeholder="e.g., Online or Paris, France"
+              required
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="maxParticipants">
+              <span class="label-icon">👥</span>
+              Max Participants <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              id="maxParticipants"
+              name="maxParticipants"
+              [(ngModel)]="formData.maxParticipants"
+              min="1"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" *ngIf="errorMessage">
+          <span class="error-icon">⚠️</span>
+          {{ errorMessage }}
+        </div>
+
+        <!-- Actions -->
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeModal()" [disabled]="loading">
+            <span class="btn-icon">✕</span>
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="loading">
+            <span class="btn-icon" *ngIf="!loading">✓</span>
+            <span class="btn-spinner" *ngIf="loading"></span>
+            <span *ngIf="!loading">Update Event</span>
+            <span *ngIf="loading">Updating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

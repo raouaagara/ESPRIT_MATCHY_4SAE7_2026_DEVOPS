@@ -1,0 +1,229 @@
+/* ============================================
+   MATCHY - Global Styles
+   ============================================ */
+
+/* CSS Variables */
+:root {
+  /* Brand Colors */
+  --primary: #4f6ef7;
+  --primary-light: #6b84ff;
+  --primary-dark: #3451d1;
+  --accent: #00e5ff;
+  --accent-secondary: #a855f7;
+
+  /* Dark Theme (FrontOffice) */
+  --fo-bg-primary: #0a0e27;
+  --fo-bg-secondary: #111436;
+  --fo-bg-card: #161b3d;
+  --fo-border: rgba(79, 110, 247, 0.2);
+  --fo-text-primary: #ffffff;
+  --fo-text-secondary: rgba(255,255,255,0.65);
+  --fo-text-muted: rgba(255,255,255,0.35);
+
+  /* Generic aliases for components */
+  --bg-primary: #0a0e27;
+  --card-bg: #161b3d;
+  --border: rgba(79, 110, 247, 0.2);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.65);
+  --text-muted: rgba(255,255,255,0.35);
+  --primary-rgb: 79, 110, 247;
+
+  /* Light Theme (BackOffice) */
+  --bo-bg-primary: #f4f6fb;
+  --bo-bg-secondary: #ffffff;
+  --bo-bg-sidebar: #0a0e27;
+  --bo-text-primary: #1a1d2e;
+  --bo-text-secondary: #5a6080;
+  --bo-border: #e5e9f5;
+
+  /* Status Colors */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #06b6d4;
+
+  /* Typography */
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  /* Spacing */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.08);
+  --shadow-elevated: 0 8px 40px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 30px rgba(79,110,247,0.25);
+}
+
+/* ============================================
+   DARK MODE OVERRIDES (Backoffice)
+   ============================================ */
+body.dark-mode {
+  --bo-bg-primary: #0a0e27;
+  --bo-bg-secondary: #161b3d;
+  --bo-bg-sidebar: #050816;
+  --bo-text-primary: #ffffff;
+  --bo-text-secondary: rgba(255,255,255,0.7);
+  --bo-border: rgba(255,255,255,0.1);
+
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-elevated: 0 8px 40px rgba(0,0,0,0.55);
+}
+
+body.theme-transitioning,
+body.theme-transitioning * {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease !important;
+}
+
+/* Dark-mode broad overrides for backoffice surfaces */
+body.dark-mode .bo-layout {
+  background: var(--bo-bg-primary);
+  color: var(--bo-text-primary);
+
+  /* Inputs / selects / textareas */
+  input, select, textarea {
+    background: var(--bo-bg-secondary) !important;
+    color: var(--bo-text-primary) !important;
+    border-color: var(--bo-border) !important;
+  }
+  input::placeholder, textarea::placeholder { color: var(--bo-text-secondary) !important; }
+
+  /* Tables */
+  table, thead, tbody, tr {
+    background-color: transparent !important;
+    color: var(--bo-text-primary);
+  }
+  th, td { border-color: var(--bo-border) !important; color: var(--bo-text-primary) !important; }
+  thead th { background: rgba(255,255,255,0.03) !important; color: var(--bo-text-secondary) !important; }
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: var(--font-body);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(79,110,247,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* Utility classes */
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+
+  &.badge-primary { background: rgba(79,110,247,0.15); color: var(--primary-light); border: 1px solid rgba(79,110,247,0.3); }
+  &.badge-success { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.3); }
+  &.badge-warning { background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
+  &.badge-danger  { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+  color: #fbbf24;
+  font-size: 14px;
+}
+
+/* ============================================
+   SHARED BackOffice Page Styles (Global)
+   ============================================ */
+
+.bo-page { display: flex; flex-direction: column; gap: 20px; }
+
+.bo-page-header {
+  display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  h1 { font-family: var(--font-display); font-size: 28px; font-weight: 800; color: var(--bo-text-primary); letter-spacing: -0.5px; }
+  p { color: var(--bo-text-secondary); font-size: 14px; margin-top: 4px; }
+}
+
+.stats-row {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  .mini-stat {
+    flex: 1; min-width: 120px; background: var(--bo-bg-secondary); border: 1px solid var(--bo-border);
+    border-radius: var(--radius-md); padding: 16px 20px; display: flex; flex-direction: column; gap: 4px;
+    .ms-val { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--bo-text-primary); }
+    .ms-label { font-size: 12px; color: var(--bo-text-secondary); }
+  }
+}
+
+.bo-filters-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bo-filter-input, .bo-filter-select {
+  padding: 9px 14px; border: 1px solid var(--bo-border); border-radius: var(--radius-sm);
+  font-size: 13px; font-family: var(--font-body);
+  background: var(--bo-bg-secondary); color: var(--bo-text-primary); outline: none; transition: border 0.2s;
+  &:focus { border-color: var(--primary); }
+}
+.bo-filter-spacer { flex: 1; }
+
+.bo-table-card { background: var(--bo-bg-secondary); border: 1px solid var(--bo-border); border-radius: var(--radius-md); overflow: hidden; }
+
+.bo-data-table {
+  width: 100%; border-collapse: collapse;
+  th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; color: var(--bo-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--bo-border); background: var(--bo-bg-primary); }
+  td { padding: 13px 16px; font-size: 13px; color: var(--bo-text-primary); border-bottom: 1px solid var(--bo-border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(79,110,247,0.03); }
+}
+
+.bo-actions-cell {
+  display: flex; gap: 4px;
+  .btn-action {
+    width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--bo-border);
+    cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center;
+    background: transparent; transition: all 0.2s;
+    &.view:hover { background: rgba(79,110,247,0.1); border-color: var(--primary); }
+    &.edit:hover { background: rgba(245,158,11,0.1); border-color: var(--warning); }
+    &.delete:hover { background: rgba(239,68,68,0.1); border-color: var(--danger); }
+  }
+}
+
+.bo-empty-row { text-align: center; color: var(--bo-text-secondary); padding: 40px !important; }
+
+.badge-muted { background: rgba(100,116,139,0.1) !important; color: #64748b !important; border: 1px solid rgba(100,116,139,0.3) !important; }

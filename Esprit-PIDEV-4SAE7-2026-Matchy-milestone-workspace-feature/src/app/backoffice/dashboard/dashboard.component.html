@@ -1,0 +1,187 @@
+<div class="dashboard">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Admin Dashboard</h1>
+      <p class="page-sub">Global overview of the Matchy platform</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <span>Loading dashboard...</span>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <app-stat-card
+        *ngFor="let stat of stats"
+        [icon]="stat.icon"
+        [iconBg]="stat.iconBg"
+        [borderColor]="stat.borderColor"
+        [label]="stat.label"
+        [subLabel]="stat.subLabel"
+        [value]="stat.value"
+        [suffix]="stat.suffix || ''">
+      </app-stat-card>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <!-- User Distribution -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-icon">👥</span>
+          <h3>User Distribution</h3>
+          <span class="chart-toggle">
+            <a href="#">Clients</a> vs <a href="#" class="active">Freelancers</a>
+          </span>
+        </div>
+        <div class="chart-placeholder">
+          <p class="empty-chart">No data available yet</p>
+        </div>
+      </div>
+
+      <!-- Project Status -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-icon">📊</span>
+          <h3>Project Status</h3>
+          <span class="chart-toggle">
+            <a href="#">Open</a> vs <a href="#" class="active">Completed</a>
+          </span>
+        </div>
+        <div class="chart-placeholder">
+          <p class="empty-chart">No data available yet</p>
+        </div>
+      </div>
+
+      <!-- KPI Overview -->
+      <div class="chart-card chart-wide">
+        <div class="chart-header">
+          <span class="chart-icon">📈</span>
+          <h3>Global KPI Overview</h3>
+          <span class="chart-badge">All key indicators</span>
+        </div>
+        <div class="kpi-bars">
+          <div class="kpi-bar" *ngFor="let label of ['Users','Clients','Freelancers','Verified','Clients','Terminal']">
+            <div class="bar-track">
+              <div class="bar-fill" [style.height.%]="0"></div>
+            </div>
+            <span class="bar-label">{{ label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tables Row -->
+    <div class="tables-row">
+      <!-- Recent Users -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">
+            <span>👤</span>
+            <h3>Recent Users</h3>
+            <span class="count-badge">{{ recentUsers.length }} results</span>
+          </div>
+          <div class="table-actions">
+            <input type="text" placeholder="Search..." [(ngModel)]="userSearch" class="search-input">
+            <button class="btn-export">📄 CSV</button>
+            <button class="btn-export">📊 Excel</button>
+          </div>
+        </div>
+
+        <div class="sort-row">
+          Sort by:
+          <button class="sort-btn active">Date</button>
+          <button class="sort-btn">Rating</button>
+          <button class="sort-btn">Projects</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Rating</th>
+                <th>Projects</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="recentUsers.length === 0">
+                <td colspan="6" class="empty-row">No users registered yet</td>
+              </tr>
+              <tr *ngFor="let user of recentUsers">
+                <td class="user-cell">
+                  <div class="avatar">{{ user.name[0] }}</div>
+                  <span>{{ user.name }}</span>
+                </td>
+                <td>{{ user.email }}</td>
+                <td><span class="badge badge-primary">{{ user.role }}</span></td>
+                <td>
+                  <span class="status-dot" [class]="user.status"></span>
+                  {{ user.status }}
+                </td>
+                <td>{{ user.rating || '—' }}</td>
+                <td>{{ user.projects || 0 }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Top Freelancers -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">
+            <span>🏆</span>
+            <h3>Top Freelancers</h3>
+            <span class="count-badge">{{ topFreelancers.length }} freelancers</span>
+          </div>
+          <div class="table-actions">
+            <input type="text" placeholder="Search..." [(ngModel)]="freelancerSearch" class="search-input">
+            <button class="btn-export">📄 CSV</button>
+            <button class="btn-export">📊 Excel</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Freelancer</th>
+                <th>City</th>
+                <th>Rating</th>
+                <th>Projects</th>
+                <th>Badge</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="topFreelancers.length === 0">
+                <td colspan="5" class="empty-row">No freelancers yet</td>
+              </tr>
+              <tr *ngFor="let f of topFreelancers">
+                <td class="user-cell">
+                  <div class="avatar">{{ f.name[0] }}</div>
+                  <span>{{ f.name }}</span>
+                </td>
+                <td>{{ f.city || '—' }}</td>
+                <td>⭐ {{ f.rating || '—' }}</td>
+                <td>{{ f.projects || 0 }}</td>
+                <td>
+                  <span class="badge badge-warning" *ngIf="f.badge">{{ f.badge }}</span>
+                  <span *ngIf="!f.badge">—</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

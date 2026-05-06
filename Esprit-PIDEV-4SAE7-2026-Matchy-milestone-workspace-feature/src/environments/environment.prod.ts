@@ -1,0 +1,5 @@
+export const environment = {
+  production: true,
+  apiUrl: 'http://localhost:8091/api',
+  paymentsAdminBaseUrl: 'http://localhost:8091/api'
+};

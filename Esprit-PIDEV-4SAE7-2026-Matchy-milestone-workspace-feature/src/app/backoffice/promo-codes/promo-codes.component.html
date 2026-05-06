@@ -1,0 +1,68 @@
+<div class="promo-codes-container">
+  <div class="promo-header">
+    <div>
+      <h1>🎁 Promo Codes Management</h1>
+      <p class="subtitle">Generate and manage promotional codes for subscribers</p>
+    </div>
+    <button class="btn-generate" (click)="toggleForm()" *ngIf="!showForm">
+      ➕ Generate New Code
+    </button>
+  </div>
+
+  <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+  <div class="alert alert-error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="generate-form" *ngIf="showForm" [formGroup]="form">
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" formControlName="notes"
+             placeholder="e.g., Summer promotion, Black Friday, etc." class="form-input">
+      <small class="form-hint">Add notes to remember why this code was created</small>
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary" (click)="generateCode()" [disabled]="isLoading">
+        {{ isLoading ? '⏳ Generating...' : '✅ Generate Code' }}
+      </button>
+      <button class="btn-secondary" (click)="toggleForm()" type="button">Cancel</button>
+    </div>
+  </div>
+
+  <div class="codes-table-wrapper">
+    <table class="codes-table" *ngIf="promoCodes.length > 0">
+      <thead>
+        <tr>
+          <th>Code</th><th>Discount</th><th>Status</th>
+          <th>Created</th><th>Usage</th><th>Notes</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let code of promoCodes" [class.inactive]="!code.active">
+          <td><span class="code-badge">{{ code.code }}</span></td>
+          <td><span class="discount-badge">{{ code.discountPercent }}% OFF</span></td>
+          <td><span class="status-badge" [style.color]="getStatusColor(code)">{{ getStatusBadge(code) }}</span></td>
+          <td class="date-cell">{{ formatDate(code.createdAt) }}</td>
+          <td><span class="usage-count">{{ code.usageCount }}</span></td>
+          <td class="notes-cell">{{ code.notes || '—' }}</td>
+          <td class="actions-cell">
+            <button class="btn-action" [class.active]="code.active" (click)="toggleCode(code)">
+              {{ code.active ? '🔒 Deactivate' : '🔓 Activate' }}
+            </button>
+            <button class="btn-action delete" (click)="deleteCode(code)">🗑️ Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty-state" *ngIf="promoCodes.length === 0 && !isLoading">
+      <div class="empty-icon">🎁</div>
+      <h3>No Promo Codes Yet</h3>
+      <p>Create your first promotional code to offer discounts to subscribers</p>
+      <button class="btn-primary" (click)="toggleForm()">Generate First Code</button>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading promo codes...</p>
+    </div>
+  </div>
+</div>

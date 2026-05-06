@@ -1,0 +1,78 @@
+<div class="projects-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Projects Management</h1>
+      <p class="page-sub">Overview of all projects on the Matchy platform</p>
+    </div>
+    <button class="btn-add">+ New Project</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar bo-filters-bar">
+    <input type="text" placeholder="🔍 Search projects..."
+      [(ngModel)]="searchTerm" (input)="onSearch()" class="filter-input bo-filter-input">
+
+    <select [(ngModel)]="selectedStatus" (change)="onSearch()" class="filter-select bo-filter-select">
+      <option value="all">All Status</option>
+      <option value="open">Open</option>
+      <option value="in_progress">In Progress</option>
+      <option value="delivered">Delivered</option>
+      <option value="completed">Completed</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+
+    <div class="filter-spacer bo-filter-spacer"></div>
+    <button class="btn-export">📄 CSV</button>
+    <button class="btn-export">📊 Excel</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Category</th>
+          <th>Budget</th>
+          <th>Status</th>
+          <th>Applications</th>
+          <th>Rating</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredProjects.length === 0">
+          <td colspan="8" class="empty-row">
+            <div class="empty-state">
+              <span class="empty-icon">📁</span>
+              <p>No projects yet</p>
+              <small>Projects will appear here once clients post them</small>
+            </div>
+          </td>
+        </tr>
+        <tr *ngFor="let project of filteredProjects">
+          <td class="project-cell">
+            <span class="project-title">{{ project.title }}</span>
+            <span class="project-desc">{{ project.description | slice:0:50 }}...</span>
+          </td>
+          <td><span class="category-tag">{{ project.category }}</span></td>
+          <td class="budget-cell">{{ project.budget | number }} {{ project.currency }}</td>
+          <td>
+            <span class="badge" [class]="'badge-' + getStatusClass(project.status)">
+              {{ project.status | titlecase }}
+            </span>
+          </td>
+          <td>{{ project.applications }}</td>
+          <td>{{ project.rating ? '⭐ ' + project.rating : '—' }}</td>
+          <td>{{ project.createdAt | date:'MMM d, y' }}</td>
+          <td class="actions-cell">
+            <button class="btn-action view" title="View">👁</button>
+            <button class="btn-action edit" title="Edit">✏️</button>
+            <button class="btn-action delete" title="Delete">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

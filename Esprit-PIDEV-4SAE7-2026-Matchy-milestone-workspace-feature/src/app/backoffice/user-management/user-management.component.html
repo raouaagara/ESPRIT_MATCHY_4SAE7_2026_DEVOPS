@@ -1,0 +1,97 @@
+<div class="bo-page">
+  <div class="bo-page-header">
+    <div><h1>User Management</h1><p>Full control over all registered users</p></div>
+    <button class="btn-primary">+ Add User</button>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button *ngFor="let tab of tabs" class="tab-btn" [class.active]="activeTab === tab.id" (click)="activeTab = tab.id">
+      {{ tab.label }} <span class="tab-count">{{ tab.count }}</span>
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="bo-filters-bar">
+    <input type="text" placeholder="🔍 Search users..." [(ngModel)]="searchTerm" class="bo-filter-input">
+    <select [(ngModel)]="selectedRole" class="bo-filter-select">
+      <option value="all">All Roles</option>
+      <option value="admin">Admin</option>
+      <option value="client">Client</option>
+      <option value="freelancer">Freelancer</option>
+    </select>
+    <select [(ngModel)]="selectedStatus" class="bo-filter-select">
+      <option value="all">All Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="banned">Banned</option>
+    </select>
+    <div class="bo-filter-spacer"></div>
+    <button class="btn-export">📄 CSV</button>
+    <button class="btn-export">📊 Excel</button>
+  </div>
+
+  <!-- Table -->
+  <div class="bo-table-card">
+    <table class="bo-data-table">
+      <thead>
+        <tr>
+          <th>User</th><th>Email</th><th>Role</th><th>Plan</th>
+          <th>Status</th><th>Verified</th><th>Rating</th><th>Projects</th><th>Joined</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td class="user-cell">
+            <div class="avatar-circle" [class]="'avatar-' + user.role">{{ getInitials(user.name) }}</div>
+            <div class="user-detail">
+              <span class="user-name">{{ user.name }}</span>
+              <span class="user-city">📍 {{ user.city }}</span>
+            </div>
+          </td>
+          <td>{{ user.email }}</td>
+          <td><span class="badge" [class]="'badge-' + getRoleClass(user.role)">{{ user.role | titlecase }}</span></td>
+          <td><span class="badge" [class]="'badge-' + getPlanClass(user.plan)">{{ user.plan | titlecase }}</span></td>
+          <td>
+            <span class="status-chip" [class]="user.status">
+              <span class="dot"></span>{{ user.status | titlecase }}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="user.verified" class="verified-badge">✅ Verified</span>
+            <button *ngIf="!user.verified" class="btn-verify" (click)="verifyUser(user)">Verify →</button>
+          </td>
+          <td>{{ user.rating ? '⭐ ' + user.rating : '—' }}</td>
+          <td>{{ user.projects }}</td>
+          <td>{{ user.joined | date:'MMM y' }}</td>
+          <td class="bo-actions-cell">
+            <button class="btn-action view" title="View profile">👁</button>
+            <button class="btn-action edit" title="Edit user">✏️</button>
+            <button class="btn-action delete" title="{{ user.status === 'banned' ? 'Unban' : 'Ban' }}"
+              (click)="openBanModal(user)">
+              {{ user.status === 'banned' ? '🔓' : '🚫' }}
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredUsers.length === 0">
+          <td colspan="10" class="bo-empty-row">No users found for this filter</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Ban Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showBanModal" (click)="showBanModal = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon">{{ selectedUser?.status === 'banned' ? '🔓' : '🚫' }}</div>
+      <h3>{{ selectedUser?.status === 'banned' ? 'Unban User' : 'Ban User' }}</h3>
+      <p>Are you sure you want to <strong>{{ selectedUser?.status === 'banned' ? 'unban' : 'ban' }}</strong> <strong>{{ selectedUser?.name }}</strong>?</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showBanModal = false">Cancel</button>
+        <button class="btn-confirm" [class.danger]="selectedUser?.status !== 'banned'" (click)="confirmBan()">
+          Confirm {{ selectedUser?.status === 'banned' ? 'Unban' : 'Ban' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="job-selector">
+  <div class="toolbar">
+    <input
+      type="search"
+      class="search-input"
+      [(ngModel)]="search"
+      placeholder="Rechercher un métier, une techno…"
+      aria-label="Recherche métiers" />
+    <select class="cat-filter" [(ngModel)]="filterCategoryId">
+      <option value="all">Toutes les catégories</option>
+      <option *ngFor="let c of categories" [value]="c.id">{{ c.icon }} {{ c.name }}</option>
+    </select>
+  </div>
+
+  <p class="hint" *ngIf="multiple">
+    Sélectionnez jusqu’à {{ maxSelected }} métiers ({{ selectedIds.length }} / {{ maxSelected }}).
+  </p>
+
+  <div class="cat-section" *ngFor="let cat of filteredCategories">
+    <h3 class="cat-title"><span class="cat-ico">{{ cat.icon }}</span> {{ cat.name }}</h3>
+    <div class="jobs-grid">
+      <button
+        type="button"
+        class="job-card"
+        *ngFor="let job of cat.jobs"
+        [class.selected]="isSelected(job.id)"
+        [disabled]="multiple && !isSelected(job.id) && selectedIds.length >= maxSelected"
+        (click)="toggle(job)">
+        <span class="job-name">{{ job.name }}</span>
+        <div class="tags">
+          <span class="tag" *ngFor="let t of job.tags.slice(0, 4)">{{ t }}</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="empty" *ngIf="filteredCategories.length === 0">
+    Aucun métier ne correspond à votre recherche.
+  </div>
+</div>

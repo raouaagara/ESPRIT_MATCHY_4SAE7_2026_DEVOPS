@@ -1,0 +1,401 @@
+/* ============================================
+   ENHANCED BUTTONS & ACTION ICONS
+   Modern, Elegant, Animated Design
+   ============================================ */
+
+/* ===== PRIMARY BUTTON (Create Event) ===== */
+.btn-primary-enhanced {
+  position: relative;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(79, 110, 247, 0.25);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: auto;
+
+  /* Shine effect overlay */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  /* Icon styling */
+  .btn-icon {
+    font-size: 16px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hover state */
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79, 110, 247, 0.35);
+
+    &::before {
+      left: 100%;
+    }
+
+    .btn-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+  }
+
+  /* Active state */
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(79, 110, 247, 0.3);
+  }
+
+  /* Disabled state */
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+/* ===== ACTION ICONS (View, Edit, Delete) ===== */
+.bo-actions-cell-enhanced {
+  display: flex !important;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.btn-action-enhanced {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid var(--bo-border);
+  background: var(--bo-bg-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  /* Icon */
+  .action-icon {
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Background glow effect */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+  }
+
+  /* Ripple effect */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+  }
+
+  /* VIEW Button */
+  &.view {
+    &:hover {
+      border-color: var(--primary);
+      background: rgba(79, 110, 247, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(79, 110, 247, 0.2);
+
+      &::before {
+        width: 100%;
+        height: 100%;
+        background: rgba(79, 110, 247, 0.1);
+      }
+
+      .action-icon {
+        color: var(--primary);
+        transform: scale(1.15);
+      }
+    }
+
+    &:active::after {
+      background: rgba(79, 110, 247, 0.2);
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* EDIT Button */
+  &.edit {
+    &:hover {
+      border-color: var(--warning);
+      background: rgba(245, 158, 11, 0.08);
+      transform: translateY(-2px) rotate(5deg);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+
+      &::before {
+        width: 100%;
+        height: 100%;
+        background: rgba(245, 158, 11, 0.1);
+      }
+
+      .action-icon {
+        color: var(--warning);
+        transform: scale(1.15) rotate(-5deg);
+      }
+    }
+
+    &:active::after {
+      background: rgba(245, 158, 11, 0.2);
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* DELETE Button */
+  &.delete {
+    &:hover {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+
+      &::before {
+        width: 100%;
+        height: 100%;
+        background: rgba(239, 68, 68, 0.1);
+      }
+
+      .action-icon {
+        color: var(--danger);
+        transform: scale(1.15);
+        animation: shake 0.5s;
+      }
+    }
+
+    &:active::after {
+      background: rgba(239, 68, 68, 0.2);
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* Active state for all */
+  &:active {
+    transform: translateY(0) scale(0.95);
+  }
+}
+
+/* Shake animation for delete button */
+@keyframes shake {
+  0%, 100% { transform: scale(1.15) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(-5deg); }
+  75% { transform: scale(1.15) rotate(5deg); }
+}
+
+/* ===== SECONDARY BUTTON VARIANT ===== */
+.btn-secondary-enhanced {
+  padding: 10px 20px;
+  background: var(--bo-bg-secondary);
+  color: var(--bo-text-primary);
+  border: 1.5px solid var(--bo-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(79, 110, 247, 0.05);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 110, 247, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* ===== ICON BUTTON (Small) ===== */
+.btn-icon-enhanced {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--bo-border);
+  background: var(--bo-bg-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+
+  &:hover {
+    border-color: var(--primary);
+    background: rgba(79, 110, 247, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(79, 110, 247, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.95);
+  }
+}
+
+/* ===== BADGE ENHANCEMENTS ===== */
+.badge-enhanced {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.badge-primary {
+    background: rgba(79, 110, 247, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(79, 110, 247, 0.2);
+  }
+
+  &.badge-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+
+  &.badge-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  &.badge-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* ===== LOADING STATE ===== */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== TOOLTIP ===== */
+.btn-tooltip {
+  position: relative;
+
+  &::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    padding: 6px 12px;
+    background: var(--bo-text-primary);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--bo-text-primary);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+  }
+
+  &:hover::before,
+  &:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

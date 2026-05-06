@@ -1,0 +1,116 @@
+.job-selector {
+  margin-top: 8px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--fo-border, #2d3348);
+  background: var(--fo-bg-card, #141824);
+  color: #fff;
+  font-size: 14px;
+}
+
+.cat-filter {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--fo-border, #2d3348);
+  background: var(--fo-bg-card, #141824);
+  color: #e5e7eb;
+  font-size: 14px;
+  min-width: 220px;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--fo-text-muted, #9ca3af);
+  margin-bottom: 16px;
+}
+
+.cat-section {
+  margin-bottom: 28px;
+}
+
+.cat-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-ico {
+  font-size: 20px;
+}
+
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.job-card {
+  text-align: left;
+  padding: 14px;
+  border-radius: 14px;
+  border: 2px solid var(--fo-border, #2d3348);
+  background: var(--fo-bg-card, #141824);
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.job-card:hover:not(:disabled) {
+  border-color: rgba(79, 110, 247, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+.job-card.selected {
+  border-color: #4f6ef7;
+  box-shadow: 0 0 0 1px rgba(79, 110, 247, 0.35);
+}
+
+.job-card:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.job-name {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(79, 110, 247, 0.15);
+  color: #a5b4fc;
+}
+
+.empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--fo-text-muted, #9ca3af);
+  font-size: 14px;
+}

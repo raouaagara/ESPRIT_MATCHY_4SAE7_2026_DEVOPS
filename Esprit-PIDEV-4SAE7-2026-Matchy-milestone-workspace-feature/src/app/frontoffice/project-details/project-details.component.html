@@ -1,0 +1,219 @@
+<div class="project-details-page" *ngIf="project">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">← Back to Projects</button>
+  </div>
+
+  <!-- Project Info Card -->
+  <div class="project-info-card">
+    <div class="card-header">
+      <div class="company-section">
+        <div class="company-avatar-large">{{ project.companyName.charAt(0) }}</div>
+        <div>
+          <h1 class="project-title">{{ project.projectTitle }}</h1>
+          <p class="company-name">{{ project.companyName }}</p>
+        </div>
+      </div>
+      <span class="status-badge" [class]="getStatusClass(project.status)">
+        {{ project.status === 'open' ? '🟢 Open' : project.status === 'in_progress' ? '🟡 In Progress' : '🔴 Closed' }}
+      </span>
+    </div>
+
+    <p class="project-description">{{ project.description }}</p>
+
+    <div class="project-details-grid">
+      <div class="detail-box">
+        <span class="detail-icon">📍</span>
+        <div>
+          <span class="detail-label">Location</span>
+          <span class="detail-value">{{ project.location || 'Not specified' }}</span>
+        </div>
+      </div>
+      <div class="detail-box">
+        <span class="detail-icon">👥</span>
+        <div>
+          <span class="detail-label">Team Size</span>
+          <span class="detail-value">{{ project.numberOfPeopleDemanded }} people</span>
+        </div>
+      </div>
+      <div class="detail-box" *ngIf="project.budget">
+        <span class="detail-icon">💰</span>
+        <div>
+          <span class="detail-label">Total Budget</span>
+          <span class="detail-value">{{ project.budget }} {{ project.currency }}</span>
+        </div>
+      </div>
+      <div class="detail-box" *ngIf="project.deadline">
+        <span class="detail-icon">📅</span>
+        <div>
+          <span class="detail-label">Deadline</span>
+          <span class="detail-value">{{ project.deadline | date:'MMM d, y' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="work-details-section">
+      <h3>Project Details</h3>
+      <p>{{ project.detailsOfWork }}</p>
+    </div>
+
+    <div class="skills-section" *ngIf="project.skills && project.skills.length > 0">
+      <h3>Required Skills</h3>
+      <div class="skills-tags">
+        <span *ngFor="let skill of project.skills" class="skill-tag">{{ skill }}</span>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stat-item">
+        <span class="stat-icon">👁️</span>
+        <span class="stat-value">{{ project.clickCount }}</span>
+        <span class="stat-label">Views</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">📝</span>
+        <span class="stat-value">{{ project.applicationsCount }}</span>
+        <span class="stat-label">Total Applications</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">🎯</span>
+        <span class="stat-value">{{ milestones.length }}</span>
+        <span class="stat-label">Milestones</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestones Section -->
+  <div class="milestones-section">
+    <div class="section-header">
+      <h2>Project Milestones</h2>
+      <p>Choose which milestone you want to work on and apply</p>
+    </div>
+
+    <div class="milestones-grid" *ngIf="milestones.length > 0">
+      <div *ngFor="let milestone of milestones" class="milestone-card">
+        <div class="milestone-header">
+          <h3 class="milestone-title">{{ milestone.title }}</h3>
+          <span class="milestone-status" [class]="getStatusClass(milestone.status)">
+            <span class="dot"></span>
+            {{ milestone.status === 'open' ? 'Open' : milestone.status === 'assigned' ? 'Assigned' : milestone.status === 'in_progress' ? 'In Progress' : 'Completed' }}
+          </span>
+        </div>
+
+        <p class="milestone-description">{{ milestone.description }}</p>
+
+        <div class="milestone-info">
+          <div class="info-item" *ngIf="milestone.budget">
+            <span class="info-label">Budget</span>
+            <span class="info-value">{{ milestone.budget }} {{ milestone.currency }}</span>
+          </div>
+          <div class="info-item" *ngIf="milestone.duration">
+            <span class="info-label">Duration</span>
+            <span class="info-value">{{ milestone.duration }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Applications</span>
+            <span class="info-value">{{ milestone.applicationsCount }}</span>
+          </div>
+        </div>
+
+        <div class="milestone-skills" *ngIf="milestone.skills && milestone.skills.length > 0">
+          <span *ngFor="let skill of milestone.skills" class="skill-badge">{{ skill }}</span>
+        </div>
+
+        <button 
+          class="btn-apply-milestone" 
+          (click)="openApplicationModal(milestone)"
+          [disabled]="milestone.status !== 'open'">
+          {{ milestone.status === 'open' ? 'Apply for this Milestone' : 'Not Available' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-milestones" *ngIf="milestones.length === 0">
+      <span class="empty-icon">🎯</span>
+      <h3>No milestones yet</h3>
+      <p>The company hasn't added any milestones to this project yet</p>
+    </div>
+  </div>
+</div>
+
+<!-- Application Modal -->
+<div class="modal-overlay" *ngIf="showApplicationModal" (click)="closeApplicationModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>Apply for Milestone</h2>
+        <p class="modal-subtitle">{{ selectedMilestone?.title }}</p>
+      </div>
+      <button class="btn-close" (click)="closeApplicationModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Years of Experience *</label>
+        <input 
+          type="number" 
+          [(ngModel)]="applicationForm.yearsOfExperience" 
+          min="0"
+          placeholder="Enter your years of experience">
+      </div>
+
+      <div class="form-group">
+        <label>Upload CV/Resume</label>
+        <div class="file-upload-wrapper">
+          <input 
+            type="file" 
+            id="cvFile"
+            accept=".pdf,.doc,.docx"
+            (change)="onCvFileSelected($event)"
+            #cvFileInput>
+          <label for="cvFile" class="file-upload-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span *ngIf="!selectedCvFile">Choose CV file (PDF, DOC, DOCX)</span>
+            <span *ngIf="selectedCvFile" class="file-selected">
+              <i class="fas fa-file-pdf"></i> {{ selectedCvFile.name }}
+            </span>
+          </label>
+          <button 
+            *ngIf="selectedCvFile" 
+            class="btn-remove-file" 
+            (click)="removeCvFile()"
+            type="button">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <small>Optional: Upload your CV or resume (Max 5MB)</small>
+      </div>
+
+      <div class="form-group">
+        <label>Proposed Budget ({{ selectedMilestone?.currency }})</label>
+        <input 
+          type="number" 
+          [(ngModel)]="applicationForm.proposedBudget" 
+          min="0"
+          placeholder="Your proposed budget">
+        <small>Suggested: {{ selectedMilestone?.budget }} {{ selectedMilestone?.currency }}</small>
+      </div>
+
+      <div class="form-group">
+        <label>Motivation Letter *</label>
+        <textarea 
+          [(ngModel)]="applicationForm.motivationLetter" 
+          rows="8"
+          placeholder="Tell the company why you're the best fit for this milestone. Include:&#10;- Your relevant experience&#10;- Why you're interested in this project&#10;- How you plan to approach this milestone&#10;- Any questions or clarifications"></textarea>
+        <small>Minimum 100 characters</small>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeApplicationModal()">Cancel</button>
+      <button class="btn-submit" (click)="submitApplication()" [disabled]="isUploading">
+        <span *ngIf="!isUploading">Submit Application</span>
+        <span *ngIf="isUploading">
+          <i class="fas fa-spinner fa-spin"></i> Uploading...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

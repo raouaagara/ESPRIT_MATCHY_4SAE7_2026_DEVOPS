@@ -1,0 +1,144 @@
+server:
+  port: 8091
+  max-http-header-size: 10MB
+  netty:
+    connection-timeout: 10000ms
+    idle-timeout: 120000ms
+
+spring:
+  application:
+    name: api-gateway
+  codec:
+    max-in-memory-size: 10MB
+  cloud:
+    gateway:
+      # Increased default route timeout
+      httpclient:
+        connect-timeout: 10000
+        response-timeout: 60000ms
+        pool:
+          max-idle-time: 120000ms
+      
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      
+      routes:
+        # Order matters — more specific routes first.
+        
+        # Event Service Routes
+        - id: event-service
+          uri: lb://event-service
+          predicates:
+            - Path=/api/evenements/**,/api/events/**,/api/registrations/**,/api/chat/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: SERVICE_UNAVAILABLE,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 1000ms
+        
+        # Content Service Routes
+        - id: content-service
+          uri: lb://content-service
+          predicates:
+            - Path=/api/content/**,/api/assessment/**,/api/certification/**,/api/favorite/**,/api/translation/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: SERVICE_UNAVAILABLE,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT
+        
+        # Subscription Service Routes
+        - id: subscription-service
+          uri: lb://subscription-service
+          predicates:
+            - Path=/api/subscription/**,/api/payment/**,/api/plan/**,/api/promocode/**,/api/paypal/**,/api/flouci/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: SERVICE_UNAVAILABLE,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT
+        
+        # Backend Service Routes (Auth, Users, Projects - catch-all for /api/**)
+        - id: backend-service
+          uri: lb://backend-service
+          predicates:
+            - Path=/api/**
+          filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: SERVICE_UNAVAILABLE,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT
+      
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+              - "http://localhost:3000"
+              - "http://127.0.0.1:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - "Authorization"
+              - "Content-Type"
+              - "X-Total-Count"
+            allowCredentials: true
+            maxAge: 86400
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 30
+    instance-info-replication-interval-seconds: 30
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+    health-check-url-path: /actuator/health
+    status-page-url-path: /actuator/info
+    metadata-map:
+      zone: default
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.netflix.eureka: INFO
+    org.springframework.cloud.commons: INFO
+    com.matchy: DEBUG
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: api-gateway

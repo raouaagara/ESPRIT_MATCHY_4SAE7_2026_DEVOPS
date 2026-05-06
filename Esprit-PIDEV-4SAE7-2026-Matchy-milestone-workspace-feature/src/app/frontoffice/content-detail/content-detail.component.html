@@ -1,0 +1,170 @@
+<app-fo-navbar></app-fo-navbar>
+
+<div class="content-detail-page">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">Loading content...</div>
+  </div>
+
+  <!-- Content Detail -->
+  <div *ngIf="!loading && content" class="content-detail-container">
+    
+    <!-- Back Button -->
+    <button class="back-button" (click)="goBack()">
+      ← Back to Contents
+    </button>
+
+    <!-- Content Header -->
+    <div class="content-detail-header">
+      <div class="content-meta-info">
+        <span class="content-badge" [ngClass]="getContentBadgeClass(content.type)">
+          {{ getContentIcon(content.type) }} {{ content.type }}
+        </span>
+        <span class="content-date">
+          Created: {{ content.createdAt | date: 'dd MMMM yyyy' }}
+        </span>
+      </div>
+      <h1 class="content-detail-title">{{ content.title }}</h1>
+      
+      <p class="content-author" *ngIf="author">
+        👤 By {{ author.name }}
+      </p>
+    </div>
+
+    <!-- Content Body -->
+    <div class="content-detail-body">
+      
+      <!-- Original Content -->
+      <div class="content-description-section">
+        <div class="section-header">
+          <h2>📖 Original Content</h2>
+          
+          <!-- Translate Button -->
+          <div class="translate-controls">
+            <div class="language-selector" *ngIf="!showTranslation">
+              <button class="translate-button" (click)="toggleLanguageDropdown()">
+                <span class="translate-icon">🌐</span>
+                <span>Translate</span>
+                <span class="dropdown-arrow">{{ showLanguageDropdown ? '▲' : '▼' }}</span>
+              </button>
+
+              <div *ngIf="showLanguageDropdown" class="language-dropdown">
+                <div 
+                  *ngFor="let lang of availableLanguages" 
+                  class="language-option"
+                  (click)="translateToLanguage(lang.code)"
+                >
+                  <span class="option-flag">{{ lang.flag }}</span>
+                  <span class="option-name">{{ lang.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hide Translation Button -->
+            <button 
+              *ngIf="showTranslation" 
+              class="hide-translation-button"
+              (click)="hideTranslation()"
+            >
+              ✕ Hide Translation
+            </button>
+          </div>
+        </div>
+
+        <p class="description-text">{{ content.description }}</p>
+      </div>
+
+      <!-- Translated Content (shown below original) -->
+      <div *ngIf="showTranslation" class="translated-content-section">
+        <div class="translation-header">
+          <h2>
+            {{ getSelectedLanguageFlag() }} Translated Content ({{ getSelectedLanguageName() }})
+          </h2>
+          <div *ngIf="translating" class="translating-indicator">
+            <span class="spinner">⏳</span> Translating...
+          </div>
+        </div>
+
+        <div *ngIf="!translating && currentTranslation" class="translation-content">
+          <div class="translated-title">
+            <h3>Title:</h3>
+            <p>{{ currentTranslation.translatedTitle }}</p>
+          </div>
+          <div class="translated-description">
+            <h3>Description:</h3>
+            <p>{{ currentTranslation.translatedDescription }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Cards -->
+      <div class="content-info-grid">
+        <div class="info-card">
+          <div class="info-icon">🕐</div>
+          <div class="info-content">
+            <h3>Last Updated</h3>
+            <p>{{ content.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">👤</div>
+          <div class="info-content">
+            <h3>Author</h3>
+            <p>{{ author?.name || content.authorId || 'Unknown' }}</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">🆔</div>
+          <div class="info-content">
+            <h3>Content ID</h3>
+            <p>{{ content.contentId }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="content-actions">
+        <button class="btn btn-primary" (click)="takeAssessment()">
+          📝 Take Assessment
+        </button>
+        
+        <button 
+          class="btn btn-pdf" 
+          (click)="downloadResources()"
+          [disabled]="downloadingPdf"
+          [class.loading]="downloadingPdf">
+          <span *ngIf="!downloadingPdf">📄 Download as PDF</span>
+          <span *ngIf="downloadingPdf">
+            <span class="spinner"></span> Generating PDF...
+          </span>
+        </button>
+        
+        <button 
+          class="btn btn-favorite" 
+          (click)="toggleFavorite()"
+          [disabled]="processingFavorite"
+          [class.is-favorite]="isFavorite"
+          [class.loading]="processingFavorite">
+          <span *ngIf="!processingFavorite && !isFavorite">⭐ Add to Favorites</span>
+          <span *ngIf="!processingFavorite && isFavorite">✅ In Favorites</span>
+          <span *ngIf="processingFavorite">
+            <span class="spinner"></span> Processing...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !content" class="error-container">
+    <h2>❌ Content not found</h2>
+    <p>The content you're looking for doesn't exist.</p>
+    <button class="btn btn-primary" (click)="goBack()">
+      Go Back
+    </button>
+  </div>
+</div>
+
+<app-fo-footer></app-fo-footer>

@@ -1,0 +1,454 @@
+﻿<div class="dashboard">
+  <div class="page-header animate-slide-down">
+    <div class="header-left">
+      <span class="welcome-eyebrow">Client Portal</span>
+      <h1 class="page-title">
+        Welcome back,
+        <span class="user-name">{{ authService.currentUser?.firstName || authService.currentUser?.name }}</span>
+        <i class="wave">👋</i>
+      </h1>
+      <p class="page-sub">Here's what's happening with your projects today</p>
+    </div>
+    <a routerLink="/client/projects" class="btn-primary">
+      <span>+</span> Post a Project
+    </a>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loader-ring"></div>
+    <span>Loading your dashboard...</span>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <div class="stats-grid">
+      <div class="stat-card stat-purple animate-fade-up" style="animation-delay:0.05s">
+        <div class="stat-glow"></div>
+        <div class="stat-icon">📋</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.total }}</span>
+          <span class="stat-label">Total Projects</span>
+        </div>
+      </div>
+      <div class="stat-card stat-green animate-fade-up" style="animation-delay:0.1s">
+        <div class="stat-glow"></div>
+        <div class="stat-icon">🟢</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.open }}</span>
+          <span class="stat-label">Open</span>
+        </div>
+      </div>
+      <div class="stat-card stat-amber animate-fade-up" style="animation-delay:0.15s">
+        <div class="stat-glow"></div>
+        <div class="stat-icon">⚙️</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.inProgress }}</span>
+          <span class="stat-label">In Progress</span>
+        </div>
+      </div>
+      <div class="stat-card stat-blue animate-fade-up" style="animation-delay:0.2s">
+        <div class="stat-glow"></div>
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.completed }}</span>
+          <span class="stat-label">Completed</span>
+        </div>
+      </div>
+      <div class="stat-card stat-red animate-fade-up" style="animation-delay:0.25s">
+        <div class="stat-glow"></div>
+        <div class="stat-icon">🔔</div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.unreadNotifs }}</span>
+          <span class="stat-label">Unread Notifs</span>
+        </div>
+        <div class="pulse-ring" *ngIf="stats.unreadNotifs > 0"></div>
+      </div>
+    </div>
+
+    <!-- BADGES SECTION -->
+<div class="badges-section animate-fade-up" style="animation-delay:0.28s">
+  <div class="badges-header">
+    <h3><span>🏅</span> My Achievements</h3>
+    <span class="badges-count">{{ earnedCount }} / {{ allBadges.length }} unlocked</span>
+  </div>
+  <div class="badges-grid">
+    <div class="badge-item" *ngFor="let b of mergedBadges"
+      [class.badge-unlocked]="!b.locked"
+      [class.badge-locked]="b.locked"
+    >
+      <div class="badge-icon-wrap">
+        <span class="badge-icon">{{ b.locked ? "🔒" : b.icon }}</span>
+      </div>
+      <div class="badge-info">
+        <span class="badge-title">{{ b.name }}</span>
+        <span class="badge-desc">{{ b.desc }}</span>
+      </div>
+      <div class="badge-earned-pill" *ngIf="!b.locked">✔ Earned</div>
+    </div>
+  </div>
+</div>
+
+    <!-- DELIVERED BANNER -->
+    <div class="delivered-banner animate-fade-up" *ngIf="deliveredProjects.length > 0" style="animation-delay:0.28s">
+      <div class="delivered-banner-header">
+        <div class="delivered-banner-title">
+          <span class="delivered-pulse"></span>
+          <span>📦 Deliveries waiting for your review</span>
+          <span class="delivered-count">{{ deliveredProjects.length }}</span>
+        </div>
+        <p class="delivered-banner-sub">A freelancer submitted work – confirm or request a revision.</p>
+      </div>
+      <div class="delivered-list">
+        <div class="delivered-item" *ngFor="let p of deliveredProjects" (click)="openDelivery(p)">
+          <div class="delivered-item-left">
+            <div class="delivered-item-icon">📦</div>
+            <div>
+              <div class="delivered-item-title">{{ p.title }}</div>
+              <div class="delivered-item-meta">
+                {{ p.budget | number }} TND
+                <span class="dot-sep">·</span>
+                {{ p.category }}
+              </div>
+            </div>
+          </div>
+          <div class="delivered-item-right">
+            <span class="badge badge-delivered">Delivered</span>
+            <button class="btn-review">Review →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TWO COLS -->
+    <div class="two-col">
+      <div class="card animate-fade-up" style="animation-delay:0.35s">
+        <div class="card-header">
+          <h3><span class="card-icon">📂</span>My Recent Projects</h3>
+          <a routerLink="/client/projects" class="link-more">View all →</a>
+        </div>
+        <div class="empty-state" *ngIf="projects.length === 0">
+          <span class="empty-icon">🔭</span>
+          <p>No projects yet. <a routerLink="/client/projects">Create one!</a></p>
+        </div>
+        <div class="project-list" *ngIf="projects.length > 0">
+          <div class="project-item" *ngFor="let p of projects">
+            <div class="project-dot"></div>
+            <div class="project-info">
+              <span class="project-title">{{ p.title }}</span>
+              <span class="project-budget" *ngIf="p.budget">{{ p.budget }} TND</span>
+            </div>
+            <span class="badge" [class]="getStatusClass(p.status)">{{ p.status }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animate-fade-up" style="animation-delay:0.4s">
+        <div class="card-header">
+          <h3><span class="card-icon">🔔</span>Notifications</h3>
+          <a routerLink="/client/notifications" class="link-more">View all →</a>
+        </div>
+        <div class="empty-state" *ngIf="notifications.length === 0">
+          <span class="empty-icon">🔕</span>
+          <p>No new notifications</p>
+        </div>
+        <div class="notif-list" *ngIf="notifications.length > 0">
+          <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.read">
+            <div class="notif-dot"></div>
+            <div class="notif-content">
+              <span class="notif-title">{{ n.title }}</span>
+              <span class="notif-msg">{{ n.message }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>
+
+<!-- ═══════════════════════════════
+     DELIVERY REVIEW MODAL
+═══════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="showDeliveryModal" (click)="closeDeliveryModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="modal-icon">📦</span>
+        <div>
+          <h3>Review Delivery</h3>
+          <p>{{ selectedDelivery?.title }}</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeDeliveryModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="delivery-section" *ngIf="selectedDelivery?.deliveryLink">
+        <label class="delivery-label">🔗 Delivery Link</label>
+        <a [href]="selectedDelivery.deliveryLink" target="_blank" class="delivery-link">
+          {{ selectedDelivery.deliveryLink }}<span class="link-ext">↗</span>
+        </a>
+      </div>
+      <div class="delivery-section" *ngIf="selectedDelivery?.deliveryMessage">
+        <label class="delivery-label">💬 Freelancer's Message</label>
+        <div class="delivery-message">{{ selectedDelivery.deliveryMessage }}</div>
+      </div>
+      <div class="delivery-empty" *ngIf="!selectedDelivery?.deliveryLink && !selectedDelivery?.deliveryMessage">
+        <span>🔎</span>
+        <p>No delivery link or message provided.</p>
+      </div>
+      <div class="revision-section" *ngIf="showRevisionInput">
+        <label class="delivery-label">✏️ Revision Request</label>
+        <textarea class="revision-textarea" [(ngModel)]="revisionMessage"
+          placeholder="Describe what needs to be changed or improved..." rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-revision-toggle" (click)="showRevisionInput = !showRevisionInput" *ngIf="!showRevisionInput">
+        📝 Request Revision
+      </button>
+      <button class="btn-send-revision" (click)="requestRevision()" *ngIf="showRevisionInput" [disabled]="!revisionMessage.trim()">
+        Send Revision Request
+      </button>
+      <button class="btn-cancel-revision" (click)="showRevisionInput = false; revisionMessage = ''" *ngIf="showRevisionInput">
+        Cancel
+      </button>
+      <button class="btn-confirm" (click)="openPaymentModal()" *ngIf="!showRevisionInput">
+        💳 Confirm &amp; Pay
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     PAYMENT MODAL
+═══════════════════════════════ -->
+<div class="pay-overlay" *ngIf="showPaymentModal" (click)="closePaymentModal()">
+  <div class="pay-modal" (click)="$event.stopPropagation()">
+
+    <!-- ── STEP: FORM ── -->
+    <ng-container *ngIf="paymentStep === 'form'">
+
+      <div class="pay-header">
+        <div class="pay-header-left">
+          <div class="pay-lock-icon">🔒</div>
+          <div>
+            <div class="pay-eyebrow">Paiement sécurisé</div>
+            <div class="pay-title">Payer le freelancer</div>
+          </div>
+        </div>
+        <button class="pay-close" (click)="closePaymentModal()">✕</button>
+      </div>
+
+      <!-- FLUX CLIENT → MATCHY → FREELANCER -->
+      <div class="pay-flow-strip">
+        <div class="pay-flow-node">
+          <div class="pay-flow-avatar pay-flow-client">👤</div>
+          <div class="pay-flow-name">Vous</div>
+          <div class="pay-flow-role">Client</div>
+        </div>
+        <div class="pay-flow-arrow">
+          <div class="pay-flow-line"></div>
+          <div class="pay-flow-tag">paiement</div>
+        </div>
+        <div class="pay-flow-node">
+          <div class="pay-flow-avatar pay-flow-platform">🔒</div>
+          <div class="pay-flow-name">Matchy</div>
+          <div class="pay-flow-role">Escrow</div>
+        </div>
+        <div class="pay-flow-arrow">
+          <div class="pay-flow-line pay-flow-line-green"></div>
+          <div class="pay-flow-tag">libération</div>
+        </div>
+        <div class="pay-flow-node">
+          <div class="pay-flow-avatar pay-flow-freelancer">🧑‍💻</div>
+          <div class="pay-flow-name">Freelancer</div>
+          <div class="pay-flow-role">Bénéficiaire</div>
+        </div>
+      </div>
+
+      <!-- ESCROW NOTE -->
+      <div class="pay-escrow-note">
+        <span>🛡️</span>
+        <p>Votre paiement est <strong>sécurisé par Matchy</strong>.
+          Les fonds sont libérés au freelancer uniquement après votre confirmation.</p>
+      </div>
+
+      <!-- AMOUNT BOX – 100% dynamique -->
+      <div class="pay-amount-box">
+        <div class="pay-amount-top">
+          <div>
+            <div class="pay-project-name">{{ selectedDelivery?.title }}</div>
+            <div class="pay-amount">
+              <span class="pay-currency">TND</span>
+              <span class="pay-value">{{ getTotalAmount() | number:'1.2-2' }}</span>
+            </div>
+          </div>
+          <div class="pay-freelancer-tag">🧑‍💻 Freelancer</div>
+        </div>
+        <div class="pay-breakdown">
+          <div class="pay-breakdown-row">
+            <span>Montant du projet</span>
+            <span>{{ getFreelancerAmount() | number:'1.2-2' }} TND</span>
+          </div>
+          <div class="pay-breakdown-row">
+            <span>Frais de service (5%)</span>
+            <span>{{ getServiceFee() | number:'1.2-2' }} TND</span>
+          </div>
+          <div class="pay-breakdown-row pay-breakdown-total">
+            <span>Total à payer</span>
+            <span>{{ getTotalAmount() | number:'1.2-2' }} TND</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Method selector -->
+      <div class="pay-methods">
+        <button class="pay-method" [class.active]="paymentMethod === 'card'" (click)="paymentMethod = 'card'">
+          <span class="pay-method-icon">💳</span><span>Carte</span>
+        </button>
+        <button class="pay-method" [class.active]="paymentMethod === 'flouci'" (click)="paymentMethod = 'flouci'">
+          <span class="pay-method-icon">📱</span><span>Flouci</span>
+        </button>
+        <button class="pay-method" [class.active]="paymentMethod === 'virement'" (click)="paymentMethod = 'virement'">
+          <span class="pay-method-icon">🏦</span><span>Virement</span>
+        </button>
+      </div>
+
+      <!-- Card form -->
+      <div class="pay-form" *ngIf="paymentMethod === 'card'">
+        <div class="pay-card-preview">
+          <div class="pay-card-chip">◼◼</div>
+          <div class="pay-card-number-display">{{ cardNumber || '•••• •••• •••• ••••' }}</div>
+          <div class="pay-card-bottom">
+            <div>
+              <div class="pay-card-label">Titulaire</div>
+              <div class="pay-card-val">{{ cardHolder || 'VOTRE NOM' }}</div>
+            </div>
+            <div>
+              <div class="pay-card-label">Expiration</div>
+              <div class="pay-card-val">{{ cardExpiry || 'MM/AA' }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="pay-field">
+          <label>Numéro de carte</label>
+          <input type="text" class="pay-input" [value]="cardNumber"
+            (input)="formatCardNumber($event)" placeholder="1234 5678 9012 3456" maxlength="19">
+        </div>
+        <div class="pay-field">
+          <label>Nom du titulaire</label>
+          <input type="text" class="pay-input" [(ngModel)]="cardHolder" placeholder="Mohamed Ali">
+        </div>
+        <div class="pay-row">
+          <div class="pay-field">
+            <label>Expiration</label>
+            <input type="text" class="pay-input" [value]="cardExpiry"
+              (input)="formatExpiry($event)" placeholder="MM/AA" maxlength="5">
+          </div>
+          <div class="pay-field">
+            <label>CVC</label>
+            <input type="text" class="pay-input" [(ngModel)]="cardCvc" placeholder="•••" maxlength="4">
+          </div>
+        </div>
+      </div>
+
+      <!-- Flouci -->
+      <div class="pay-info-box" *ngIf="paymentMethod === 'flouci'">
+        <span class="pay-info-icon">📱</span>
+        <div>
+          <div class="pay-info-title">Payer via Flouci</div>
+          <div class="pay-info-sub">
+            Vous serez redirigé vers Flouci pour payer
+            <strong>{{ getTotalAmount() | number:'1.2-2' }} TND</strong>.
+            Les fonds seront placés en escrow jusqu'à confirmation.
+          </div>
+        </div>
+      </div>
+
+      <!-- Virement -->
+      <div class="pay-info-box" *ngIf="paymentMethod === 'virement'">
+        <span class="pay-info-icon">🏦</span>
+        <div>
+          <div class="pay-info-title">Virement bancaire</div>
+          <div class="pay-info-sub">
+            RIB : <strong>20 800 0123456789 12</strong><br>
+            Bénéficiaire : <strong>Matchy Platform</strong><br>
+            Référence : <strong>PRJ-{{ selectedDelivery?.id }}</strong><br>
+            Montant : <strong>{{ getTotalAmount() | number:'1.2-2' }} TND</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="pay-error" *ngIf="paymentError">⚠️ {{ paymentError }}</div>
+
+      <button class="pay-btn-submit" (click)="processPayment()">
+        <span>🔒</span> Confirmer et payer {{ getTotalAmount() | number:'1.2-2' }} TND
+      </button>
+
+      <div class="pay-secure-note">
+        <span>🔍</span> Les fonds sont libérés au freelancer après confirmation
+      </div>
+
+    </ng-container>
+
+    <!-- ── STEP: PROCESSING ── -->
+    <ng-container *ngIf="paymentStep === 'processing'">
+      <div class="pay-processing">
+        <div class="pay-spinner-wrap">
+          <div class="pay-spinner-ring"></div>
+          <div class="pay-spinner-inner">💳</div>
+        </div>
+        <div class="pay-processing-title">Traitement en cours...</div>
+        <div class="pay-processing-sub">Sécurisation des fonds en escrow</div>
+        <div class="pay-processing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ── STEP: SUCCESS ── -->
+    <ng-container *ngIf="paymentStep === 'success'">
+      <div class="pay-success">
+        <div class="pay-success-icon-wrap">
+          <div class="pay-success-ring"></div>
+          <div class="pay-success-icon">✅</div>
+        </div>
+        <div class="pay-success-title">Paiement effectué !</div>
+        <div class="pay-success-sub">
+          <strong>{{ getTotalAmount() | number:'1.2-2' }} TND</strong> libérés pour<br>
+          <em>{{ selectedDelivery?.title }}</em>
+        </div>
+
+        <!-- Récapitulatif transfert -->
+        <div class="pay-transfer-recap">
+          <div class="pay-transfer-title">Récapitulatif du transfert</div>
+          <div class="pay-transfer-row">
+            <div class="pay-t-icon pay-t-client">👤</div>
+            <div class="pay-t-label">Vous (client)</div>
+            <div class="pay-t-amount pay-t-debit">− {{ getTotalAmount() | number:'1.2-2' }} TND</div>
+          </div>
+          <div class="pay-t-connector"></div>
+          <div class="pay-transfer-row">
+            <div class="pay-t-icon pay-t-platform">🔒</div>
+            <div class="pay-t-label">Matchy (frais 5%)</div>
+            <div class="pay-t-amount pay-t-fee">{{ getServiceFee() | number:'1.2-2' }} TND</div>
+          </div>
+          <div class="pay-t-connector"></div>
+          <div class="pay-transfer-row">
+            <div class="pay-t-icon pay-t-freelancer">🧑‍💻</div>
+            <div class="pay-t-label">Freelancer</div>
+            <div class="pay-t-amount pay-t-credit">+ {{ getFreelancerAmount() | number:'1.2-2' }} TND</div>
+          </div>
+        </div>
+
+        <div class="pay-success-badge">✔ Projet marqué comme Terminé</div>
+        <button class="pay-btn-done" (click)="finishPayment()">Fermer 🎉</button>
+      </div>
+    </ng-container>
+
+  </div>
+</div>
+

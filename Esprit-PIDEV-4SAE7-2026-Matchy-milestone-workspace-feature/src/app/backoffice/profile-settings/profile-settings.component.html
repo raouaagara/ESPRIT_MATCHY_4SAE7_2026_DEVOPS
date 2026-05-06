@@ -1,0 +1,78 @@
+<div class="bo-page">
+  <div class="bo-page-header">
+    <div><h1>Profile Settings</h1><p>Manage admin account and platform settings</p></div>
+    <button class="btn-primary" (click)="save()">Save Changes</button>
+  </div>
+
+  <div class="ps-grid">
+    <!-- Admin Profile Card -->
+    <div class="ps-card">
+      <h3>Admin Profile</h3>
+      <form [formGroup]="form">
+        <div class="ps-form-group">
+          <label>Full Name</label>
+          <input type="text" formControlName="name" class="ps-input" placeholder="Full Name">
+        </div>
+        <div class="ps-form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" class="ps-input" placeholder="Email">
+        </div>
+        <div class="ps-form-group">
+          <label>Phone</label>
+          <input type="text" formControlName="phone" class="ps-input" placeholder="Phone">
+        </div>
+        <div class="ps-form-group">
+          <label>Role</label>
+          <input type="text" formControlName="role" class="ps-input" [attr.readonly]="true">
+        </div>
+      </form>
+    </div>
+
+    <!-- Platform Settings Card -->
+    <div class="ps-card">
+      <h3>Platform Settings</h3>
+      <div class="ps-setting-row">
+        <div>
+          <strong>Maintenance Mode</strong>
+          <p>Temporarily disable public access</p>
+        </div>
+        <label class="ps-toggle">
+          <input type="checkbox" [(ngModel)]="settings.maintenance">
+          <span class="ps-slider"></span>
+        </label>
+      </div>
+      <div class="ps-setting-row">
+        <div>
+          <strong>User Registration</strong>
+          <p>Allow new users to sign up</p>
+        </div>
+        <label class="ps-toggle">
+          <input type="checkbox" [(ngModel)]="settings.registration">
+          <span class="ps-slider"></span>
+        </label>
+      </div>
+      <div class="ps-setting-row">
+        <div>
+          <strong>Email Notifications</strong>
+          <p>Send automated emails to users</p>
+        </div>
+        <label class="ps-toggle">
+          <input type="checkbox" [(ngModel)]="settings.emails">
+          <span class="ps-slider"></span>
+        </label>
+      </div>
+      <div class="ps-setting-row">
+        <div>
+          <strong>Manual Verification</strong>
+          <p>Manually verify freelancer profiles</p>
+        </div>
+        <label class="ps-toggle">
+          <input type="checkbox" [(ngModel)]="settings.verification">
+          <span class="ps-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="ps-success" *ngIf="saved">✅ Settings saved successfully!</div>
+</div>

@@ -1,0 +1,254 @@
+<div class="bo-page">
+    <div class="bo-tabs">
+        <button class="toggle-view" routerLink="/backoffice/subscription-management" routerLinkActive="active">📋 Subscription</button>
+        <button class="toggle-view" routerLink="/backoffice/subscription-plan" routerLinkActive="active">📦 Plan</button>
+        <button class="toggle-view" routerLink="/backoffice/subscription-pay" routerLinkActive="active">💰 Payment</button>
+    </div>
+
+    <div class="bo-page-header">
+        <div>
+            <h1>💰 Payments</h1>
+            <p>Track and manage all subscription payments</p>
+        </div>
+        <button class="btn-primary" (click)="openAddModal()">➕ Add Payment</button>
+    </div>
+
+    <div class="bo-toast" *ngIf="toastMessage" role="status">{{ toastMessage }}</div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="mini-stat">
+            <span class="ms-val revenue">{{ totalRevenue }} TND</span>
+            <span class="ms-label">Total Revenue</span>
+        </div>
+        <div class="mini-stat">
+            <span class="ms-val completed">{{ completedCount }}</span>
+            <span class="ms-label">Completed</span>
+        </div>
+        <div class="mini-stat">
+            <span class="ms-val pending">{{ pendingCount }}</span>
+            <span class="ms-label">Pending</span>
+        </div>
+        <div class="mini-stat">
+            <span class="ms-val failed">{{ failedCount }}</span>
+            <span class="ms-label">Failed</span>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bo-filters-bar">
+        <input type="text" placeholder="🔍 Search payments, users, transactions..." [(ngModel)]="searchTerm"
+            class="bo-filter-input">
+        <select [(ngModel)]="selectedStatus" class="bo-filter-select">
+            <option *ngFor="let s of statuses" [value]="s">{{ s === 'all' ? 'All Status' : (s | titlecase) }}</option>
+        </select>
+        <select [(ngModel)]="selectedMethod" class="bo-filter-select">
+            <option *ngFor="let m of methods" [value]="m">{{ m === 'all' ? 'All Methods' : (m | titlecase) }}</option>
+        </select>
+        <div class="bo-filter-spacer"></div>
+        <button class="btn-export">📄 Export CSV</button>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="bo-table-card">
+        <table class="bo-data-table">
+            <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>User</th>
+                    <th>Plan</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of filteredPayments" [class.row-failed]="p.status === 'failed'"
+                    [class.row-refunded]="p.status === 'refunded'">
+                    <td class="id-cell">{{ p.id }}</td>
+                    <td class="user-cell">
+                        <div class="avatar">{{ (p.user || '?')[0] }}</div>
+                        <div class="user-info">
+                            <span class="user-name">{{ p.user || '—' }}</span>
+                            <span class="user-email">{{ p.email || '—' }}</span>
+                        </div>
+                    </td>
+                    <td><span class="plan-badge" [class.pro]="p.plan === 'Pro'" [class.elite]="p.plan === 'Premium'">{{
+                            p.plan }}</span></td>
+                    <td class="amount-cell">{{ p.amount }} {{ p.currency }}</td>
+                    <td><span class="method-badge">{{ getMethodIcon(p.method) }} {{ p.method | titlecase }}</span></td>
+                    <td>{{ p.date ? (p.date | date:'MMM d, y') : '—' }}</td>
+                    <td><span class="badge" [class]="getStatusClass(p.status)">{{ p.status | titlecase }}</span></td>
+                    <td class="bo-actions-cell">
+                        <button type="button" class="btn-action approve" *ngIf="p.status === 'pending'"
+                            (click)="approve(p)" title="Approuver">✅</button>
+                        <button type="button" class="btn-action reject" *ngIf="p.status === 'pending'"
+                            (click)="openReject(p)" title="Rejeter">❌</button>
+                        <button type="button" class="btn-action view" (click)="viewDetail(p)" title="View Details">👁</button>
+                        <button type="button" class="btn-action edit" *ngIf="p.status === 'completed'" (click)="openRefund(p)"
+                            title="Refund">↩️</button>
+                    </td>
+                </tr>
+                <tr *ngIf="filteredPayments.length === 0">
+                    <td colspan="8" class="bo-empty-row">No payments found</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Payment Detail Modal -->
+<div class="modal-overlay" *ngIf="showDetail && selectedPayment" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>🧾 Payment Detail</h2>
+            <button class="modal-close" (click)="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Payment ID</span>
+                    <span class="detail-value id-val">{{ selectedPayment.id }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Transaction ID</span>
+                    <span class="detail-value id-val">{{ selectedPayment.transactionId }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">User</span>
+                    <span class="detail-value">{{ selectedPayment.user }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">{{ selectedPayment.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Plan</span>
+                    <span class="detail-value">{{ selectedPayment.plan }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value amount-val">{{ selectedPayment.amount }} {{ selectedPayment.currency
+                        }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Method</span>
+                    <span class="detail-value">{{ getMethodIcon(selectedPayment.method) }} {{ selectedPayment.method |
+                        titlecase }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Date</span>
+                    <span class="detail-value">{{ selectedPayment.date ? (selectedPayment.date | date:'MMMM d, y') : '—' }}</span>
+                </div>
+                <div class="detail-item full">
+                    <span class="detail-label">Status</span>
+                    <span class="badge" [class]="getStatusClass(selectedPayment.status)">{{ selectedPayment.status |
+                        titlecase }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeModal()">Close</button>
+            <button class="btn-refund" *ngIf="selectedPayment.status === 'completed'"
+                (click)="openRefund(selectedPayment)">↩️ Refund</button>
+        </div>
+    </div>
+</div>
+
+<!-- Refund Confirmation -->
+<div class="modal-overlay" *ngIf="showRefundModal && paymentToRefund" (click)="closeModal()">
+    <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header warn-header">
+            <h2>↩️ Confirm Refund</h2>
+            <button class="modal-close" (click)="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p class="refund-msg">
+                Refund <strong>{{ paymentToRefund.amount }} {{ paymentToRefund.currency }}</strong>
+                to <strong>{{ paymentToRefund.user }}</strong>?<br>
+                <span class="refund-sub">Payment {{ paymentToRefund.id }} • {{ paymentToRefund.plan }} plan</span>
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+            <button class="btn-refund" (click)="confirmRefund()">Confirm Refund</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reject modal -->
+<div class="modal-overlay" *ngIf="showRejectModal && paymentToReject" (click)="closeModal()">
+    <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header warn-header">
+            <h2>❌ Rejeter le paiement</h2>
+            <button type="button" class="modal-close" (click)="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p class="refund-msg">Paiement <strong>{{ paymentToReject.id }}</strong> — {{ paymentToReject.user }}</p>
+            <label class="reject-label">Motif (visible dans l’email utilisateur)</label>
+            <textarea class="reject-textarea" [(ngModel)]="rejectReason" rows="4"
+                placeholder="Ex. : justificatif manquant, montant incorrect…"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="closeModal()">Annuler</button>
+            <button type="button" class="btn-refund" (click)="confirmReject()">Confirmer le rejet</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>➕ Add Payment</h2>
+            <button class="modal-close" (click)="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <form (ngSubmit)="savePayment()" class="form-grid">
+                <div class="form-group full">
+                    <label>User Name</label>
+                    <input type="text" [(ngModel)]="newPayment.user" name="user" placeholder="e.g. Flen Ben Flen" required>
+                </div>
+                <div class="form-group full">
+                    <label>Email Address</label>
+                    <input type="email" [(ngModel)]="newPayment.email" name="email" placeholder="e.g. email@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Plan</label>
+                    <select [(ngModel)]="newPayment.plan" name="plan">
+                        <option value="Pro">Pro</option>
+                        <option value="Premium">Premium</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (TND)</label>
+                    <input type="number" [(ngModel)]="newPayment.amount" name="amount">
+                </div>
+                <div class="form-group">
+                    <label>Method</label>
+                    <select [(ngModel)]="newPayment.method" name="method">
+                        <option value="card">Card</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="bank_transfer">Virement</option>
+                        <option value="mobile">Mobile</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select [(ngModel)]="newPayment.status" name="status">
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+            <button class="btn-save" (click)="savePayment()">Save</button>
+        </div>
+    </div>
+</div>

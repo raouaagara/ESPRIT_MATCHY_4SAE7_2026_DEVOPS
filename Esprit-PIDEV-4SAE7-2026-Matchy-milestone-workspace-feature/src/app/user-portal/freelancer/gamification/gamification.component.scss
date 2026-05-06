@@ -1,0 +1,188 @@
+.gamification-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Level Card ── */
+.level-card {
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+
+  &.level-newcomer { background: linear-gradient(135deg, #e2e8f0, #cbd5e1); }
+  &.level-bronze   { background: linear-gradient(135deg, #cd7f32, #b8732d); color: white; }
+  &.level-silver   { background: linear-gradient(135deg, #94a3b8, #64748b); color: white; }
+  &.level-gold     { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+  &.level-diamond  { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
+}
+
+.level-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.level-icon { font-size: 48px; }
+
+.level-name {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.level-sub {
+  font-size: 14px;
+  opacity: 0.85;
+  margin: 2px 0 0;
+}
+
+.level-progress-wrap {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.level-progress-bar {
+  height: 10px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.level-progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 20px;
+  transition: width 0.8s ease;
+}
+
+.level-next {
+  font-size: 12px;
+  opacity: 0.85;
+  text-align: right;
+}
+
+/* ── Stats Row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+
+  .stat-icon  { font-size: 28px; }
+  .stat-value { font-size: 28px; font-weight: 800; color: #1e293b; }
+  .stat-label { font-size: 12px; color: #64748b; font-weight: 500; }
+}
+
+/* ── Section Card ── */
+.section-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 20px;
+}
+
+/* ── Badges ── */
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.badge-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: transform 0.2s;
+
+  &:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+}
+
+.badge-icon { font-size: 32px; flex-shrink: 0; }
+
+.badge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.badge-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+.badge-desc  { font-size: 12px; color: #64748b; }
+.badge-date  { font-size: 11px; color: #94a3b8; }
+
+.empty-badges, .empty-history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: #9ca3af;
+  font-size: 15px;
+
+  span { font-size: 40px; opacity: 0.4; }
+}
+
+/* ── History ── */
+.history-list { display: flex; flex-direction: column; gap: 8px; }
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #f8fafc;
+
+  .history-desc  { flex: 1; color: #374151; }
+  .history-date  { color: #9ca3af; font-size: 11px; }
+
+  &.positive .history-points { color: #10b981; font-weight: 700; }
+  &.negative .history-points { color: #ef4444; font-weight: 700; }
+}
+
+.loading-state {
+  display: flex; justify-content: center; padding: 60px;
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

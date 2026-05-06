@@ -1,0 +1,57 @@
+<div class="bo-history-page">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>📜 Activity History</h1>
+      <p>Complete timeline of all notifications and actions</p>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-container">
+    <div *ngIf="allNotifications.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h3>No history yet</h3>
+      <p>Your activity history will appear here</p>
+    </div>
+
+    <div *ngFor="let dateKey of getDateKeys()" class="timeline-section">
+      <div class="timeline-date">
+        <span class="date-label">{{ dateKey }}</span>
+      </div>
+
+      <div class="timeline-items">
+        <div 
+          *ngFor="let notification of groupedNotifications[dateKey]" 
+          class="timeline-item"
+          (click)="handleNotificationClick(notification)">
+          
+          <div class="timeline-marker">
+            <div class="marker-dot" [class]="notification.type"></div>
+            <div class="marker-line"></div>
+          </div>
+
+          <div class="timeline-content">
+            <div class="timeline-time">{{ getTimeOnly(notification.created_at) }}</div>
+            <div class="timeline-card">
+              <div class="card-icon">
+                <span *ngIf="notification.type === 'application_received'">📨</span>
+                <span *ngIf="notification.type === 'application_accepted'">✅</span>
+                <span *ngIf="notification.type === 'application_rejected'">❌</span>
+                <span *ngIf="notification.type === 'interview_scheduled'">📅</span>
+              </div>
+              <div class="card-content">
+                <div class="card-header">
+                  <h3>{{ notification.title }}</h3>
+                  <span class="card-badge" [class]="notification.type">
+                    {{ getTypeLabel(notification.type) }}
+                  </span>
+                </div>
+                <p>{{ notification.message }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<div class="stat-card" [style.border-top-color]="borderColor || iconBg">
+  <div class="stat-icon" [style.background]="iconBg + '20'" [style.color]="iconBg">
+    {{ icon }}
+  </div>
+  <div class="stat-body">
+    <div class="stat-value">{{ value }}<span class="stat-suffix" *ngIf="suffix">{{ suffix }}</span></div>
+    <div class="stat-label">{{ label }}</div>
+    <div class="stat-sublabel" *ngIf="subLabel">{{ subLabel }}</div>
+  </div>
+</div>

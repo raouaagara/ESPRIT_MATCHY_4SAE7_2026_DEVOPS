@@ -1,0 +1,80 @@
+<div class="bo-page">
+  <div class="bo-page-header">
+    <div>
+      <h1>Courses &amp; Resources</h1>
+      <p>Manage all educational content on the platform</p>
+    </div>
+    <button class="btn-primary">+ Add Course</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="mini-stat"><span class="ms-val">{{ courses.length }}</span><span class="ms-label">Total Courses</span></div>
+    <div class="mini-stat"><span class="ms-val">{{ getTotalStudents() }}</span><span class="ms-label">Total Students</span></div>
+    <div class="mini-stat"><span class="ms-val">{{ courses.length }}</span><span class="ms-label">Published</span></div>
+    <div class="mini-stat"><span class="ms-val">2</span><span class="ms-label">Free Courses</span></div>
+  </div>
+
+  <div class="bo-filters-bar filters-bar">
+    <input type="text" placeholder="🔍 Search courses..." [(ngModel)]="searchTerm" class="bo-filter-input filter-input">
+    <select [(ngModel)]="selectedCategory" class="bo-filter-select filter-select">
+      <option *ngFor="let cat of categories" [value]="cat">{{ cat | titlecase }}</option>
+    </select>
+    <div class="bo-filter-spacer filter-spacer"></div>
+    <button class="btn-export">📄 CSV</button>
+    <button class="btn-export">📊 Excel</button>
+  </div>
+
+  <div class="bo-table-card table-card">
+    <table class="bo-data-table data-table">
+      <thead>
+        <tr>
+          <th>Course</th>
+          <th>Category</th>
+          <th>Level</th>
+          <th>Author</th>
+          <th>Students</th>
+          <th>Lessons</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let course of filteredCourses">
+          <td class="course-title-cell">
+            <strong>{{ course.title }}</strong>
+            <small>{{ course.createdAt | date:'MMM d, y' }}</small>
+          </td>
+          <td><span class="category-tag">{{ course.category | titlecase }}</span></td>
+          <td>
+            <span class="badge" [ngClass]="{'badge-success': course.level==='beginner','badge-primary': course.level==='intermediate','badge-danger': course.level==='advanced'}">
+              {{ course.level | titlecase }}
+            </span>
+          </td>
+          <td>{{ course.author }}</td>
+          <td>👥 {{ course.students | number }}</td>
+          <td>📖 {{ course.lessons }}</td>
+          <td>
+            <span class="badge" [ngClass]="course.isFree ? 'badge-success' : 'badge-warning'">
+              {{ course.isFree ? 'Free' : 'Paid' }}
+            </span>
+          </td>
+          <td>
+            <button class="status-toggle" [class.published]="course.status==='published'"
+              (click)="toggleStatus(course)">
+              {{ course.status | titlecase }}
+            </button>
+          </td>
+          <td class="bo-actions-cell actions-cell">
+            <button class="btn-action view">👁</button>
+            <button class="btn-action edit">✏️</button>
+            <button class="btn-action delete">🗑</button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredCourses.length === 0">
+          <td colspan="9" class="bo-empty-row empty-row">No courses found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,170 @@
+.profile-page {
+  min-height: 100vh;
+  background: var(--fo-bg-primary);
+  padding: 100px 32px 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 40px; flex-wrap: wrap; gap: 16px;
+
+  .user-card {
+    display: flex; align-items: center; gap: 20px;
+    .avatar-large {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent-secondary));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 24px; font-weight: 700; font-family: var(--font-display);
+      border: 3px solid rgba(79,110,247,0.4);
+    }
+    .user-info {
+      h1 { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: white; }
+      p { color: var(--fo-text-secondary); font-size: 14px; margin: 4px 0; }
+      .role-badge {
+        display: inline-block; padding: 3px 10px; background: rgba(79,110,247,0.15);
+        border: 1px solid rgba(79,110,247,0.3); border-radius: 10px;
+        color: var(--primary-light); font-size: 12px; font-weight: 600;
+      }
+    }
+  }
+
+  .success-toast {
+    background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 10px; padding: 12px 20px; color: #86efac;
+    font-size: 14px; font-weight: 600; animation: fadeIn 0.3s ease;
+  }
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+.settings-layout {
+  display: grid; grid-template-columns: 220px 1fr; gap: 28px;
+}
+
+.tabs-nav {
+  display: flex; flex-direction: column; gap: 4px;
+  background: var(--fo-bg-card); border: 1px solid var(--fo-border);
+  border-radius: var(--radius-md); padding: 12px; height: fit-content;
+}
+
+.tab-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; border-radius: 8px; border: none;
+  background: transparent; color: var(--fo-text-secondary);
+  font-size: 14px; font-weight: 500; cursor: pointer; text-align: left;
+  transition: all 0.2s; font-family: var(--font-body);
+  .tab-icon { font-size: 16px; }
+  &.active { background: rgba(79,110,247,0.15); color: white; border: 1px solid rgba(79,110,247,0.25); }
+  &:not(.active):hover { background: rgba(255,255,255,0.05); color: var(--fo-text-primary); }
+}
+
+.tab-content {
+  background: var(--fo-bg-card); border: 1px solid var(--fo-border);
+  border-radius: var(--radius-md); padding: 32px;
+}
+
+.section-sub {
+  color: var(--fo-text-secondary);
+  font-size: 14px;
+  margin: -8px 0 20px;
+}
+
+.subsection-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin: 32px 0 16px;
+}
+
+.section-title {
+  font-family: var(--font-display); font-size: 22px; font-weight: 800;
+  color: white; margin-bottom: 28px; letter-spacing: -0.5px;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;
+  &.full { margin-bottom: 16px; }
+  label { font-size: 13px; font-weight: 600; color: var(--fo-text-secondary); }
+}
+
+.form-input {
+  padding: 11px 14px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--fo-border); border-radius: 8px;
+  color: white; font-size: 14px; font-family: var(--font-body); outline: none; transition: all 0.2s;
+  &::placeholder { color: var(--fo-text-muted); }
+  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,110,247,0.15); }
+}
+
+.form-textarea {
+  padding: 11px 14px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--fo-border); border-radius: 8px;
+  color: white; font-size: 14px; font-family: var(--font-body); outline: none;
+  resize: vertical; transition: border 0.2s;
+  &::placeholder { color: var(--fo-text-muted); }
+  &:focus { border-color: var(--primary); }
+}
+
+.btn-save {
+  margin-top: 8px; padding: 12px 28px;
+  background: var(--primary); color: white; border: none;
+  border-radius: 8px; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: var(--font-body); transition: all 0.2s;
+  &:hover:not(:disabled) { background: var(--primary-light); transform: translateY(-1px); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &.danger { background: var(--danger); &:hover:not(:disabled) { background: #dc2626; } }
+}
+
+/* Skills */
+.skills-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+.skill-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 14px; background: rgba(79,110,247,0.15); border: 1px solid rgba(79,110,247,0.3);
+  border-radius: 20px; color: var(--primary-light); font-size: 13px; font-weight: 600;
+  .skill-remove {
+    background: none; border: none; color: rgba(107,132,255,0.6); cursor: pointer;
+    font-size: 16px; line-height: 1; padding: 0; transition: color 0.2s;
+    &:hover { color: var(--danger); }
+  }
+}
+.add-skill { display: flex; gap: 10px; }
+.btn-add-skill {
+  padding: 11px 20px; background: var(--primary); color: white; border: none;
+  border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-body); white-space: nowrap; transition: all 0.2s;
+  &:hover { background: var(--primary-light); }
+}
+
+/* Notifications */
+.notif-section {
+  h3 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: white; margin-bottom: 16px; }
+}
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px 0; border-bottom: 1px solid var(--fo-border);
+  &:last-child { border-bottom: none; }
+  strong { display: block; font-size: 14px; color: white; margin-bottom: 4px; }
+  p { font-size: 13px; color: var(--fo-text-muted); }
+}
+
+.toggle {
+  position: relative; width: 44px; height: 24px; flex-shrink: 0;
+  input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 12px;
+    cursor: pointer; transition: 0.3s;
+    &::before {
+      content: ''; position: absolute; width: 18px; height: 18px;
+      background: white; border-radius: 50%; left: 3px; top: 3px; transition: 0.3s;
+    }
+  }
+  input:checked + .slider { background: var(--primary); }
+  input:checked + .slider::before { transform: translateX(20px); }
+}
+
+@media (max-width: 768px) {
+  .settings-layout { grid-template-columns: 1fr; }
+  .tabs-nav { flex-direction: row; flex-wrap: wrap; }
+  .form-row { grid-template-columns: 1fr; }
+}

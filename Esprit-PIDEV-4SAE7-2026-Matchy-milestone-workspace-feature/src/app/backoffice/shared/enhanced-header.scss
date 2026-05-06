@@ -1,0 +1,592 @@
+/* ============================================
+   ENHANCED PAGE HEADER
+   Modern, Elegant, SaaS Dashboard Style
+   ============================================ */
+
+/* ===== PAGE HEADER CONTAINER ===== */
+.bo-page-header-enhanced {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 24px 0;
+  animation: fadeInDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== LEFT SECTION (Tabs + Title) ===== */
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-width: 300px;
+}
+
+/* ===== TABS NAVIGATION ===== */
+.header-tabs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px;
+  background: var(--bo-bg-secondary);
+  border: 1.5px solid var(--bo-border);
+  border-radius: 10px;
+  width: fit-content;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: visible;
+  animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Animated background slider */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    height: calc(100% - 12px);
+    width: calc(50% - 12px);
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: 8px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+    box-shadow: 0 4px 12px rgba(79, 110, 247, 0.3);
+    animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+  }
+
+  /* Active tab indicator */
+  &.users-active::before {
+    left: 6px;
+  }
+
+  &.projects-active::before {
+    left: calc(50% + 6px);
+  }
+}
+
+.header-tab {
+  position: relative;
+  min-width: 140px;
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  color: var(--bo-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  z-index: 1;
+  white-space: nowrap;
+
+  /* Tab icon */
+  .tab-icon {
+    font-size: 18px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: bounceIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+  }
+
+  /* Stagger animation for each tab */
+  &:nth-child(1) {
+    animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+  }
+
+  &:nth-child(2) {
+    animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+  }
+
+  /* Hover state */
+  &:hover:not(.active) {
+    color: var(--bo-text-primary);
+    background: rgba(79, 110, 247, 0.08);
+    transform: translateY(-1px);
+
+    .tab-icon {
+      transform: scale(1.15) rotate(5deg);
+      animation: wiggle 0.5s ease-in-out;
+    }
+  }
+
+  /* Active state */
+  &.active {
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+    .tab-icon {
+      transform: scale(1.1);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+
+  /* Focus state */
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+
+  /* Active state (click) */
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: scale(1.15) rotate(5deg);
+  }
+  25% {
+    transform: scale(1.15) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(5deg);
+  }
+  75% {
+    transform: scale(1.15) rotate(-5deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* ===== TITLE SECTION ===== */
+.header-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--bo-text-primary);
+    letter-spacing: -0.8px;
+    line-height: 1.2;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Title icon */
+    .title-icon {
+      font-size: 28px;
+      animation: bounceIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+
+  p {
+    color: var(--bo-text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    /* Description icon */
+    .desc-icon {
+      font-size: 14px;
+    }
+  }
+}
+
+/* ===== RIGHT SECTION (Actions) ===== */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== FRONT OFFICE LINK ===== */
+.front-office-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(79, 110, 247, 0.3);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+
+  /* Arrow icon */
+  .link-arrow {
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    animation: slideArrow 1.5s ease-in-out infinite;
+  }
+
+  /* Shine effect */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  /* Hover state */
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(79, 110, 247, 0.4);
+
+    &::before {
+      left: 100%;
+    }
+
+    .link-arrow {
+      transform: translateX(4px) scale(1.2);
+      animation: bounceArrow 0.6s ease-in-out;
+    }
+  }
+
+  /* Active state */
+  &:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 4px 16px rgba(79, 110, 247, 0.3);
+  }
+
+  /* Focus state */
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 3px;
+  }
+}
+
+/* ===== ARROW ANIMATIONS ===== */
+@keyframes slideArrow {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes bounceArrow {
+  0%, 100% {
+    transform: translateX(4px) scale(1.1);
+  }
+  25% {
+    transform: translateX(8px) scale(1.15);
+  }
+  50% {
+    transform: translateX(2px) scale(1.05);
+  }
+  75% {
+    transform: translateX(6px) scale(1.12);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== BREADCRUMB (Optional) ===== */
+.header-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--bo-text-secondary);
+  margin-bottom: 12px;
+
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+
+    &:hover {
+      color: var(--primary);
+    }
+
+    &.active {
+      color: var(--bo-text-primary);
+      font-weight: 600;
+    }
+  }
+
+  .breadcrumb-separator {
+    opacity: 0.5;
+  }
+}
+
+/* ===== BADGE (Optional) ===== */
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(79, 110, 247, 0.1);
+  border: 1px solid rgba(79, 110, 247, 0.2);
+  border-radius: 20px;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+
+  .badge-icon {
+    font-size: 12px;
+  }
+}
+
+/* ===== DIVIDER ===== */
+.header-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--bo-border),
+    transparent
+  );
+  margin: 8px 0;
+  animation: expandWidth 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .bo-page-header-enhanced {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .header-left {
+    min-width: 100%;
+  }
+
+  .header-tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .header-tab {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .front-office-link {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .header-title-section h1 {
+    font-size: 24px;
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes expandWidth {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ===== LOADING STATE ===== */
+.bo-page-header-enhanced.loading {
+  opacity: 0.6;
+  pointer-events: none;
+
+  .header-tab,
+  .front-office-link {
+    cursor: not-allowed;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+.header-tab:focus-visible,
+.front-office-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .bo-page-header-enhanced,
+  .header-title-section h1,
+  .header-title-section p,
+  .header-right,
+  .header-badge {
+    animation: none;
+  }
+
+  .header-tab,
+  .front-office-link {
+    transition: none;
+  }
+}

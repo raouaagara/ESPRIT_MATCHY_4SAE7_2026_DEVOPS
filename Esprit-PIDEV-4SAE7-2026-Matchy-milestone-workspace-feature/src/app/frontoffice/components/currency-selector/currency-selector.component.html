@@ -1,0 +1,12 @@
+<div class="currency-pill" role="group" aria-label="Choisir la devise">
+  <button
+    type="button"
+    *ngFor="let o of options"
+    class="pill-btn"
+    [class.active]="isActive(o.code)"
+    (click)="select(o.code)"
+    [attr.aria-pressed]="isActive(o.code)">
+    <span class="flag" aria-hidden="true">{{ o.flag }}</span>
+    <span class="code">{{ o.label }}</span>
+  </button>
+</div>

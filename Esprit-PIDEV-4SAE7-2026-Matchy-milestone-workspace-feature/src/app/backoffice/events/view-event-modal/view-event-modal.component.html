@@ -1,0 +1,86 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-content">
+        <span class="header-icon">👁️</span>
+        <h2>Event Details</h2>
+      </div>
+      <button class="btn-close" (click)="close()">
+        <span class="close-icon">✕</span>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="event">
+      <div class="detail-group">
+        <div class="detail-label">
+          <span class="label-icon">📝</span>
+          Title
+        </div>
+        <div class="detail-value">{{ event.title }}</div>
+      </div>
+
+      <div class="detail-group">
+        <div class="detail-label">
+          <span class="label-icon">📄</span>
+          Description
+        </div>
+        <div class="detail-value">{{ event.description || 'No description provided' }}</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-group">
+          <div class="detail-label">
+            <span class="label-icon">🏷️</span>
+            Type
+          </div>
+          <div class="detail-value">
+            <span class="badge-enhanced badge-primary">{{ event.type }}</span>
+          </div>
+        </div>
+
+        <div class="detail-group">
+          <div class="detail-label">
+            <span class="label-icon">📅</span>
+            Date
+          </div>
+          <div class="detail-value">{{ formatDate(event.date) }}</div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-group">
+          <div class="detail-label">
+            <span class="label-icon">📍</span>
+            Location
+          </div>
+          <div class="detail-value">{{ event.location }}</div>
+        </div>
+
+        <div class="detail-group">
+          <div class="detail-label">
+            <span class="label-icon">👥</span>
+            Participants
+          </div>
+          <div class="detail-value">{{ event.attendees }} / {{ event.maxAttendees }}</div>
+        </div>
+      </div>
+
+      <div class="detail-group">
+        <div class="detail-label">
+          <span class="label-icon">✓</span>
+          Status
+        </div>
+        <div class="detail-value">
+          <span class="badge-enhanced badge-success">{{ event.status }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-primary" (click)="close()">
+        <span class="btn-icon">✓</span>
+        Close
+      </button>
+    </div>
+  </div>
+</div>

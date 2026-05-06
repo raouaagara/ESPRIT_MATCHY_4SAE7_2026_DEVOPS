@@ -1,0 +1,162 @@
+<div class="bo-page">
+    <div class="bo-tabs">
+        <button class="toggle-view" routerLink="/backoffice/subscription-management" routerLinkActive="active">📋 Subscription</button>
+        <button class="toggle-view" routerLink="/backoffice/subscription-plan" routerLinkActive="active">📦 Plan</button>
+        <button class="toggle-view" routerLink="/backoffice/subscription-pay" routerLinkActive="active">💰 Payment</button>
+    </div>
+
+    <div class="bo-page-header">
+        <div>
+            <h1>📋 Subscription Plans</h1>
+            <p>Manage your subscription plans, pricing, and features</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" (click)="openAdd()">➕ Add Plan</button>
+            <button class="btn-comparison-toggle" (click)="toggleComparison()">
+                📊 View Plan Comparison Details
+            </button>
+        </div>
+    </div>
+
+    <!-- Centered Billing Toggle -->
+    <div class="billing-toggle-container">
+        <div class="billing-toggle">
+            <button [class.active]="billingCycle === 'monthly'" (click)="toggleBilling('monthly')">Monthly</button>
+            <button [class.active]="billingCycle === 'yearly'" (click)="toggleBilling('yearly')">
+                Yearly <span class="discount-tag">-20%</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Plans Section -->
+    <div class="plans-section">
+
+        <div class="plans-grid">
+            <div class="plan-card" *ngFor="let plan of plans" [style.border-top-color]="plan.color">
+                <div class="plan-card-top">
+                    <div class="plan-icon" [style.background]="plan.color + '20'">{{ plan.icon }}</div>
+                    <div class="plan-actions-top">
+                        <button class="action-btn" (click)="openEdit(plan)" title="Edit">✏️</button>
+                        <button class="action-btn danger" (click)="confirmDelete(plan)" title="Delete">🗑️</button>
+                    </div>
+                </div>
+
+                <h3 class="plan-name" [style.color]="plan.color">{{ plan.name }}</h3>
+                <p class="plan-description">{{ plan.description }}</p>
+
+                <div class="plan-pricing">
+                    <span class="price-main" [style.color]="plan.color">
+                        {{ plan.price === 0 ? 'Free' : plan.price }}
+                    </span>
+                    <span class="price-detail" *ngIf="plan.price > 0">
+                        {{ plan.currency }}/{{ billingCycle === 'monthly' ? 'mo' : 'yr' }}
+                    </span>
+                </div>
+
+                <div class="plan-monthly-equiv" *ngIf="billingCycle === 'yearly' && plan.price > 0">
+                    ≈ {{ (plan.price / 12 | number:'1.0-0') }} {{ plan.currency }}/mo
+                </div>
+
+                <ul class="feature-list">
+                    <li *ngFor="let f of plan.features">
+                        <span class="check-icon" [style.color]="plan.color">✓</span> {{ f }}
+                    </li>
+                </ul>
+
+                <div class="plan-tags">
+                    <span class="tag tag-popular" *ngIf="plan.isPopular">⭐ Popular</span>
+                    <span class="tag tag-current" *ngIf="plan.isCurrent">✓ Current</span>
+                    <span class="tag tag-free" *ngIf="plan.price === 0">Free Tier</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>{{ isEditing ? '✏️ Edit Plan' : '➕ Create Plan' }}</h2>
+                <button class="modal-close" (click)="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Live Preview -->
+                <div class="preview-bar" [style.border-left-color]="form.color">
+                    <span class="preview-icon" [style.background]="form.color + '20'">{{ form.icon }}</span>
+                    <div>
+                        <strong [style.color]="form.color">{{ form.name || 'Plan Name' }}</strong>
+                        <span class="preview-price">{{ form.price === 0 ? 'Free' : form.price + ' ' + form.currency +
+                            '/mo'
+                            }}</span>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Plan Name</label>
+                        <input type="text" [(ngModel)]="form.name" placeholder="e.g. Starter, Pro...">
+                    </div>
+                    <div class="form-group">
+                        <label>Price ({{ form.currency }})</label>
+                        <input type="number" [(ngModel)]="form.price" min="0">
+                    </div>
+                    <div class="form-group full">
+                        <label>Description</label>
+                        <input type="text" [(ngModel)]="form.description" placeholder="Short plan description...">
+                    </div>
+                    <div class="form-group full">
+                        <label>Features <span class="hint">(one per line)</span></label>
+                        <textarea [(ngModel)]="form.features" rows="5"
+                            placeholder="Feature 1&#10;Feature 2&#10;Feature 3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Icon</label>
+                        <div class="picker">
+                            <button *ngFor="let i of icons" class="pick-btn" [class.active]="form.icon === i"
+                                (click)="form.icon = i">{{ i }}</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Color</label>
+                        <div class="picker">
+                            <button *ngFor="let c of colors" class="pick-btn color-btn"
+                                [class.active]="form.color === c" [style.background]="c"
+                                (click)="form.color = c"></button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="check-label">
+                            <input type="checkbox" [(ngModel)]="form.isPopular"> Mark as Popular
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+                <button class="btn-confirm" [style.background]="form.color" (click)="save()"
+                    [disabled]="!form.name.trim() || !form.description.trim()">
+                    {{ isEditing ? 'Save Changes' : 'Create Plan' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeModal()">
+        <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+            <div class="modal-header danger-header">
+                <h2>⚠️ Delete Plan</h2>
+                <button class="modal-close" (click)="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="delete-msg">Delete <strong [style.color]="planToDelete?.color">{{ planToDelete?.name
+                        }}</strong>
+                    plan? This cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+                <button class="btn-danger" (click)="deletePlan()">Delete Plan</button>
+            </div>
+        </div>
+    </div>

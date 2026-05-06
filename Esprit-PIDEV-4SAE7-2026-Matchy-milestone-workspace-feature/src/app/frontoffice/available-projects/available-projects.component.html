@@ -1,0 +1,99 @@
+<div class="projects-page">
+  <!-- Hero Section -->
+  <section class="projects-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Available <span class="text-gradient">Projects</span></h1>
+      <p class="hero-subtitle">Discover exciting opportunities from top companies in Tunisia</p>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <input
+        type="text"
+        placeholder="🔍 Search projects, companies..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        class="filter-input">
+
+      <select [(ngModel)]="selectedCategory" (change)="applyFilters()" class="filter-select">
+        <option value="all">All Categories</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+
+      <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
+        <option value="all">All Status</option>
+        <option value="open">Open</option>
+        <option value="in_progress">In Progress</option>
+        <option value="closed">Closed</option>
+      </select>
+
+      <div class="results-count">
+        {{ filteredProjects.length }} project{{ filteredProjects.length !== 1 ? 's' : '' }} found
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="projects-container">
+    <div class="projects-grid">
+      <div *ngIf="filteredProjects.length === 0" class="empty-state">
+        <span class="empty-icon">📋</span>
+        <h3>No projects found</h3>
+        <p>Try adjusting your filters or check back later for new opportunities</p>
+      </div>
+
+      <div *ngFor="let project of filteredProjects" class="project-card">
+        <div class="card-header">
+          <div class="company-info">
+            <div class="company-avatar">{{ project.companyName.charAt(0) }}</div>
+            <div>
+              <h3 class="company-name">{{ project.companyName }}</h3>
+              <span class="project-location" *ngIf="project.location">📍 {{ project.location }}</span>
+            </div>
+          </div>
+          <span class="status-badge" [class]="getStatusClass(project.status)">
+            {{ project.status === 'open' ? '🟢 Open' : project.status === 'in_progress' ? '🟡 In Progress' : '🔴 Closed' }}
+          </span>
+        </div>
+
+        <h2 class="project-title">{{ project.projectTitle }}</h2>
+        <p class="project-description">{{ project.description }}</p>
+
+        <div class="project-details">
+          <div class="detail-item">
+            <span class="detail-label">Category</span>
+            <span class="detail-value">{{ project.category }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Team Size</span>
+            <span class="detail-value">{{ project.numberOfPeopleDemanded }} people</span>
+          </div>
+          <div class="detail-item" *ngIf="project.budget">
+            <span class="detail-label">Budget</span>
+            <span class="detail-value">{{ project.budget }} {{ project.currency }}</span>
+          </div>
+          <div class="detail-item" *ngIf="project.deadline">
+            <span class="detail-label">Deadline</span>
+            <span class="detail-value">{{ project.deadline | date:'MMM d, y' }}</span>
+          </div>
+        </div>
+
+        <div class="skills-tags" *ngIf="project.skills && project.skills.length > 0">
+          <span *ngFor="let skill of project.skills" class="skill-tag">{{ skill }}</span>
+        </div>
+
+        <div class="card-footer">
+          <div class="project-stats">
+            <span class="stat-item">👁️ {{ project.clickCount }} views</span>
+            <span class="stat-item">📝 {{ project.applicationsCount }} applications</span>
+          </div>
+          <button class="btn-apply" [routerLink]="['/projects', project.id]">
+            View Details & Apply
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

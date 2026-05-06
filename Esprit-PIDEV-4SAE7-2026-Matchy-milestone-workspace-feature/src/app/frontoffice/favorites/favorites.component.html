@@ -1,0 +1,79 @@
+<app-fo-navbar></app-fo-navbar>
+
+<div class="favorites-container">
+  <!-- En-tête -->
+  <div class="favorites-header">
+    <button class="back-button" (click)="goBack()">
+      ← Back to Contents
+    </button>
+    
+    <div class="header-content">
+      <h1>⭐ My Favorite Contents</h1>
+      <p class="subtitle" *ngIf="!loading">
+        {{ favoriteContents.length }} content{{ favoriteContents.length !== 1 ? 's' : '' }} saved
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading your favorites...</p>
+  </div>
+
+  <!-- Liste vide -->
+  <div class="empty-state" *ngIf="!loading && favoriteContents.length === 0">
+    <div class="empty-icon">📭</div>
+    <h2>No favorites yet</h2>
+    <p>Start adding contents to your favorites to see them here!</p>
+    <button class="btn btn-primary" (click)="goBack()">
+      Explore Contents
+    </button>
+  </div>
+
+  <!-- Grille de contenus favoris -->
+  <div class="favorites-grid" *ngIf="!loading && favoriteContents.length > 0">
+    <div 
+      class="favorite-card" 
+      *ngFor="let content of favoriteContents"
+      (click)="viewContent(content.contentId!)">
+      
+      <!-- Badge Type -->
+      <div class="card-header">
+        <span class="content-badge" [ngClass]="getContentBadgeClass(content.type)">
+          {{ getContentIcon(content.type) }} {{ content.type }}
+        </span>
+        
+        <!-- Bouton Supprimer -->
+        <button 
+          class="btn-remove-favorite" 
+          (click)="removeFavorite(content, $event)"
+          [disabled]="removingFavoriteId === content.contentId"
+          title="Remove from favorites">
+          <span *ngIf="removingFavoriteId !== content.contentId">❌</span>
+          <span *ngIf="removingFavoriteId === content.contentId" class="spinner-small"></span>
+        </button>
+      </div>
+
+      <!-- Contenu -->
+      <div class="card-body">
+        <h3 class="card-title">{{ content.title }}</h3>
+        <p class="card-description">
+          {{ content.description.length > 120 
+             ? (content.description.substring(0, 120) + '...') 
+             : content.description }}
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer">
+        <span class="card-date">
+          📅 {{ content.createdAt | date: 'dd MMM yyyy' }}
+        </span>
+        <span class="view-link">View Details →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-fo-footer></app-fo-footer>

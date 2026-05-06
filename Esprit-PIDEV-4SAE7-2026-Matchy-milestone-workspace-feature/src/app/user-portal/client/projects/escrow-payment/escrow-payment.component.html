@@ -1,0 +1,262 @@
+<!-- src/app/client/projects/escrow-payment/escrow-payment.component.html -->
+
+<div class="escrow-page">
+
+  <!-- ── Loading ── -->
+  <div class="loading-state" *ngIf="loadingProject">
+    <div class="spinner"></div>
+    <span>Loading project…</span>
+  </div>
+
+  <!-- ── Fatal error ── -->
+  <div class="error-banner" *ngIf="!loadingProject && errorMessage && !project">
+    <span class="error-icon">⚠️</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- ── Main content ── -->
+  <ng-container *ngIf="!loadingProject && project && summary">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="logo">
+        <div class="logo-icon">🔗</div>
+        <span class="logo-name">Matchy</span>
+      </div>
+      <h1 class="page-title">Secure Escrow Payment</h1>
+      <p class="page-sub">Your payment is protected until delivery is confirmed</p>
+    </div>
+
+    <!-- Steps bar -->
+    <div class="steps-bar">
+      <div
+        class="step"
+        *ngFor="let s of steps; let i = index"
+        [ngClass]="getStepState(i)"
+      >
+        <div class="step-circle">
+          <span *ngIf="getStepState(i) === 'done'">✓</span>
+          <span *ngIf="getStepState(i) !== 'done'">{{ i + 1 }}</span>
+        </div>
+        <div class="step-label">{{ s.label }}</div>
+      </div>
+    </div>
+
+    <!-- Inline error (after load) -->
+    <div class="error-banner inline" *ngIf="errorMessage">
+      <span class="error-icon">⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Grid -->
+    <div class="main-grid">
+
+      <!-- ══ LEFT: Project details ══ -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon icon-purple">📋</div>
+          <div class="card-header-title">Project Details</div>
+        </div>
+        <div class="card-body">
+
+          <!-- Project banner -->
+          <div class="project-banner">
+            <div class="project-banner-title">{{ project.title }}</div>
+            <div class="project-banner-desc">{{ project.description }}</div>
+            <div class="project-meta">
+              <span class="meta-tag cat">{{ project.category }}</span>
+              <span class="meta-tag date">📅 {{ formatDate(project.createdAt) }}</span>
+              <span class="meta-tag id">#PRJ-{{ project.id }}</span>
+            </div>
+          </div>
+
+          <!-- Parties -->
+          <div class="parties-row">
+
+            <div class="party-card">
+              <div class="party-avatar client">
+                {{ getInitials(project.client.firstName, project.client.lastName) }}
+              </div>
+              <div class="party-role">Client</div>
+              <div class="party-name">
+                {{ project.client.firstName }} {{ project.client.lastName }}
+              </div>
+            </div>
+
+            <div class="arrow-icon">→</div>
+
+            <div class="party-card">
+              <ng-container *ngIf="project.freelancer; else noFreelancer">
+                <div class="party-avatar freelancer">
+                  {{ getInitials(project.freelancer!.firstName, project.freelancer!.lastName) }}
+                </div>
+                <div class="party-role">Freelancer</div>
+                <div class="party-name">
+                  {{ project.freelancer!.firstName }} {{ project.freelancer!.lastName }}
+                </div>
+              </ng-container>
+              <ng-template #noFreelancer>
+                <div class="party-avatar empty">?</div>
+                <div class="party-role">Freelancer</div>
+                <div class="party-name no-assign">Not assigned</div>
+              </ng-template>
+            </div>
+
+          </div>
+
+          <!-- Escrow explanation -->
+          <div class="escrow-explain">
+            <div class="escrow-explain-icon">🔒</div>
+            <div class="escrow-explain-text">
+              By confirming the payment, your budget will be
+              <strong>held in escrow</strong> by Matchy.
+              Funds will only be released to the freelancer after your
+              <strong>delivery confirmation</strong>.
+              In case of dispute, our team will arbitrate.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ RIGHT: Payment summary ══ -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon icon-green">💰</div>
+          <div class="card-header-title">Payment Summary</div>
+        </div>
+        <div class="card-body" style="position: relative;">
+
+          <!-- Processing overlay -->
+          <div class="processing-overlay" *ngIf="loadingPayment">
+            <div class="spinner-lg"></div>
+            <div class="processing-text">Processing payment…</div>
+          </div>
+
+          <!-- Amount -->
+          <div class="amount-display">
+            <div class="amount-label">Total amount to hold in escrow</div>
+            <div class="amount-value">
+              {{ summary.grossAmount | number:'1.0-2' }}
+              <span class="amount-devise">TND</span>
+            </div>
+          </div>
+
+          <!-- Breakdown -->
+          <div class="breakdown">
+            <div class="breakdown-row">
+              <span class="breakdown-label">
+                <span class="dot purple"></span>
+                Project budget
+              </span>
+              <span class="breakdown-value gross">
+                {{ summary.grossAmount | number:'1.0-2' }} TND
+              </span>
+            </div>
+
+            <div class="breakdown-row">
+              <span class="breakdown-label">
+                <span class="dot yellow"></span>
+                Matchy fee ({{ summary.commissionRate }}%)
+              </span>
+              <span class="breakdown-value comm">
+                − {{ summary.commission | number:'1.0-2' }} TND
+              </span>
+            </div>
+
+            <div class="breakdown-divider"></div>
+
+            <div class="breakdown-row">
+              <span class="breakdown-label bold">
+                <span class="dot green"></span>
+                Freelancer receives
+              </span>
+              <span class="breakdown-value net">
+                {{ summary.netAmount | number:'1.0-2' }} TND
+              </span>
+            </div>
+          </div>
+
+          <!-- Escrow lock badge -->
+          <div class="escrow-lock">
+            <div class="escrow-lock-icon">🔐</div>
+            <div class="escrow-lock-text">
+              <strong>Protected by Matchy Escrow</strong><br/>
+              Funds held until you confirm delivery
+            </div>
+          </div>
+
+          <!-- Payment methods -->
+          <div class="payment-methods">
+            <div
+              class="pay-method"
+              *ngFor="let m of paymentMethods"
+              [class.selected]="selectedMethod === m.key"
+              (click)="selectMethod(m.key)"
+            >
+              <div class="pay-method-radio">
+                <div class="radio-dot" *ngIf="selectedMethod === m.key"></div>
+              </div>
+              <div class="pay-method-icon">{{ m.icon }}</div>
+              <div class="pay-method-info">
+                <div class="pay-method-name">{{ m.name }}</div>
+                <div class="pay-method-desc">{{ m.desc }}</div>
+              </div>
+              <span class="pay-method-badge" *ngIf="m.badge">{{ m.badge }}</span>
+            </div>
+          </div>
+
+          <!-- Pay button -->
+          <button
+            class="btn-pay"
+            (click)="processPayment()"
+            [disabled]="loadingPayment || !project.freelancer"
+          >
+            <span class="btn-shimmer"></span>
+            🔒 Hold funds in escrow
+          </button>
+
+          <div class="secure-note">🛡️ 100% Secure — SSL Encrypted</div>
+
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- ══ Success Modal ══ -->
+  <div class="success-overlay" *ngIf="paymentSuccess">
+    <div class="success-modal">
+
+      <div class="success-check">✅</div>
+      <div class="success-title">Funds Held!</div>
+      <div class="success-sub">
+        Your payment of
+        <strong>{{ summary?.grossAmount | number:'1.0-2' }} TND</strong>
+        is now securely held in escrow.<br/>
+        The project can start. Confirm delivery to release the funds.
+      </div>
+
+      <div class="escrow-status-box">
+        <div class="escrow-status-title">🔄 Escrow Flow Activated</div>
+        <div class="escrow-flow">
+          <span class="ef-badge client-b">Client pays</span>
+          <span class="ef-arrow">→</span>
+          <span class="ef-badge escrow-b">🔒 Escrow</span>
+          <span class="ef-arrow">→</span>
+          <span class="ef-badge free-b">Freelancer</span>
+        </div>
+      </div>
+
+      <div class="tx-info" *ngIf="transactionId">
+        Transaction #{{ transactionId }}
+      </div>
+
+      <button class="btn-close-success" (click)="goToDashboard()">
+        ✓ Go to My Projects
+      </button>
+
+    </div>
+  </div>
+
+</div>
