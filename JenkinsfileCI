@@ -1,0 +1,78 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'   // adapte si ton Jenkins appelle "Maven"
+        jdk 'JDK17'     // adapte selon ton installation
+    }
+
+    environment {
+        SONARQUBE = 'sonarqube-server'
+        NEXUS_REPO = 'http://localhost:8082/repository/maven-releases/'
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'subscription-service',
+                url: 'https://github.com/raouaagara/ESPRIT_MATCHY_4SAE7_2026_DEVOPS.git'
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube-server') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Build Package') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Deploy to Nexus') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-cred',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+
+                    writeFile file: 'settings.xml', text: """
+<settings>
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>${USER}</username>
+      <password>${PASS}</password>
+    </server>
+  </servers>
+</settings>
+"""
+
+                    sh 'mvn -s settings.xml deploy -DskipTests'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'CI Pipeline SUCCESS ✔'
+        }
+
+        failure {
+            echo 'CI Pipeline FAILED ❌'
+        }
+    }
+}
