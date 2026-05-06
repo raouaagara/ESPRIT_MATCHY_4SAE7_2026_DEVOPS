@@ -1,15 +1,12 @@
 pipeline {
     agent any
 
-    environment {
-        NEXUS_DOCKER_URL = '192.168.80.137:8083'
-        NEXUS_CREDS      = 'nexus'
-        IMAGE_NAME       = 'content-service'
-        IMAGE_TAG        = "1.0.${BUILD_NUMBER}"
-    }
-
     triggers {
         pollSCM('H/2 * * * *')
+    }
+
+    environment {
+        SONAR_SERVER = 'sonar-server'
     }
 
     stages {
@@ -20,10 +17,18 @@ pipeline {
             }
         }
 
-        stage('Tests Unitaires') {
+        stage('Build & Test') {
             steps {
-                sh 'mvn test'
+                sh '''
+                    if [ -f "mvnw" ]; then
+                        chmod +x mvnw
+                        ./mvnw clean verify
+                    else
+                        mvn clean verify
+                    fi
+                '''
             }
+
             post {
                 always {
                     junit 'target/surefire-reports/*.xml', allowEmptyResults: true
@@ -31,47 +36,36 @@ pipeline {
             }
         }
 
-        stage('Build Maven') {
+        stage('SonarQube Analysis') {
             steps {
-                sh 'mvn clean package -DskipTests'
-            }
-        }
-
-        stage('Deploy JAR → Nexus') {
-            steps {
-                sh 'mvn deploy -DskipTests'
-            }
-        }
-
-        stage('Build Image Docker') {
-            steps {
-                sh "docker build -t ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG} ."
-            }
-        }
-
-        stage('Push Image → Nexus Docker Registry') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: "${NEXUS_CREDS}",
-                    usernameVariable: 'NEXUS_USER',
-                    passwordVariable: 'NEXUS_PASS'
-                )]) {
-                    sh """
-                        echo \$NEXUS_PASS | docker login ${NEXUS_DOCKER_URL} \
-                            -u \$NEXUS_USER --password-stdin
-                        docker push ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG}
-                    """
+                withSonarQubeEnv("${SONAR_SERVER}") {
+                    sh '''
+                        if [ -f "mvnw" ]; then
+                            ./mvnw sonar:sonar
+                        else
+                            mvn sonar:sonar
+                        fi
+                    '''
                 }
             }
         }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
     }
 
     post {
         success {
-            echo "✅ CI terminée — image ${IMAGE_NAME}:${IMAGE_TAG} pushée sur Nexus"
+            echo "✅ CI OK - code validé"
         }
         failure {
-            echo "❌ CI échouée — vérifie les logs"
+            echo "❌ CI FAILED - code rejeté"
         }
     }
 }
