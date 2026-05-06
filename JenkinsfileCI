@@ -11,12 +11,11 @@ pipeline {
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
 
         SONARQUBE = 'sonarqube-server'
+    }
 
-        NEXUS_DOCKER_URL = '192.168.183.128:8083'
-        NEXUS_CREDS = 'nexus'
-
-        IMAGE_NAME = 'content-service'
-        IMAGE_TAG = "1.0.${BUILD_NUMBER}"
+    triggers {
+        // soit webhook GitHub, soit polling
+        pollSCM('H/2 * * * *')
     }
 
     stages {
@@ -46,40 +45,26 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Package') {
             steps {
-                sh """
-                    docker build -t ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG} .
-                """
+                sh 'mvn package -DskipTests'
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Archive Artifact') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: "${NEXUS_CREDS}",
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
-
-                    sh """
-                        echo $PASS | docker login ${NEXUS_DOCKER_URL} \
-                        -u $USER --password-stdin
-
-                        docker push ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG}
-                    """
-                }
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
     }
 
     post {
         success {
-            echo "SUCCESS CI/CD ✔ ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "✅ CI SUCCESS — Build + Test + Sonar OK"
         }
 
         failure {
-            echo "FAILED PIPELINE ❌"
+            echo "❌ CI FAILED"
         }
     }
 }
