@@ -24,7 +24,7 @@ pipeline {
 
         stage('Tests Unitaires') {
             steps {
-                sh 'mvn test'
+                sh './mvnw test'
             }
             post {
                 always {
@@ -35,13 +35,13 @@ pipeline {
 
         stage('Build Maven') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh './mvnw clean package -DskipTests'
             }
         }
 
         stage('Deploy JAR → Nexus') {
             steps {
-                sh 'mvn deploy -DskipTests'
+                sh './mvnw deploy -DskipTests'
             }
         }
 
