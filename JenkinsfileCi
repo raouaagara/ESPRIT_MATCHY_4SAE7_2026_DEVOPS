@@ -74,7 +74,7 @@ pipeline {
             echo "✅ CI terminée — image pushée sur Nexus : ${NEXUS_DOCKER_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
         }
         failure {
-            echo "❌ CI échouée — vérifie les logs"
+            echo "❌ CI échouée — vérifie les logs  !!!  "
         }
     }
 }
