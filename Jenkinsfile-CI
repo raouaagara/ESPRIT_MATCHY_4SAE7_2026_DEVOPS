@@ -1,13 +1,13 @@
 pipeline {
     agent any
 
-    triggers {
-        pollSCM('H/2 * * * *')
+    tools {
+        maven 'M3'
+        jdk 'JDK17'
     }
 
     environment {
         SONAR_SERVER = 'sonar-server'
-        MAVEN_CMD = '/usr/share/maven/bin/mvn'
     }
 
     stages {
@@ -20,14 +20,7 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                sh '''
-                    if [ -f "mvnw" ]; then
-                        chmod +x mvnw
-                        ./mvnw clean verify
-                    else
-                        /usr/share/maven/bin/mvn clean verify
-                    fi
-                '''
+                sh 'mvn clean verify'
             }
 
             post {
@@ -40,13 +33,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONAR_SERVER}") {
-                    sh '''
-                        if [ -f "mvnw" ]; then
-                            ./mvnw sonar:sonar
-                        else
-                            /usr/share/maven/bin/mvn sonar:sonar
-                        fi
-                    '''
+                    sh 'mvn sonar:sonar'
                 }
             }
         }
@@ -62,10 +49,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ CI OK - code validé"
+            echo "✅ CI OK"
         }
         failure {
-            echo "❌ CI FAILED - code rejeté"
+            echo "❌ CI FAILED"
         }
     }
 }
