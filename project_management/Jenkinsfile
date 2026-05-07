@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm  // ✅ checkout automatique de la branche qui a déclenché le pipeline
+                checkout scm
             }
         }
         stage('Detect Changes') {
@@ -30,7 +30,12 @@ pipeline {
 
                     if (branch == 'user_project_management') {
                         echo "👤 Branche Raouaa"
-                        env.BUILD_BACKEND = changes.contains('src') || changes.contains('pom.xml') || changes.contains('Dockerfile') ? 'true' : 'false'
+                        env.BUILD_BACKEND = changes.contains('project_management/src') || changes.contains('project_management/pom.xml') || changes.contains('project_management/Dockerfile') ? 'true' : 'false'
+                        env.BUILD_FRONTEND = changes.contains('angular.json') || changes.contains('package.json') || changes.contains('src/app') ? 'true' : 'false'
+
+                    } else if (branch == 'main') {
+                        echo "🚀 Branche Main"
+                        env.BUILD_BACKEND = 'false'
                         env.BUILD_FRONTEND = changes.contains('angular.json') || changes.contains('package.json') || changes.contains('src/app') ? 'true' : 'false'
 
                     } else if (branch == 'content-service') {
@@ -48,16 +53,6 @@ pipeline {
                         env.BUILD_BACKEND = changes.contains('src') || changes.contains('pom.xml') ? 'true' : 'false'
                         env.BUILD_FRONTEND = 'false'
 
-                    } else if (branch == 'main') {
-                        echo "🚀 Branche Main"
-                        env.BUILD_BACKEND = 'false'
-                        env.BUILD_FRONTEND = changes.contains('angular.json') || changes.contains('package.json') || changes.contains('src/app') ? 'true' : 'false'
-
-                    } else if (branch == 'test-pipeline') {
-                        echo "🧪 Branche Test"
-                        env.BUILD_BACKEND = 'true'
-                        env.BUILD_FRONTEND = 'false'
-
                     } else {
                         echo "⛔ Branche inconnue - rien à builder"
                         env.BUILD_BACKEND = 'false'
@@ -73,32 +68,40 @@ pipeline {
         stage('Backend Build') {
             when { expression { env.BUILD_BACKEND == 'true' } }
             steps {
-                sh 'mvn clean package -DskipTests'
+                dir('project_management') {
+                    sh 'mvn clean package -DskipTests'
+                }
             }
         }
         stage('Backend Test') {
             when { expression { env.BUILD_BACKEND == 'true' } }
             steps {
-                sh 'mvn test -Dtest="MatchingServiceTest"'
+                dir('project_management') {
+                    sh 'mvn test -Dtest="MatchingServiceTest"'
+                }
             }
         }
         stage('SonarQube') {
             when { expression { env.BUILD_BACKEND == 'true' } }
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    sh """
-                        mvn sonar:sonar \
-                        -Dsonar.projectKey=matchy-service \
-                        -Dsonar.host.url=http://192.168.150.130:9000 \
-                        -Dsonar.login=${SONAR_TOKEN}
-                    """
+                dir('project_management') {
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                            mvn sonar:sonar \
+                            -Dsonar.projectKey=matchy-service \
+                            -Dsonar.host.url=http://192.168.150.130:9000 \
+                            -Dsonar.login=${SONAR_TOKEN}
+                        """
+                    }
                 }
             }
         }
         stage('Backend Docker Build') {
             when { expression { env.BUILD_BACKEND == 'true' } }
             steps {
-                sh 'docker build -t matchy-service:latest .'
+                dir('project_management') {
+                    sh 'docker build -t matchy-service:latest .'
+                }
             }
         }
         stage('Backend Nexus Push') {
@@ -160,7 +163,7 @@ pipeline {
                 expression { env.BUILD_BACKEND == 'true' || env.BUILD_FRONTEND == 'true' }
             }
             steps {
-                sh 'kubectl apply -f k8s/'
+                sh 'kubectl apply -f project_management/k8s/'
             }
         }
     }
