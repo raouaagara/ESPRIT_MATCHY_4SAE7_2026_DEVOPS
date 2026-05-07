@@ -15,6 +15,14 @@ pipeline {
             }
         }
 
+        stage('Debug') {
+            steps {
+                sh 'pwd'
+                sh 'ls -la'
+                sh 'ls -la target || true'
+            }
+        }
+
         stage('Build Jar') {
             steps {
                 sh 'mvn clean package -DskipTests'
@@ -48,11 +56,11 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                sh '''
+                sh """
                     docker stop $CONTAINER_NAME || true
                     docker rm $CONTAINER_NAME || true
                     docker run -d --name $CONTAINER_NAME -p 8082:8080 $IMAGE
-                '''
+                """
             }
         }
     }
