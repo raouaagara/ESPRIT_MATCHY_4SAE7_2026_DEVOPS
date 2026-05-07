@@ -4,9 +4,7 @@ pipeline {
     environment {
         APP_NAME = "subscription-service"
         VERSION = "1.0.0"
-
         NEXUS_URL = "http://nexus:8081/repository/maven-releases"
-        IMAGE_NAME = "subscription-service"
         DOCKER_IMAGE = "subscription-service:1.0.0"
     }
 
@@ -23,8 +21,8 @@ pipeline {
                     echo "📥 Downloading JAR from Nexus..."
 
                     curl --fail -u \$NEXUS_USER:\$NEXUS_PASS \
-                    -o app.jar \
-                    ${NEXUS_URL}/tn/esprit/${APP_NAME}/${VERSION}/${APP_NAME}-${VERSION}.jar
+                        -o app.jar \
+                        ${NEXUS_URL}/tn/esprit/${APP_NAME}/${VERSION}/${APP_NAME}-${VERSION}.jar
 
                     echo "✅ JAR size: \$(stat -c%s app.jar) bytes"
                     """
@@ -50,6 +48,7 @@ pipeline {
                 sh """
                 echo "🐳 Building Docker image..."
                 docker build -t ${DOCKER_IMAGE} .
+                echo "✅ Docker image built: ${DOCKER_IMAGE}"
                 """
             }
         }
@@ -61,13 +60,16 @@ pipeline {
                 docker stop ${APP_NAME} || true
                 docker rm ${APP_NAME} || true
 
-                docker run -d --name ${APP_NAME} \
-                -p 8085:8084 \
-                ${DOCKER_IMAGE}
+                docker run -d \
+                    --name ${APP_NAME} \
+                    --network devops-net \
+                    -p 8085:8084 \
+                    ${DOCKER_IMAGE}
 
                 echo "⏳ Waiting for container to start..."
                 sleep 5
-                docker ps | grep ${APP_NAME}
+
+                docker ps | grep ${APP_NAME} && echo "✅ Container is running" || echo "❌ Container failed to start"
                 """
             }
         }
@@ -75,10 +77,10 @@ pipeline {
         stage('Deploy to Kubernetes (kubeadm)') {
             steps {
                 sh """
-                echo "☸ Deploying to Kubernetes..."
+                echo "☸️ Deploying to Kubernetes..."
                 kubectl apply -f k8s/deployment.yaml
                 kubectl apply -f k8s/service.yaml
-                kubectl rollout status deployment/${APP_NAME}
+                kubectl rollout status deployment/${APP_NAME} --timeout=120s
                 """
             }
         }
@@ -90,6 +92,10 @@ pipeline {
         }
         failure {
             echo "❌ CD FAILED"
+        }
+        always {
+            echo " Cleaning up workspace..."
+            cleanWs()
         }
     }
 }
