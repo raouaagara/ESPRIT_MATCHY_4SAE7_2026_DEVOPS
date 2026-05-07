@@ -11,33 +11,30 @@ pipeline {
         DOCKER_IMAGE = "subscription-service:1.0.0"
     }
 
-    stages {
+    stage('Download JAR from Nexus') {
+        steps {
 
-        stage('Download JAR from Nexus') {
-            steps {
+            withCredentials([usernamePassword(
+                credentialsId: 'nexus-cred',
+                usernameVariable: 'NEXUS_USER',
+                passwordVariable: 'NEXUS_PASS'
+            )]) {
 
-                withCredentials([usernamePassword(
-                    credentialsId: 'nexus-cred',
-                    usernameVariable: 'NEXUS_USER',
-                    passwordVariable: 'NEXUS_PASS'
-                )]) {
+                sh """
+                echo "Downloading JAR from Nexus..."
 
-                    sh '''
-                    echo "Downloading JAR from Nexus..."
+                curl --fail --location \
+                -u \$NEXUS_USER:\$NEXUS_PASS \
+                -o app.jar \
+                ${NEXUS_URL}/${GROUP_PATH}/${VERSION}/${APP_NAME}-${VERSION}.jar
 
-                    curl --fail --location \
-                        -u $NEXUS_USER:$NEXUS_PASS \
-                        -o app.jar \
-                        '"${NEXUS_URL}"'/'"${GROUP_PATH}"'/'"${VERSION}"'/'"${APP_NAME}"'-'"${VERSION}"'.jar
+                echo "JAR downloaded successfully"
 
-                    echo "JAR downloaded successfully"
-
-                    ls -lh app.jar
-                    '''
-                }
+                ls -lh app.jar
+                """
             }
         }
-
+    }
         stage('Check JAR') {
             steps {
 
