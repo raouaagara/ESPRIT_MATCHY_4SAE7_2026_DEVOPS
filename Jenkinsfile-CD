@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "content-service"
         IMAGE = "asmaibr/content-service:latest"
         CONTAINER_NAME = "content-service-container"
     }
@@ -15,6 +14,12 @@ pipeline {
             }
         }
 
+        stage('Build Maven + Test') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
         stage('Debug') {
             steps {
                 sh 'pwd'
@@ -23,15 +28,8 @@ pipeline {
             }
         }
 
-        stage('Build Jar') {
-            steps {
-                sh 'mvn clean package -DskipTests'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                sh 'docker --version'
                 sh 'docker build -t $IMAGE .'
             }
         }
@@ -56,21 +54,22 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                sh """
+                sh '''
                     docker stop $CONTAINER_NAME || true
                     docker rm $CONTAINER_NAME || true
                     docker run -d --name $CONTAINER_NAME -p 8082:8080 $IMAGE
-                """
+                '''
             }
         }
+
     }
 
     post {
         success {
-            echo '✅ CD SUCCESS'
+            echo "✅ CD SUCCESS - Image deployed"
         }
         failure {
-            echo '❌ CD FAILED'
+            echo "❌ CD FAILED"
         }
     }
 }
