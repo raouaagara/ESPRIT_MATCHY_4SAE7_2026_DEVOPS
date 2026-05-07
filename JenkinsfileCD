@@ -1,0 +1,81 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = "subscription-service"
+        VERSION = "1.0.0"
+
+        NEXUS_URL = "http://nexus:8081/repository/maven-releases"
+        IMAGE_NAME = "subscription-service"
+        DOCKER_IMAGE = "subscription-service:1.0.0"
+    }
+
+    stages {
+
+        stage('Download JAR from Nexus') {
+            steps {
+                sh """
+                echo "📥 Downloading JAR from Nexus..."
+
+                curl -u admin:admin \
+                -o app.jar \
+                ${NEXUS_URL}/tn/esprit/${APP_NAME}/${VERSION}/${APP_NAME}-${VERSION}.jar
+                """
+            }
+        }
+
+        stage('Check JAR') {
+            steps {
+                sh "ls -lh app.jar"
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh """
+                echo "🐳 Building Docker image..."
+
+                docker build -t ${DOCKER_IMAGE} .
+                """
+            }
+        }
+
+        stage('Run Docker Container (test)') {
+            steps {
+                sh """
+                echo "🚀 Running container locally..."
+
+                docker stop ${APP_NAME} || true
+                docker rm ${APP_NAME} || true
+
+                docker run -d --name ${APP_NAME} \
+                -p 8085:8084 \
+                ${DOCKER_IMAGE}
+                """
+            }
+        }
+
+        stage('Deploy to Kubernetes (kubeadm)') {
+            steps {
+                sh """
+                echo "☸ Deploying to Kubernetes..."
+
+                kubectl apply -f k8s/deployment.yaml
+                kubectl apply -f k8s/service.yaml
+
+                kubectl rollout status deployment/${APP_NAME}
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ CD SUCCESS: Docker + Kubernetes deployed successfully"
+        }
+
+        failure {
+            echo "❌ CD FAILED"
+        }
+    }
+}
