@@ -15,7 +15,7 @@ pipeline {
         stage('Download JAR from Nexus') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'nexus-credentials',
+                    credentialsId: 'nexus-cred',
                     usernameVariable: 'NEXUS_USER',
                     passwordVariable: 'NEXUS_PASS'
                 )]) {
