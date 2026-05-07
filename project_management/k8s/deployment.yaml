@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matchy-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: matchy-service
+  template:
+    metadata:
+      labels:
+        app: matchy-service
+    spec:
+      containers:
+      - name: matchy-service
+        image: raouaaa/matchy-profile-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://mysql-db:3306/matchy_db
+        - name: SPRING_DATASOURCE_USERNAME
+          value: root
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: root
