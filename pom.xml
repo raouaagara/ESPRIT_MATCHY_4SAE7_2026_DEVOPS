@@ -13,7 +13,7 @@
 
     <groupId>tn.esprit</groupId>
     <artifactId>subscription-service</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>subscription-service</name>
     <description>Matchy Subscription Microservice</description>
 
