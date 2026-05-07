@@ -52,10 +52,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Building Docker image..."
-
                 docker build -t $DOCKER_IMAGE .
-
-                echo "Docker image built"
                 '''
             }
         }
@@ -68,13 +65,12 @@ pipeline {
                 docker rm -f $APP_NAME || true
 
                 docker run -d \
-                  --name $APP_NAME \
-                  --network devops-net \
-                  -p 8085:8084 \
-                  $DOCKER_IMAGE
+                    --name $APP_NAME \
+                    --network devops-net \
+                    -p 8085:8084 \
+                    $DOCKER_IMAGE
 
                 sleep 10
-
                 docker ps | grep $APP_NAME
                 '''
             }
@@ -83,31 +79,24 @@ pipeline {
         stage('Deploy Kubernetes') {
             steps {
                 sh '''
-                echo "Checking kubectl..."
-
-                if ! command -v kubectl >/dev/null 2>&1; then
-                    echo "Installing kubectl..."
-                    curl -LO https://dl.k8s.io/release/v1.29.0/bin/linux/amd64/kubectl
-                    chmod +x kubectl
-                    mv kubectl /usr/local/bin/
-                fi
+                echo "Deploying to Kubernetes..."
 
                 kubectl apply -f k8s/deployment.yaml
                 kubectl apply -f k8s/service.yaml
+
+                kubectl rollout status deployment/$APP_NAME --timeout=120s
                 '''
             }
         }
+    }
 
     post {
-
         success {
-            echo 'CD SUCCESS'
+            echo "CD SUCCESS"
         }
-
         failure {
-            echo ' xxCD FAILED'
+            echo "CD FAILED"
         }
-
         always {
             cleanWs()
         }
