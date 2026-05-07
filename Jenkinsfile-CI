@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         SONAR_SERVER = 'sonar-server'
+        MAVEN_CMD = '/usr/share/maven/bin/mvn'
     }
 
     stages {
@@ -24,16 +25,16 @@ pipeline {
                         chmod +x mvnw
                         ./mvnw clean verify
                     else
-                        mvn clean verify
+                        /usr/share/maven/bin/mvn clean verify
                     fi
                 '''
             }
 
-           post {
-               always {
-                   junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
-               }
-           }
+            post {
+                always {
+                    junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
+                }
+            }
         }
 
         stage('SonarQube Analysis') {
@@ -43,7 +44,7 @@ pipeline {
                         if [ -f "mvnw" ]; then
                             ./mvnw sonar:sonar
                         else
-                            mvn sonar:sonar
+                            /usr/share/maven/bin/mvn sonar:sonar
                         fi
                     '''
                 }
@@ -57,7 +58,6 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {
