@@ -90,7 +90,7 @@ pipeline {
         }
 
         failure {
-            echo "❌ CI FAILED"
+            echo "❌ CI FAILED  :"
         }
 
         always {
