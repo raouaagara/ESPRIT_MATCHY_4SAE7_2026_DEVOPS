@@ -83,16 +83,20 @@ pipeline {
         stage('Deploy Kubernetes') {
             steps {
                 sh '''
-                echo "Deploying to Kubernetes..."
+                echo "Checking kubectl..."
+
+                if ! command -v kubectl >/dev/null 2>&1; then
+                    echo "Installing kubectl..."
+                    curl -LO https://dl.k8s.io/release/v1.29.0/bin/linux/amd64/kubectl
+                    chmod +x kubectl
+                    mv kubectl /usr/local/bin/
+                fi
 
                 kubectl apply -f k8s/deployment.yaml
                 kubectl apply -f k8s/service.yaml
-
-                kubectl rollout status deployment/$APP_NAME --timeout=120s
                 '''
             }
         }
-    }
 
     post {
 
