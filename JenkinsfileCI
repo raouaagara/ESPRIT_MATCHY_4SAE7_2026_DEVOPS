@@ -12,11 +12,12 @@ pipeline {
 
         SONARQUBE = 'sonarqube-server'
 
-        NEXUS_REPO = 'http://nexus:8081/repository/maven-releases/'
+        // IMPORTANT : CI → SNAPSHOT repo
+        NEXUS_REPO = 'http://nexus:8081/repository/maven-snapshots/'
     }
 
     triggers {
-        pollSCM('H/2 * * * *')   // ou webhook GitHub si configuré
+        pollSCM('H/2 * * * *')
     }
 
     stages {
@@ -33,7 +34,8 @@ pipeline {
             }
             post {
                 always {
-                    junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+                    junit allowEmptyResults: true,
+                          testResults: 'target/surefire-reports/*.xml'
                 }
             }
         }
@@ -52,7 +54,7 @@ pipeline {
             }
         }
 
-        stage('Deploy JAR to Nexus') {
+        stage('Deploy to Nexus (Snapshots)') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'nexus-cred',
@@ -81,10 +83,18 @@ pipeline {
     post {
         success {
             echo "✅ CI SUCCESS : Build + Test + Sonar + Nexus OK"
+
+            echo "🚀 Triggering CD Pipeline..."
+
+            build job: 'CD-Pipeline', wait: false
         }
 
         failure {
-            echo "❌  FAILED"
+            echo "❌ CI FAILED"
+        }
+
+        always {
+            cleanWs()
         }
     }
 }
