@@ -1,13 +1,10 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'M3'
-        jdk 'JDK17'
-    }
-
     environment {
-        DOCKER_IMAGE = "TON_DOCKERHUB/content-service"
+        APP_NAME = "content-service"
+        IMAGE = "asmaibr/content-service:latest"
+        CONTAINER_NAME = "content-service-container"
     }
 
     stages {
@@ -26,35 +23,35 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE:latest .'
+                sh 'docker --version'
+                sh 'docker build -t $IMAGE .'
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Login DockerHub') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
+                    credentialsId: 'dockerhub-cred',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-
-                    sh 'docker push $DOCKER_IMAGE:latest'
                 }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh 'docker push $IMAGE'
             }
         }
 
         stage('Deploy Container') {
             steps {
                 sh '''
-                docker stop content-service || true
-                docker rm content-service || true
-
-                docker run -d \
-                  --name content-service \
-                  -p 8085:8085 \
-                  $DOCKER_IMAGE:latest
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
+                    docker run -d --name $CONTAINER_NAME -p 8082:8080 $IMAGE
                 '''
             }
         }
@@ -64,7 +61,6 @@ pipeline {
         success {
             echo '✅ CD SUCCESS'
         }
-
         failure {
             echo '❌ CD FAILED'
         }
