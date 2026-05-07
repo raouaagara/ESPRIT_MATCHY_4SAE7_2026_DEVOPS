@@ -71,20 +71,8 @@ pipeline {
                     $DOCKER_IMAGE
 
                 sleep 10
+
                 docker ps | grep $APP_NAME
-                '''
-            }
-        }
-
-        stage('Deploy Kubernetes') {
-            steps {
-                sh '''
-                echo "Deploying to Kubernetes..."
-
-                kubectl apply -f k8s/deployment.yaml
-                kubectl apply -f k8s/service.yaml
-
-                kubectl rollout status deployment/$APP_NAME --timeout=120s
                 '''
             }
         }
@@ -94,9 +82,11 @@ pipeline {
         success {
             echo "CD SUCCESS"
         }
+
         failure {
             echo "CD FAILED"
         }
+
         always {
             cleanWs()
         }
