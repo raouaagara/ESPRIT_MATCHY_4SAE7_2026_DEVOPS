@@ -28,14 +28,9 @@ pipeline {
                     echo "🌿 Branche : ${branch}"
                     echo "📝 Fichiers modifiés : ${changes}"
 
-                    if (branch == 'user_project_management') {
-                        echo "👤 Branche Raouaa"
+                    if (branch == 'user_project_management' || branch == 'main') {
+                        echo "👤 Branche ${branch}"
                         env.BUILD_BACKEND = changes.contains('project_management/src') || changes.contains('project_management/pom.xml') || changes.contains('project_management/Dockerfile') ? 'true' : 'false'
-                        env.BUILD_FRONTEND = changes.contains('angular.json') || changes.contains('package.json') || changes.contains('src/app') ? 'true' : 'false'
-
-                    } else if (branch == 'main') {
-                        echo "🚀 Branche Main"
-                        env.BUILD_BACKEND = 'false'
                         env.BUILD_FRONTEND = changes.contains('angular.json') || changes.contains('package.json') || changes.contains('src/app') ? 'true' : 'false'
 
                     } else if (branch == 'content-service') {
