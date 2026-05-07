@@ -14,17 +14,13 @@ pipeline {
 
         stage('Download JAR from Nexus') {
             steps {
-                sh '''
-                echo "📥 Downloading JAR from Nexus via Maven..."
+                sh """
+                echo "📥 Downloading JAR from Nexus..."
 
-                mvn dependency:get \
-                  -Dartifact=tn.esprit:subscription-service:1.0.0:jar \
-                  -DrepoUrl=http://nexus:8081/repository/maven-releases/
-
-                cp ~/.m2/repository/tn/esprit/subscription-service/1.0.0/subscription-service-1.0.0.jar app.jar
-
-                ls -lh app.jar
-                '''
+                curl -u admin:admin \
+                -o app.jar \
+                ${NEXUS_URL}/tn/esprit/${APP_NAME}/${VERSION}/${APP_NAME}-${VERSION}.jar
+                """
             }
         }
 
