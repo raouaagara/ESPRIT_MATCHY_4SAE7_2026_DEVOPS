@@ -14,19 +14,34 @@ pipeline {
 
         stage('Download JAR from Nexus') {
             steps {
-                sh """
-                echo "📥 Downloading JAR from Nexus..."
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-credentials',
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+                    sh """
+                    echo "📥 Downloading JAR from Nexus..."
 
-                curl -u admin:admin \
-                -o app.jar \
-                ${NEXUS_URL}/tn/esprit/${APP_NAME}/${VERSION}/${APP_NAME}-${VERSION}.jar
-                """
+                    curl --fail -u \$NEXUS_USER:\$NEXUS_PASS \
+                    -o app.jar \
+                    ${NEXUS_URL}/tn/esprit/${APP_NAME}/${VERSION}/${APP_NAME}-${VERSION}.jar
+
+                    echo "✅ JAR size: \$(stat -c%s app.jar) bytes"
+                    """
+                }
             }
         }
 
         stage('Check JAR') {
             steps {
-                sh "ls -lh app.jar"
+                sh """
+                ls -lh app.jar
+                if [ ! -s app.jar ]; then
+                    echo "❌ ERROR: app.jar is empty!"
+                    exit 1
+                fi
+                echo "✅ JAR is valid"
+                """
             }
         }
 
@@ -34,7 +49,6 @@ pipeline {
             steps {
                 sh """
                 echo "🐳 Building Docker image..."
-
                 docker build -t ${DOCKER_IMAGE} .
                 """
             }
@@ -44,13 +58,16 @@ pipeline {
             steps {
                 sh """
                 echo "🚀 Running container locally..."
-
                 docker stop ${APP_NAME} || true
                 docker rm ${APP_NAME} || true
 
                 docker run -d --name ${APP_NAME} \
                 -p 8085:8084 \
                 ${DOCKER_IMAGE}
+
+                echo "⏳ Waiting for container to start..."
+                sleep 5
+                docker ps | grep ${APP_NAME}
                 """
             }
         }
@@ -59,10 +76,8 @@ pipeline {
             steps {
                 sh """
                 echo "☸ Deploying to Kubernetes..."
-
                 kubectl apply -f k8s/deployment.yaml
                 kubectl apply -f k8s/service.yaml
-
                 kubectl rollout status deployment/${APP_NAME}
                 """
             }
@@ -73,7 +88,6 @@ pipeline {
         success {
             echo "✅ CD SUCCESS: Docker + Kubernetes deployed successfully"
         }
-
         failure {
             echo "❌ CD FAILED"
         }
